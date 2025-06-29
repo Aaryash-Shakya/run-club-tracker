@@ -1,0 +1,26 @@
+{
+	"name": "strava-club-activity-tracker",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": "https://github.com/Aaryash-Shakya/strava-club-activity-tracker.git",
+	"author": "Aaryash-Shakya <aaryashshakya.dev@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"dev": "nodemon",
+		"start": "ts-node app.ts"
+	},
+	"dependencies": {
+		"axios": "^1.10.0",
+		"dotenv": "^17.0.0",
+		"mongoose": "^8.16.1",
+		"node-cron": "^4.1.1"
+	},
+	"devDependencies": {
+		"@types/mongoose": "^5.11.97",
+		"@types/node": "^24.0.7",
+		"@types/node-cron": "^3.0.11",
+		"nodemon": "^3.1.10",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.3"
+	}
+}

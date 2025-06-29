@@ -1,0 +1,5 @@
+{
+	"ignore": ["logs/*", "src/api-docs/*"],
+	"exec": "ts-node ./app.ts",
+	"ext": "ts,js,json"
+}
