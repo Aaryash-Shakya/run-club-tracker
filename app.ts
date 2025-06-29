@@ -1,19 +1,17 @@
-import dotenv from "dotenv";
 import mongoose from "mongoose";
-
-dotenv.config();
+import { config } from "./config";
 
 async function connectDB() {
 	try {
 		console.log("🔄 Attempting to connect to MongoDB...");
-		console.log("📍 MongoDB URI:", process.env.MONGODB_URI ? "Found" : "Not found");
-		
+		console.log("📍 MongoDB URI:", config.MONGODB_URI ? "Found" : "Not found");
+
 		const options = {
 			serverSelectionTimeoutMS: 5000, // 5 second timeout
 			connectTimeoutMS: 10000, // 10 second timeout
 		};
-		
-		await mongoose.connect(process.env.MONGODB_URI!, options);
+
+		await mongoose.connect(config.MONGODB_URI, options);
 		console.log("✅ Connected to MongoDB");
 	} catch (err) {
 		console.error("❌ MongoDB connection error:", err);
@@ -24,7 +22,7 @@ async function connectDB() {
 async function main() {
 	console.log("🚀 Starting application...");
 	await connectDB();
-    console.log('✨ Application started successfully');
+	console.log("✨ Application started successfully");
 }
 
 main();

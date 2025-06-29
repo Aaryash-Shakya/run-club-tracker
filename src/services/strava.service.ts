@@ -1,8 +1,6 @@
 import axios from "axios";
-import dotenv from "dotenv";
 import TokenModel from "../models/token.model";
-
-dotenv.config();
+import { config } from "../../config";
 
 export async function getValidAccessToken(): Promise<string> {
 	let tokens = await TokenModel.findOne(); // Get the first (and should be only) token document
@@ -18,10 +16,10 @@ export async function getValidAccessToken(): Promise<string> {
 		console.log("🔄 Access token expired — refreshing...");
 
 		const res = await axios.post("https://www.strava.com/api/v3/oauth/token", {
-			client_id: process.env.STRAVA_CLIENT_ID,
-			client_secret: process.env.STRAVA_CLIENT_SECRET,
+			client_id: config.STRAVA_CLIENT_ID,
+			client_secret: config.STRAVA_CLIENT_SECRET,
 			grant_type: "refresh_token",
-			refresh_token: process.env.STRAVA_REFRESH_TOKEN,
+			refresh_token: config.STRAVA_REFRESH_TOKEN,
 		});
 
 		const responseData: {
