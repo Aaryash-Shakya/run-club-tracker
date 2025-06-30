@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
 import { CronJob } from "cron";
@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Routes
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
 	res.json({
 		message: "Strava Club Activity Tracker API",
 		status: "running",
@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 	});
 });
 
-app.get("/health", (req, res) => {
+app.get("/health", (req: Request, res: Response) => {
 	res.json({
 		status: "OK",
 		timestamp: new Date().toISOString(),
