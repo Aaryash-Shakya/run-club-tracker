@@ -9,7 +9,7 @@
 		"dev": "nodemon",
 		"start": "node dist/app.js",
 		"check-spelling": "cspell '**/*' --config ./cspell.json --no-progress --unique",
-		"clean": "rimraf ./dist",
+		"clean": "npx rimraf ./dist",
 		"build-ts": "tsc",
 		"build": "yarn clean && yarn install && yarn build-ts"
 	},
