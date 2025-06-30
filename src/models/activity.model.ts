@@ -3,13 +3,15 @@ import { Schema, model, Document, Types } from "mongoose";
 export interface IActivity extends Document {
 	name: string;
 	distance: number;
-	moving_time: number;
-	elapsed_time: number;
-	total_elevation_gain: number;
+	movingTime: number;
+	elapsedTime: number;
+	totalElevationGain: number;
 	type: string;
-	sport_type: string;
-	workout_type: number;
-	user_id: Types.ObjectId;
+	sportType: string;
+	workoutType: number;
+	activityDate: Date;
+	isValid: boolean;
+	userId: Types.ObjectId;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -18,13 +20,15 @@ const ActivitySchema = new Schema<IActivity>(
 	{
 		name: { type: String, required: true },
 		distance: { type: Number, required: true },
-		moving_time: { type: Number, required: true },
-		elapsed_time: { type: Number, required: true },
-		total_elevation_gain: { type: Number, required: true },
+		movingTime: { type: Number, required: true },
+		elapsedTime: { type: Number, required: true },
+		totalElevationGain: { type: Number, required: true },
 		type: { type: String, required: true },
-		sport_type: { type: String, required: true },
-		workout_type: { type: Number, required: true },
-		user_id: { type: Schema.Types.ObjectId, ref: "User", required: true },
+		sportType: { type: String, required: true },
+		workoutType: { type: Number, required: true },
+		activityDate: { type: Date, required: true },
+		isValid: { type: Boolean, default: true },
+		userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
 	},
 	{
 		timestamps: true,

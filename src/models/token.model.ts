@@ -1,19 +1,19 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface IToken extends Document {
-	access_token: string;
-	expires_at: number; // Unix timestamp
+	accessToken: string;
+	expiresAt: number; // Unix timestamp
 	createdAt: Date;
 	updatedAt: Date;
 }
 
 const tokenSchema = new Schema<IToken>(
 	{
-		access_token: {
+		accessToken: {
 			type: String,
 			required: true,
 		},
-		expires_at: {
+		expiresAt: {
 			type: Number,
 			required: true,
 		},
