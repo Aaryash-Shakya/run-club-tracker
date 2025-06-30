@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IToken extends Document {
 	accessToken: string;
-	expiresAt: number; // Unix timestamp
+	expiresAt: Date; // Unix timestamp
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -14,7 +14,7 @@ const tokenSchema = new Schema<IToken>(
 			required: true,
 		},
 		expiresAt: {
-			type: Number,
+			type: Date,
 			required: true,
 		},
 	},

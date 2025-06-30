@@ -19,12 +19,12 @@ export type StravaClubActivity = {
 	type: string;
 	sport_type: string;
 	workout_type: number;
-}
+};
 
 async function getLastActivityFromDB() {
 	try {
 		const lastActivity = await Activity.findOne()
-			.sort({ createdAt: -1 }) // Sort by activity date descending (most recent first)
+			.sort({ createdAt: -1, _id: -1 }) // Sort by activity date descending (most recent first), id is tie breaker
 			.exec();
 
 		return lastActivity;
@@ -70,8 +70,8 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 
 		console.log(`🆕 Found ${newActivities.length} new activities`);
 
-        // Return new activities in oldest-first order
-        return newActivities.reverse();
+		// Return new activities in oldest-first order
+		return newActivities.reverse();
 	} catch (error) {
 		console.error("❌ Error finding new activities:", error);
 		throw error;
@@ -122,7 +122,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			} else {
 				// Create new user if not found
 				console.log(`👤 Creating new user: ${userKey}`);
-				
+
 				const newUser = new User({
 					firstName: stravaActivity.athlete.firstname,
 					lastName: stravaActivity.athlete.lastname,
@@ -170,7 +170,6 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 }
 
 export default {
-	getLastActivityFromDB,
 	findNewActivities,
-    addNewActivitiesToDatabase,
+	addNewActivitiesToDatabase,
 };

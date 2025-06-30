@@ -3,19 +3,20 @@ import TokenModel from "../models/token.model";
 import { config } from "../../config";
 import { StravaClubActivity } from "./activity.service";
 
+type TokenResponse = {
+	token_type: string;
+	access_token: string;
+	expires_at: number; // Unix timestamp
+	expires_in: number; // seconds
+	refresh_token: string;
+};
+
 async function getValidAccessToken(): Promise<string> {
 	let tokens = await TokenModel.findOne(); // Get the first (and should be only) token document
 
 	if (!tokens) {
-		throw new Error("No tokens found in database. Please initialize with valid Strava tokens.");
-	}
-
-	// convert ms to seconds
-	const now = Math.floor(Date.now() / 1000);
-
-	if (tokens.expiresAt < now) {
-		console.log("🔄 Access token expired — refreshing...");
-
+		// No token found, call Strava API to generate a new token
+		console.log("🔄 No tokens found in database, requesting new token from Strava...");
 		const res = await axios.post("https://www.strava.com/api/v3/oauth/token", {
 			client_id: config.STRAVA_CLIENT_ID,
 			client_secret: config.STRAVA_CLIENT_SECRET,
@@ -23,16 +24,34 @@ async function getValidAccessToken(): Promise<string> {
 			refresh_token: config.STRAVA_REFRESH_TOKEN,
 		});
 
-		const responseData: {
-			token_type: string;
-			access_token: string;
-			expires_at: number; // Unix timestamp
-			expires_in: number; // seconds
-			refresh_token: string;
-		} = res.data;
+		const responseData: TokenResponse = res.data;
+
+		tokens = new TokenModel({
+			accessToken: responseData.access_token,
+			expiresAt: new Date(responseData.expires_at * 1000),
+			refreshToken: responseData.refresh_token,
+		});
+		await tokens.save();
+		console.log("✅ New token generated and saved to database.");
+	}
+
+	// convert ms to seconds
+	const now = Date.now();
+
+	if (tokens.expiresAt.getTime() < now) {
+		console.log("🔄 Access token expired — refreshing...");
+
+		const res = await axios.post("https://www.strava.com/api/v3/oauth/token", {
+			client_id: config.STRAVA_CLIENT_ID,
+			client_secret: config.STRAVA_CLIENT_SECRET,
+			grant_type: "refresh_token",
+			refresh_token: config.STRAVA_REFRESH_TOKEN,
+		});[]
+
+		const responseData: TokenResponse = res.data;
 
 		tokens.accessToken = responseData.access_token;
-		tokens.expiresAt = responseData.expires_at;
+		tokens.expiresAt = new Date(responseData.expires_at * 1000);
 
 		await tokens.save();
 

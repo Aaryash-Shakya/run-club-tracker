@@ -25,7 +25,7 @@ const ActivitySchema = new Schema<IActivity>(
 		totalElevationGain: { type: Number, required: true },
 		type: { type: String, required: true },
 		sportType: { type: String, required: true },
-		workoutType: { type: Number, required: true },
+		workoutType: { type: Number, required: false, default: -1 },
 		activityDate: { type: Date, required: true },
 		isValid: { type: Boolean, default: true },
 		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
