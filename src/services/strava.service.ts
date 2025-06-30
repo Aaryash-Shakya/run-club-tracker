@@ -1,6 +1,7 @@
 import axios from "axios";
 import TokenModel from "../models/token.model";
 import { config } from "../../config";
+import { StravaClubActivity } from "./activity.service";
 
 async function getValidAccessToken(): Promise<string> {
 	let tokens = await TokenModel.findOne(); // Get the first (and should be only) token document
@@ -41,4 +42,23 @@ async function getValidAccessToken(): Promise<string> {
 	return tokens.accessToken;
 }
 
-export default { getValidAccessToken };
+async function fetchClubActivitiesFromStrava(page: number = 1, perPage: number = 50): Promise<StravaClubActivity[]> {
+	const accessToken = await getValidAccessToken();
+
+	console.log(`🔄 Fetching club activities from Strava (page: ${page}, per_page: ${perPage})...`);
+
+	const response = await axios.get(`https://www.strava.com/api/v3/clubs/${config.STRAVA_CLUB_ID}/activities`, {
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+		},
+		params: {
+			page,
+			per_page: perPage,
+		},
+	});
+
+	console.log(`✅ Fetched ${response.data.length} activities from Strava`);
+	return response.data;
+}
+
+export default { getValidAccessToken, fetchClubActivitiesFromStrava };

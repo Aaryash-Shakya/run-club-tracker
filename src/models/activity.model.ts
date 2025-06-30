@@ -11,7 +11,7 @@ export interface IActivity extends Document {
 	workoutType: number;
 	activityDate: Date;
 	isValid: boolean;
-	userId: Types.ObjectId;
+	user: Types.ObjectId;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -28,7 +28,7 @@ const ActivitySchema = new Schema<IActivity>(
 		workoutType: { type: Number, required: true },
 		activityDate: { type: Date, required: true },
 		isValid: { type: Boolean, default: true },
-		userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 	},
 	{
 		timestamps: true,
