@@ -94,7 +94,19 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 		});
 
 		// 3. Loop over newActivities and format them for database
-		const activitiesToSave = [];
+		const activitiesToSave: {
+			name: string;
+			distance: number;
+			movingTime: number;
+			elapsedTime: number;
+			totalElevationGain: number;
+			type: string;
+			sportType: string;
+			workoutType: number;
+			activityDate: Date;
+			isValid: boolean;
+			user: string;
+		}[] = [];
 
 		for (const stravaActivity of newActivities) {
 			// Create the key to find the user
@@ -114,7 +126,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 					workoutType: stravaActivity.workout_type,
 					activityDate: new Date(),
 					isValid: true,
-					user: associatedUser._id, // Reference to user's _id
+					user: String(associatedUser._id), // Reference to user's _id as string
 				};
 
 				activitiesToSave.push(formattedActivity);
@@ -146,7 +158,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 					workoutType: stravaActivity.workout_type,
 					activityDate: new Date(),
 					isValid: true,
-					user: savedUser._id, // Reference to new user's _id
+					user: String(savedUser._id), // Reference to new user's _id as string
 				};
 
 				activitiesToSave.push(formattedActivity);
