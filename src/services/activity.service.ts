@@ -38,34 +38,55 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 	try {
 		console.log("🔍 Looking for new activities...");
 
-		// Get the last activity from our database
-		const lastActivity = await getLastActivityFromDB();
+		// Get the last few activities from our database (more robust than just one)
+		const recentActivities = await Activity.find()
+			.sort({ createdAt: -1, _id: -1 })
+			.limit(10) // Check against last 10 activities
+			.exec();
 
 		// Fetch activities from Strava
 		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava();
 
 		let newActivities: StravaClubActivity[] = [];
 
-		if (lastActivity) {
-			// Find the index of the last activity in the fetched Strava activities
-			const lastIndex = stravaActivities.findIndex(
-				(activity: any) =>
-					activity.name === lastActivity.name &&
-					activity.distance === lastActivity.distance &&
-					activity.moving_time === lastActivity.movingTime &&
-					activity.elapsed_time === lastActivity.elapsedTime
-			);
+		if (recentActivities.length > 0) {
+			// Find the earliest index where any of our recent activities match
+			let earliestMatchIndex = -1;
 
-			// All activities before (and not including) lastIndex are new
-			if (lastIndex > 0) {
-				newActivities = stravaActivities.slice(0, lastIndex);
-			} else if (lastIndex === -1) {
-				// If not found, assume all are new
-				newActivities = stravaActivities;
+			for (let i = 0; i < stravaActivities.length; i++) {
+				const stravaActivity = stravaActivities[i];
+
+				// Check if this Strava activity matches any of our recent activities
+				const matchFound = recentActivities.some(
+					dbActivity =>
+						stravaActivity.name === dbActivity.name &&
+						stravaActivity.distance === dbActivity.distance &&
+						stravaActivity.moving_time === dbActivity.movingTime &&
+						stravaActivity.elapsed_time === dbActivity.elapsedTime
+				);
+
+				if (matchFound) {
+					earliestMatchIndex = i;
+					break; // Found the first match, everything before this is new
+				}
 			}
+
+			// All activities before the earliest match are new
+			if (earliestMatchIndex > 0) {
+				newActivities = stravaActivities.slice(0, earliestMatchIndex);
+			} else if (earliestMatchIndex === -1) {
+				// No matches found - this could mean:
+				// 1. All activities are genuinely new, OR
+				// 2. Recent activities were deleted from Strava
+				// Be conservative: only take a reasonable number as "new"
+				console.warn("⚠️ No matching activities found. Taking conservative approach.");
+				newActivities = stravaActivities.slice(0, Math.min(5, stravaActivities.length));
+			}
+			// If earliestMatchIndex === 0, no new activities (first Strava activity matches our DB)
 		} else {
-			// If no last activity, all are new
-			newActivities = stravaActivities;
+			// If no activities in DB, take all (but limit for safety)
+			console.log("📝 No activities in database, taking first batch");
+			newActivities = stravaActivities.slice(0, Math.min(20, stravaActivities.length));
 		}
 
 		console.log(`🆕 Found ${newActivities.length} new activities`);
