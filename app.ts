@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { config } from "./config";
 import { CronJob } from "cron";
 import stravaController from "./src/controller/strava.controller";
+import activityRepository from "./src/repositories/activity.repository";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +26,24 @@ app.get("/health", (req: Request, res: Response) => {
 		timestamp: new Date().toISOString(),
 		database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
 	});
+});
+
+app.get("/activities", async (req: Request, res: Response) => {
+	try {
+		const activities = await activityRepository.listAllActivitiesInAMonth(new Date());
+		res.json({
+			status: "OK",
+			message: "Activities fetched successfully",
+			activities,
+		});
+	} catch (error) {
+		console.error("❌ Error fetching activities:", error);
+		res.status(500).json({
+			status: "error",
+			message: "Failed to fetch activities",
+			error: error instanceof Error ? error.message : "Unknown error",
+		});
+	}
 });
 
 async function connectDB() {

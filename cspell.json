@@ -5,6 +5,7 @@
         "envalid",
         "firstname",
         "lastname",
+        "luxon",
         "strava"
     ],
     "ignorePaths": [
