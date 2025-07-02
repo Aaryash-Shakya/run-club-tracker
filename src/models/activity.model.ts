@@ -6,11 +6,13 @@ export interface IActivity extends Document {
 	movingTime: number;
 	elapsedTime: number;
 	totalElevationGain: number;
+	movingPace: number;
 	type: string;
 	sportType: string;
 	workoutType: number;
 	activityDate: Date;
 	isValid: boolean;
+	note: string | null;
 	user: Types.ObjectId;
 	createdAt: Date;
 	updatedAt: Date;
@@ -19,15 +21,16 @@ export interface IActivity extends Document {
 const ActivitySchema = new Schema<IActivity>(
 	{
 		name: { type: String, required: true },
-		distance: { type: Number, required: true },
 		movingTime: { type: Number, required: true },
 		elapsedTime: { type: Number, required: true },
 		totalElevationGain: { type: Number, required: true },
+		movingPace: { type: Number, required: true },
 		type: { type: String, required: true },
 		sportType: { type: String, required: true },
 		workoutType: { type: Number, required: false, default: -1 },
 		activityDate: { type: Date, required: true },
 		isValid: { type: Boolean, default: true },
+		note: { type: String, required: false },
 		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 	},
 	{

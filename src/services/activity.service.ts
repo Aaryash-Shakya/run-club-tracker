@@ -2,6 +2,7 @@ import axios from "axios";
 import { Activity } from "../models/activity.model";
 import { User } from "../models/user.model";
 import stravaService from "./strava.service";
+import paceUtilities from "../utilities/pace.utilities";
 
 // Strava API response type for club activities
 export type StravaClubActivity = {
@@ -57,12 +58,13 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 				const stravaActivity = stravaActivities[i];
 
 				// Check if this Strava activity matches any of our recent activities
+				// don't use name as name can be changed by user
 				const matchFound = recentActivities.some(
 					dbActivity =>
-						stravaActivity.name === dbActivity.name &&
 						stravaActivity.distance === dbActivity.distance &&
 						stravaActivity.moving_time === dbActivity.movingTime &&
-						stravaActivity.elapsed_time === dbActivity.elapsedTime
+						stravaActivity.elapsed_time === dbActivity.elapsedTime &&
+						stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
 				);
 
 				if (matchFound) {
@@ -135,6 +137,26 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			const associatedUser = userMap[userKey];
 
 			if (associatedUser) {
+				let isValid: boolean = true;
+				let note: string | null = null;
+				const pace = paceUtilities.getPaceFromTimeAndDistance(
+					stravaActivity.moving_time,
+					stravaActivity.distance
+				);
+				const paceString = paceUtilities.formatPaceToString(pace);
+				
+				// Pace above 10 min/km is considered walking
+				if (pace > 10 && stravaActivity.distance < 3000) {
+					isValid = false;
+					note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum 3 km required for a valid walk.`;
+				}
+
+				// Pace 10 min/km or below is considered running
+				if (pace <= 10 && stravaActivity.distance < 1000) {
+					isValid = false;
+					note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 1 km required for a valid run.`;
+				}
+
 				// Format activity according to database schema
 				const formattedActivity = {
 					name: stravaActivity.name,
@@ -142,12 +164,14 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 					movingTime: stravaActivity.moving_time,
 					elapsedTime: stravaActivity.elapsed_time,
 					totalElevationGain: stravaActivity.total_elevation_gain,
+					movingPace: pace, // Calculate moving pace in min per km
 					type: stravaActivity.type,
 					sportType: stravaActivity.sport_type,
 					workoutType: stravaActivity.workout_type,
 					activityDate: new Date(),
-					isValid: true,
+					isValid: isValid,
 					user: String(associatedUser._id), // Reference to user's _id as string
+					note: note,
 				};
 
 				activitiesToSave.push(formattedActivity);
