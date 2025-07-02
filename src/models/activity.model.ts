@@ -21,6 +21,7 @@ export interface IActivity extends Document {
 const ActivitySchema = new Schema<IActivity>(
 	{
 		name: { type: String, required: true },
+		distance: { type: Number, required: true },
 		movingTime: { type: Number, required: true },
 		elapsedTime: { type: Number, required: true },
 		totalElevationGain: { type: Number, required: true },
@@ -30,7 +31,7 @@ const ActivitySchema = new Schema<IActivity>(
 		workoutType: { type: Number, required: false, default: -1 },
 		activityDate: { type: Date, required: true },
 		isValid: { type: Boolean, default: true },
-		note: { type: String, required: false },
+		note: { type: String, required: false, default: null },
 		user: { type: Schema.Types.ObjectId, ref: "User", required: true },
 	},
 	{
@@ -40,3 +41,4 @@ const ActivitySchema = new Schema<IActivity>(
 );
 
 export const Activity = model<IActivity>("Activity", ActivitySchema);
+

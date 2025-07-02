@@ -39,62 +39,47 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 	try {
 		console.log("🔍 Looking for new activities...");
 
-		// Get the last few activities from our database (more robust than just one)
-		const recentActivities = await Activity.find()
-			.sort({ createdAt: -1, _id: -1 })
-			.limit(10) // Check against last 10 activities
-			.exec();
+		// Fetch recent activities from Strava (last 30) - newest first
+		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava(1, 30);
 
-		// Fetch activities from Strava
-		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava();
+		// Fetch recent activities from DB (last 30 for better coverage) - newest first
+		const recentDbActivities = await Activity.find().sort({ createdAt: -1, _id: -1 }).limit(30).exec();
 
 		let newActivities: StravaClubActivity[] = [];
+		let matchCount = 0;
 
-		if (recentActivities.length > 0) {
-			// Find the earliest index where any of our recent activities match
-			let earliestMatchIndex = -1;
+		// Process Strava activities in order (newest first)
+		for (const stravaActivity of stravaActivities) {
+			const matchFound = recentDbActivities.some(
+				dbActivity =>
+					stravaActivity.distance === dbActivity.distance &&
+					stravaActivity.moving_time === dbActivity.movingTime &&
+					stravaActivity.elapsed_time === dbActivity.elapsedTime &&
+					stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
+			);
 
-			for (let i = 0; i < stravaActivities.length; i++) {
-				const stravaActivity = stravaActivities[i];
+			if (matchFound) {
+				// Record exists in DB - ignore it and increment match count
+				matchCount++;
+				console.log(`✅ Activity already exists in DB (match ${matchCount})`);
 
-				// Check if this Strava activity matches any of our recent activities
-				// don't use name as name can be changed by user
-				const matchFound = recentActivities.some(
-					dbActivity =>
-						stravaActivity.distance === dbActivity.distance &&
-						stravaActivity.moving_time === dbActivity.movingTime &&
-						stravaActivity.elapsed_time === dbActivity.elapsedTime &&
-						stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
-				);
-
-				if (matchFound) {
-					earliestMatchIndex = i;
-					break; // Found the first match, everything before this is new
+				// If we have enough consecutive matches, we can be confident older activities exist
+				if (matchCount >= 3) {
+					console.log(`🛑 Found ${matchCount} consecutive matches, stopping search`);
+					break;
 				}
-			}
+			} else {
+				// Record doesn't exist in DB - add to new activities
+				newActivities.push(stravaActivity);
+				console.log(`🆕 New activity found: "${stravaActivity.name}"`);
 
-			// All activities before the earliest match are new
-			if (earliestMatchIndex > 0) {
-				newActivities = stravaActivities.slice(0, earliestMatchIndex);
-			} else if (earliestMatchIndex === -1) {
-				// No matches found - this could mean:
-				// 1. All activities are genuinely new, OR
-				// 2. Recent activities were deleted from Strava
-				// Be conservative: only take a reasonable number as "new"
-				console.warn("⚠️ No matching activities found. Taking conservative approach.");
-				newActivities = stravaActivities.slice(0, Math.min(5, stravaActivities.length));
+				// Reset match count when we find a new activity
+				matchCount = 0;
 			}
-			// If earliestMatchIndex === 0, no new activities (first Strava activity matches our DB)
-		} else {
-			// If no activities in DB, take all (but limit for safety)
-			console.log("📝 No activities in database, taking first batch");
-			newActivities = stravaActivities.slice(0, Math.min(20, stravaActivities.length));
 		}
 
-		console.log(`🆕 Found ${newActivities.length} new activities`);
-
-		// Return new activities in oldest-first order
-		return newActivities.reverse();
+		console.log(`🆕 Found ${newActivities.length} new activities to save`);
+		return newActivities.reverse(); // Return oldest first for saving
 	} catch (error) {
 		console.error("❌ Error finding new activities:", error);
 		throw error;
@@ -123,11 +108,13 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			movingTime: number;
 			elapsedTime: number;
 			totalElevationGain: number;
+			movingPace: number;
 			type: string;
 			sportType: string;
 			workoutType: number;
 			activityDate: Date;
 			isValid: boolean;
+			note: string | null;
 			user: string;
 		}[] = [];
 
@@ -136,15 +123,11 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			const userKey = `${stravaActivity.athlete.firstname}_${stravaActivity.athlete.lastname}`;
 			const associatedUser = userMap[userKey];
 
+			let isValid: boolean = true;
+			let note: string | null = null;
+			const pace = paceUtilities.getPaceFromTimeAndDistance(stravaActivity.moving_time, stravaActivity.distance);
+			const paceString = paceUtilities.formatPaceToString(pace);
 			if (associatedUser) {
-				let isValid: boolean = true;
-				let note: string | null = null;
-				const pace = paceUtilities.getPaceFromTimeAndDistance(
-					stravaActivity.moving_time,
-					stravaActivity.distance
-				);
-				const paceString = paceUtilities.formatPaceToString(pace);
-				
 				// Pace above 10 min/km is considered walking
 				if (pace > 10 && stravaActivity.distance < 3000) {
 					isValid = false;
@@ -170,8 +153,8 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 					workoutType: stravaActivity.workout_type,
 					activityDate: new Date(),
 					isValid: isValid,
-					user: String(associatedUser._id), // Reference to user's _id as string
 					note: note,
+					user: String(associatedUser._id), // Reference to user's _id as string
 				};
 
 				activitiesToSave.push(formattedActivity);
@@ -198,11 +181,13 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 					movingTime: stravaActivity.moving_time,
 					elapsedTime: stravaActivity.elapsed_time,
 					totalElevationGain: stravaActivity.total_elevation_gain,
+					movingPace: pace,
 					type: stravaActivity.type,
 					sportType: stravaActivity.sport_type,
 					workoutType: stravaActivity.workout_type,
 					activityDate: new Date(),
-					isValid: true,
+					isValid: isValid,
+					note: note,
 					user: String(savedUser._id), // Reference to new user's _id as string
 				};
 
@@ -230,3 +215,4 @@ export default {
 	findNewActivities,
 	addNewActivitiesToDatabase,
 };
+
