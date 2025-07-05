@@ -1,15 +1,17 @@
-import express, { Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
 import { CronJob } from "cron";
 import stravaController from "./src/controller/strava.controller";
 import activityRepository from "./src/repositories/activity.repository";
+import slackService from "./src/services/slack.service";
 
-const app = express();
+const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
 app.get("/", (req: Request, res: Response) => {
@@ -41,6 +43,33 @@ app.get("/activities", async (req: Request, res: Response) => {
 		res.status(500).json({
 			status: "error",
 			message: "Failed to fetch activities",
+			error: error instanceof Error ? error.message : "Unknown error",
+		});
+	}
+});
+
+app.post("/send-message", async (req: Request, res: Response): Promise<void> => {
+	try {
+		const { channelName, message } = req.body as { channelName?: string; message?: string };
+		if (!channelName || !message) {
+			res.status(400).json({
+				status: "error",
+				message: "Channel name and message are required",
+			});
+			return;
+		}
+		console.log(`📬 Sending message to channel: ${channelName}`);
+		const result = await slackService.sendMessage(channelName, message);
+		res.json({
+			status: "OK",
+			message: "Message sent successfully",
+			result,
+		});
+	} catch (error) {
+		console.error("❌ Error sending message:", error);
+		res.status(500).json({
+			status: "error",
+			message: "Failed to send message",
 			error: error instanceof Error ? error.message : "Unknown error",
 		});
 	}
@@ -90,3 +119,4 @@ process.on("SIGINT", async () => {
 	await mongoose.disconnect();
 	process.exit(0);
 });
+

@@ -10,7 +10,7 @@ async function sendMessage(channelName: string, message: string) {
 		const result = await client.chat.postMessage({
 			channel: channelName,
 			text: message,
-			username: "StrideBot",
+			username: "Stride Bot",
 			icon_url: "https://imgur.com/a/kkdV1IM",
 			// or use icon_emoji instead:
 			// icon_emoji: ":running_shoe:",
