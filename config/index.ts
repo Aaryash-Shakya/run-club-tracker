@@ -11,4 +11,6 @@ export const config = cleanEnv(process.env, {
 	STRAVA_CLIENT_ID: num(),
 	STRAVA_CLIENT_SECRET: str(),
 	STRAVA_REFRESH_TOKEN: str(),
+	SLACK_BOT_TOKEN: str(),
 });
+
