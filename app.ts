@@ -3,13 +3,11 @@ import mongoose from "mongoose";
 import { config } from "./config";
 import { CronJob } from "cron";
 import stravaController from "./src/controller/strava.controller";
-import activityRepository from "./src/repositories/activity.repository";
-import slackService from "./src/services/slack.service";
-import { DateTime } from "luxon";
-import activityHelper from "./src/helpers/activity.helper";
+import activityController from "./src/controller/activity.controller";
+import slackController from "./src/controller/slack.controller";
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 
 // Middleware
 app.use(express.json({ limit: "5mb" }));
@@ -32,100 +30,11 @@ app.get("/health", (req: Request, res: Response) => {
 	});
 });
 
-app.get("/monthly-activities", async (req: Request, res: Response) => {
-	try {
-		const TIME_ZONE = "Asia/Kathmandu"; // Set your desired time zone
-		const date = new Date();
-		const nptDate = DateTime.fromJSDate(date).setZone(TIME_ZONE);
+app.get("/monthly-activities", activityController.fetchMonthlyActivities);
 
-		// Start of month in Nepali time:
-		const startOfMonthNPT = nptDate.startOf("month");
+app.get("/daily-activities", activityController.fetchDailyActivities);
 
-		// Start of next month in Nepali time:
-		const startOfNextMonthNPT = startOfMonthNPT.plus({ months: 1 });
-
-		// Convert to UTC JS Date for MongoDB:
-		const startOfMonthUTC = startOfMonthNPT.toUTC().toJSDate();
-		const startOfNextMonthUTC = startOfNextMonthNPT.toUTC().toJSDate();
-		const activities = await activityRepository.listAllActivitiesInRange(startOfMonthUTC, startOfNextMonthUTC);
-		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-
-		res.json({
-			status: "OK",
-			message: "Activities fetched successfully",
-			userGroupedActivities,
-		});
-	} catch (error) {
-		console.error("❌ Error fetching activities:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch activities",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
-	}
-});
-
-app.get("/daily-activities", async (req: Request, res: Response) => {
-	try {
-		const TIME_ZONE = "Asia/Kathmandu";
-		const date = new Date(); // today
-		const nptDate = DateTime.fromJSDate(date).setZone(TIME_ZONE);
-
-		// Start of day in Nepali time:
-		const startOfDayNPT = nptDate.startOf("day");
-
-		// Start of next day in Nepali time:
-		const startOfNextDayNPT = startOfDayNPT.plus({ days: 1 });
-
-		// Convert to UTC JS Date for MongoDB:
-		const startOfDayUTC = startOfDayNPT.toUTC().toJSDate();
-		const startOfNextDayUTC = startOfNextDayNPT.toUTC().toJSDate();
-
-		const activities = await activityRepository.listAllActivitiesInRange(startOfDayUTC, startOfNextDayUTC);
-		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-
-		res.json({
-			status: "OK",
-			message: "Activities for today fetched successfully",
-			activities,
-			userGroupedActivities,
-		});
-	} catch (error) {
-		console.error("❌ Error fetching daily activities:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch daily activities",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
-	}
-});
-
-app.post("/send-message", async (req: Request, res: Response): Promise<void> => {
-	try {
-		const { channelName, message } = req.body as { channelName?: string; message?: string };
-		if (!channelName || !message) {
-			res.status(400).json({
-				status: "error",
-				message: "Channel name and message are required",
-			});
-			return;
-		}
-		console.log(`📬 Sending message to channel: ${channelName}`);
-		const result = await slackService.sendMessage(channelName, message);
-		res.json({
-			status: "OK",
-			message: "Message sent successfully",
-			result,
-		});
-	} catch (error) {
-		console.error("❌ Error sending message:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to send message",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
-	}
-});
+app.post("/send-message", slackController.sendMessageToSlack);
 
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
@@ -155,7 +64,7 @@ async function main() {
 		"Asia/Kathmandu"
 	);
 
-	// await stravaController.fetchAndStoreActivities();
+	await stravaController.fetchAndStoreActivities();
 
 	console.log("✨ Cron scheduled, app ready.");
 }

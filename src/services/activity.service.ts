@@ -64,7 +64,7 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 				console.log(`✅ Activity already exists in DB (match ${matchCount})`);
 
 				// If we have enough consecutive matches, we can be confident older activities exist
-				if (matchCount >= 3) {
+				if (matchCount >= 10) {
 					console.log(`🛑 Found ${matchCount} consecutive matches, stopping search`);
 					break;
 				}
