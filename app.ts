@@ -1,10 +1,9 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
 import { CronJob } from "cron";
 import stravaController from "./src/controller/strava.controller";
-import activityController from "./src/controller/activity.controller";
-import slackController from "./src/controller/slack.controller";
+import router from "./src/routes/index.route"; // <-- import the router
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
@@ -14,29 +13,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
-app.get("/", (req: Request, res: Response) => {
-	res.json({
-		message: "Strava Club Activity Tracker API",
-		status: "running",
-		timestamp: new Date().toISOString(),
-	});
-});
-
-app.get("/health", (req: Request, res: Response) => {
-	res.json({
-		status: "OK",
-		timestamp: new Date().toISOString(),
-		database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-	});
-});
-
-app.get("/monthly-activities", activityController.fetchMonthlyActivities);
-
-app.get("/daily-activities", activityController.fetchDailyActivities);
-
-app.post("/send-message", slackController.sendMessageToSlack);
-
-app.post("/update-message", slackController.updateMessage);
+app.use("/api/", router); // <-- use the router
 
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
