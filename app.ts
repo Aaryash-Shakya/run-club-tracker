@@ -1,15 +1,17 @@
-import express, { Request, Response } from "express";
+import express, { Application, Request, Response } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
 import { CronJob } from "cron";
 import stravaController from "./src/controller/strava.controller";
-import activityRepository from "./src/repositories/activity.repository";
+import activityController from "./src/controller/activity.controller";
+import slackController from "./src/controller/slack.controller";
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+const app: Application = express();
+const PORT = process.env.PORT || 8000;
 
 // Middleware
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
 app.get("/", (req: Request, res: Response) => {
@@ -28,23 +30,13 @@ app.get("/health", (req: Request, res: Response) => {
 	});
 });
 
-app.get("/activities", async (req: Request, res: Response) => {
-	try {
-		const activities = await activityRepository.listAllActivitiesInAMonth(new Date());
-		res.json({
-			status: "OK",
-			message: "Activities fetched successfully",
-			activities,
-		});
-	} catch (error) {
-		console.error("❌ Error fetching activities:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch activities",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
-	}
-});
+app.get("/monthly-activities", activityController.fetchMonthlyActivities);
+
+app.get("/daily-activities", activityController.fetchDailyActivities);
+
+app.post("/send-message", slackController.sendMessageToSlack);
+
+app.post("/update-message", slackController.updateMessage);
 
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
@@ -64,7 +56,7 @@ async function main() {
 	});
 
 	new CronJob(
-		"0 */2 * * *",
+		"*/30 * * * *",
 		async () => {
 			console.log("⏰ Running scheduled fetchAndStoreActivities...");
 			await stravaController.fetchAndStoreActivities();
@@ -90,3 +82,4 @@ process.on("SIGINT", async () => {
 	await mongoose.disconnect();
 	process.exit(0);
 });
+
