@@ -36,6 +36,8 @@ app.get("/daily-activities", activityController.fetchDailyActivities);
 
 app.post("/send-message", slackController.sendMessageToSlack);
 
+app.post("/update-message", slackController.updateMessage);
+
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
 	await mongoose.connect(config.MONGODB_URI, {
@@ -54,7 +56,7 @@ async function main() {
 	});
 
 	new CronJob(
-		"0 */2 * * *",
+		"*/30 * * * *",
 		async () => {
 			console.log("⏰ Running scheduled fetchAndStoreActivities...");
 			await stravaController.fetchAndStoreActivities();

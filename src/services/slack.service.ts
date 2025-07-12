@@ -24,7 +24,24 @@ async function sendMessage(channelName: string, message: string) {
 	}
 }
 
+async function updateMessage(channelId: string, ts: string, message: string) {
+	try {
+		const result = await client.chat.update({
+			channel: channelId,
+			ts,
+			text: message,
+		});
+
+		console.log("Message updated successfully:", result.ts);
+		return result;
+	} catch (error) {
+		console.error("Error updating message in Slack:", error);
+		throw error;
+	}
+}
+
 export default {
 	sendMessage,
+	updateMessage,
 };
 
