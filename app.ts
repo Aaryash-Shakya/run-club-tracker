@@ -1,9 +1,8 @@
 import express, { Application } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
-import { CronJob } from "cron";
-import stravaController from "./src/controller/strava.controller";
-import router from "./src/routes/index.route"; // <-- import the router
+import { startStravaJob } from "./src/jobs/strava.job"; // <-- import the job
+import router from "./src/routes/index.route";
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
@@ -13,7 +12,7 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
-app.use("/api/", router); // <-- use the router
+app.use("/api/", router);
 
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
@@ -32,18 +31,7 @@ async function main() {
 		console.log(`🚀 Server running on port ${PORT}`);
 	});
 
-	new CronJob(
-		"*/30 * * * *",
-		async () => {
-			console.log("⏰ Running scheduled fetchAndStoreActivities...");
-			await stravaController.fetchAndStoreActivities();
-		},
-		null,
-		true,
-		"Asia/Kathmandu"
-	);
-
-	// await stravaController.fetchAndStoreActivities();
+	startStravaJob(); // <-- start the job here
 
 	console.log("✨ Cron scheduled, app ready.");
 }
