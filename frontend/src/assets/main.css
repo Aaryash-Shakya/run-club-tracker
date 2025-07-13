@@ -1,8 +1,8 @@
+@import 'tailwindcss';
+
 /* Custom base styles */
 @layer base {
-  body {
-    @apply bg-dark-bg text-dark-text-primary;
-  }
+  
 }
 
 /* Custom component styles */
