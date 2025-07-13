@@ -1,8 +1,9 @@
 import express, { Application } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
-import { startStravaJob } from "./src/jobs/strava.job"; // <-- import the job
+import { startStravaJob } from "./src/jobs/strava.job";
 import router from "./src/routes/index.route";
+import { errorHandler, notFoundHandler } from "./src/middleware/errorHandler";
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
@@ -13,6 +14,12 @@ app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
 app.use("/api/", router);
+
+// 404 handler (must be after all routes)
+app.use(notFoundHandler);
+
+// Global error handler (must be last)
+app.use(errorHandler);
 
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
@@ -25,21 +32,45 @@ async function connectDB() {
 
 async function main() {
 	console.log("🚀 Starting application...");
-	await connectDB();
 
-	app.listen(PORT, () => {
-		console.log(`🚀 Server running on port ${PORT}`);
-	});
+	try {
+		await connectDB();
 
-	startStravaJob(); // <-- start the job here
+		const server = app.listen(PORT, () => {
+			console.log(`🚀 Server running on port ${PORT}`);
+		});
 
-	console.log("✨ Cron scheduled, app ready.");
+		// Handle server errors
+		server.on("error", (error: Error) => {
+			console.error("❌ Server error:", error);
+			process.exit(1);
+		});
+
+		startStravaJob();
+		console.log("✨ Cron scheduled, app ready.");
+	} catch (error) {
+		console.error("❌ Failed to start application:", error);
+		process.exit(1);
+	}
 }
 
 main();
 
-process.on("unhandledRejection", (reason) => {
-	console.error("❌ Unhandled Rejection:", reason);
+// Enhanced error handlers
+process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) => {
+	console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+	process.exit(1);
+});
+
+process.on("uncaughtException", (error: Error) => {
+	console.error("❌ Uncaught Exception:", error);
+	process.exit(1);
+});
+
+process.on("SIGTERM", async () => {
+	console.log("👋 SIGTERM received, shutting down gracefully...");
+	await mongoose.disconnect();
+	process.exit(0);
 });
 
 process.on("SIGINT", async () => {

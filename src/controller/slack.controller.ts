@@ -19,12 +19,7 @@ async function sendMessageToSlack(req: Request, res: Response, next: NextFunctio
 			result,
 		});
 	} catch (error) {
-		console.error("❌ Error sending message:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to send message",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
+		next(error);
 	}
 }
 
@@ -50,12 +45,7 @@ async function updateMessage(req: Request, res: Response, next: NextFunction): P
 			result,
 		});
 	} catch (error) {
-		console.error("❌ Error updating message:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to update message",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
+		next(error);
 	}
 }
 

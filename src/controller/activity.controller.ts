@@ -31,12 +31,7 @@ async function fetchMonthlyActivities(req: Request, res: Response, next: NextFun
 			userActivitiesWithStats,
 		});
 	} catch (error) {
-		console.error("❌ Error fetching activities:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch activities",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
+		next(error);
 	}
 }
 
@@ -71,12 +66,7 @@ async function fetchDailyActivities(req: Request, res: Response, next: NextFunct
 			userActivitiesWithStats,
 		});
 	} catch (error) {
-		console.error("❌ Error fetching daily activities:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to fetch daily activities",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
+		next(error);
 	}
 }
 
