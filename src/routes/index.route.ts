@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import mongoose from "mongoose";
 import activityRoutes from "./activity.route";
 import slackRoutes from "./slack.route";
+import authMiddleware from "../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.get("/health", (req: Request, res: Response) => {
 
 router.use("/activities", activityRoutes);
 
-router.use("/slack", slackRoutes);
+router.use("/slack", authMiddleware.authenticateApiKey, slackRoutes);
 
 export default router;
 

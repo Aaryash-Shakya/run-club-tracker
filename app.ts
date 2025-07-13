@@ -43,7 +43,7 @@ async function main() {
 		"Asia/Kathmandu"
 	);
 
-	await stravaController.fetchAndStoreActivities();
+	// await stravaController.fetchAndStoreActivities();
 
 	console.log("✨ Cron scheduled, app ready.");
 }

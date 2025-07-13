@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from "express";
 import { config } from "../../config";
 
-export function authenticateApiKey(req: Request, res: Response, next: NextFunction) {
+export function authenticateApiKey(req: any, res: any, next: any) {
 	const tokenPrefix = "bearer ";
 	const { authorization } = req.headers;
 
