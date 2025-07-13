@@ -12,7 +12,7 @@ async function sendMessageToSlack(req: Request, res: Response, next: NextFunctio
 			return;
 		}
 		console.log(`📬 Sending message to channel: ${channelName}`);
-		const result = await slackService.sendMessage(channelName, message);
+		const result = await slackService.sendMessage(message, channelName);
 		res.json({
 			status: "OK",
 			message: "Message sent successfully",

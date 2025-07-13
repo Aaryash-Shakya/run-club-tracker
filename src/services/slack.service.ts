@@ -11,7 +11,7 @@ const client = new WebClient(config.SLACK_BOT_TOKEN, {
 	},
 });
 
-async function sendMessage(channelName: string, message: string) {
+async function sendMessage(message: string, channelName: string = config.SLACK_CHANNEL_NAME) {
 	try {
 		const result = await client.chat.postMessage({
 			channel: channelName,
