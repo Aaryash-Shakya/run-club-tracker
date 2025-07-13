@@ -1,7 +1,7 @@
 import { Activity } from "../models/activity.model";
 import { User } from "../models/user.model";
 import stravaService from "./strava.service";
-import paceUtilities from "../utilities/pace.utilities";
+import paceUtils from "../utils/pace.utils";
 
 // Strava API response type for club activities
 export type StravaClubActivity = {
@@ -114,11 +114,11 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 
 			let isValid: boolean = true;
 			let note: string | null = null;
-			const pace = paceUtilities.getPaceFromTimeAndDistance(
+			const pace = paceUtils.getPaceFromTimeAndDistance(
 				stravaActivity.moving_time,
 				stravaActivity.distance
 			);
-			const paceString = paceUtilities.formatPaceToString(pace);
+			const paceString = paceUtils.formatPaceToString(pace);
 			if (associatedUser) {
 				// Pace above 10 min/km is considered walking
 				if (pace > 10 && stravaActivity.distance < 3000) {

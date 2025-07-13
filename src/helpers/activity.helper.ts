@@ -9,7 +9,7 @@ interface UserStats {
 	invalidActivities: number;
 }
 
-interface TGroupedUserActivitiesWithStats extends TGroupedUserActivities {
+export interface TGroupedUserActivitiesWithStats extends TGroupedUserActivities {
 	stats: UserStats;
 }
 

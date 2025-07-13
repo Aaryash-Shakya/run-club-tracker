@@ -35,6 +35,45 @@ async function fetchMonthlyActivities(req: Request, res: Response, next: NextFun
 	}
 }
 
+async function fetchWeeklyActivities(req: Request, res: Response, next: NextFunction) {
+	try {
+		const TIME_ZONE = "Asia/Kathmandu";
+		const date = new Date();
+		const nptDate = DateTime.fromJSDate(date).setZone(TIME_ZONE);
+
+		// Get day of week: Sunday = 7 for Luxon
+		const weekday = nptDate.weekday; // 1 = Monday, 7 = Sunday
+
+		// Calculate start of week (Sunday)
+		const startOfWeekNPT = nptDate.minus({ days: weekday % 7 }).startOf("day");
+
+		// Calculate end of week (Saturday)
+		const endOfWeekNPT = startOfWeekNPT.plus({ days: 6 }).endOf("day");
+
+		// Convert to UTC for MongoDB
+		const startOfWeekUTC = startOfWeekNPT.toUTC().toJSDate();
+		const endOfWeekUTC = endOfWeekNPT.toUTC().toJSDate();
+
+		const activities = await activityRepository.listAllActivitiesInRange(
+			startOfWeekUTC,
+			endOfWeekUTC
+		);
+		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
+		const userActivitiesWithStats =
+			activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+
+		res.json({
+			status: "OK",
+			message: "Weekly activities fetched successfully",
+			startOfWeekUTC,
+			endOfWeekUTC,
+			userActivitiesWithStats,
+		});
+	} catch (error) {
+		next(error);
+	}
+}
+
 async function fetchDailyActivities(req: Request, res: Response, next: NextFunction) {
 	try {
 		const TIME_ZONE = "Asia/Kathmandu";
@@ -62,7 +101,6 @@ async function fetchDailyActivities(req: Request, res: Response, next: NextFunct
 		res.json({
 			status: "OK",
 			message: "Activities for today fetched successfully",
-			activities,
 			userActivitiesWithStats,
 		});
 	} catch (error) {
@@ -72,5 +110,6 @@ async function fetchDailyActivities(req: Request, res: Response, next: NextFunct
 
 export default {
 	fetchMonthlyActivities,
+	fetchWeeklyActivities,
 	fetchDailyActivities,
 };
