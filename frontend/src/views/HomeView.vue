@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-dark-bg py-6">
+  <div class="min-h-screen py-6">
     <LeaderboardTable
       title="July 70KM Leaderboard"
       :leaderboard="leaderboard"

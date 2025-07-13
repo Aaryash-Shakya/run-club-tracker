@@ -37,8 +37,8 @@
                 <span
                   class="font-medium w-12"
                   :class="{
-                    'text-green-500': record.stats.totalDistance / 1000 > 70,
-                    'text-[#bdbdbd]': record.stats.totalDistance / 1000 <= 70,
+                    'text-green-500': record.stats.totalDistance >= targetDistance,
+                    'text-[#bdbdbd]': record.stats.totalDistance < targetDistance,
                   }"
                 >
                   {{ (record.stats.totalDistance / 1000).toFixed(2) }}
@@ -50,7 +50,10 @@
                     class="absolute left-0 top-0 h-1 rounded bg-green-500"
                     :style="{
                       width:
-                        Math.min(100, Math.round((record.stats.totalDistance / 70000) * 100)) + '%',
+                        Math.min(
+                          100,
+                          Math.round((record.stats.totalDistance / targetDistance) * 100),
+                        ) + '%',
                     }"
                   ></div>
                 </div>
