@@ -4,6 +4,7 @@ import { config } from "./config";
 import { startStravaJob } from "./src/jobs/strava.job";
 import router from "./src/routes/index.route";
 import { errorHandler, notFoundHandler } from "./src/middleware/errorHandler";
+import { startNotificationJobs } from "./src/jobs/notification.job";
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
@@ -47,7 +48,7 @@ async function main() {
 		});
 
 		startStravaJob();
-		console.log("✨ Cron scheduled, app ready.");
+		startNotificationJobs();
 	} catch (error) {
 		console.error("❌ Failed to start application:", error);
 		process.exit(1);
