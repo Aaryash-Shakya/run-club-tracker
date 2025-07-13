@@ -24,7 +24,7 @@ async function generateActivityList(
 	});
 
 	// add space between each user line
-	return userLines.join(" \n") + "\n\n";
+	return userLines.join("\n") + "\n\n";
 }
 
 // Function that creates daily update message

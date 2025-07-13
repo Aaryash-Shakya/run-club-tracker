@@ -12,7 +12,7 @@ async function sendDailyUpdate(): Promise<void> {
 
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 		if (activities.length === 0) {
-			slackService.sendMessage(
+			await slackService.sendMessage(
 				"No runs today! :eyes: Lace up and let's fix that tomorrow! :man-running: :dash:"
 			);
 			return;
@@ -43,7 +43,7 @@ async function sendWeeklyUpdate(): Promise<void> {
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 
 		if (activities.length === 0) {
-			slackService.sendMessage(
+			await slackService.sendMessage(
 				"No runs logged this week… :cry:\nYour leaderboard misses you — lace up and make me happy again! :man_running::blue_heart:"
 			);
 			return;
