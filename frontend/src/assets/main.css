@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+/* Custom base styles */
+body {
+  background-color: #141316;
+  color: #e0e0e0;
+}
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
