@@ -1,7 +1,6 @@
 {
 	"name": "strava-club-activity-tracker",
 	"version": "1.0.0",
-	"type": "module",
 	"main": "dist/app.js",
 	"repository": "https://github.com/Aaryash-Shakya/strava-club-activity-tracker.git",
 	"author": "Aaryash-Shakya <aaryashshakya.dev@gmail.com>",
