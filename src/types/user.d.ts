@@ -11,4 +11,3 @@ export type TGroupedUserActivities = {
 	};
 	activities: Omit<TActivityWithUser, "user">[];
 };
-

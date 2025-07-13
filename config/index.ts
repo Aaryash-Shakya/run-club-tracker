@@ -14,4 +14,3 @@ export const config = cleanEnv(process.env, {
 	SLACK_BOT_TOKEN: str(),
 	API_KEY: str(),
 });
-

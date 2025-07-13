@@ -27,4 +27,3 @@ router.use("/activities", activityRoutes);
 router.use("/slack", authMiddleware.authenticateApiKey, slackRoutes);
 
 export default router;
-

@@ -46,4 +46,3 @@ export type TActivityWithUser = {
 	createdAt: Date;
 	updatedAt: Date;
 };
-

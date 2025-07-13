@@ -38,7 +38,7 @@ async function main() {
 
 main();
 
-process.on("unhandledRejection", reason => {
+process.on("unhandledRejection", (reason) => {
 	console.error("❌ Unhandled Rejection:", reason);
 });
 
@@ -47,4 +47,3 @@ process.on("SIGINT", async () => {
 	await mongoose.disconnect();
 	process.exit(0);
 });
-

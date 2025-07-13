@@ -30,7 +30,11 @@ async function sendMessageToSlack(req: Request, res: Response, next: NextFunctio
 
 async function updateMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
 	try {
-		const { channelId, ts, message } = req.body as { channelId?: string; ts?: string; message?: string };
+		const { channelId, ts, message } = req.body as {
+			channelId?: string;
+			ts?: string;
+			message?: string;
+		};
 		if (!channelId || !ts || !message) {
 			res.status(400).json({
 				status: "error",
@@ -57,6 +61,5 @@ async function updateMessage(req: Request, res: Response, next: NextFunction): P
 
 export default {
 	sendMessageToSlack,
-	updateMessage
+	updateMessage,
 };
-

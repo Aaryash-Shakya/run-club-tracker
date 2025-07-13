@@ -18,9 +18,13 @@ async function fetchMonthlyActivities(req: Request, res: Response, next: NextFun
 		// Convert to UTC JS Date for MongoDB:
 		const startOfMonthUTC = startOfMonthNPT.toUTC().toJSDate();
 		const startOfNextMonthUTC = startOfNextMonthNPT.toUTC().toJSDate();
-		const activities = await activityRepository.listAllActivitiesInRange(startOfMonthUTC, startOfNextMonthUTC);
+		const activities = await activityRepository.listAllActivitiesInRange(
+			startOfMonthUTC,
+			startOfNextMonthUTC
+		);
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+		const userActivitiesWithStats =
+			activityHelper.calculateUserStatsAndSort(userGroupedActivities);
 		res.json({
 			status: "OK",
 			message: "Activities fetched successfully",
@@ -52,9 +56,13 @@ async function fetchDailyActivities(req: Request, res: Response, next: NextFunct
 		const startOfDayUTC = startOfDayNPT.toUTC().toJSDate();
 		const startOfNextDayUTC = startOfNextDayNPT.toUTC().toJSDate();
 
-		const activities = await activityRepository.listAllActivitiesInRange(startOfDayUTC, startOfNextDayUTC);
+		const activities = await activityRepository.listAllActivitiesInRange(
+			startOfDayUTC,
+			startOfNextDayUTC
+		);
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+		const userActivitiesWithStats =
+			activityHelper.calculateUserStatsAndSort(userGroupedActivities);
 
 		res.json({
 			status: "OK",
@@ -76,4 +84,3 @@ export default {
 	fetchMonthlyActivities,
 	fetchDailyActivities,
 };
-

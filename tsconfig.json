@@ -1,25 +1,21 @@
 {
-    "compilerOptions": {
-        "target": "es2019",
-        "lib": [
-            "esnext"
-        ],
-        "module": "commonjs",
-        "rootDir": ".",
-        "moduleResolution": "node",
-        "allowJs": true,
-        "outDir": "./dist",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "strict": true,
-        "strictNullChecks": true,
-        "noImplicitAny": false,
-        "skipLibCheck": true,
-        "sourceMap": true,
-        "inlineSources": true,
-        "sourceRoot": "/"
-    },
-    "exclude": [
-        "node_modules"
-    ]
+	"compilerOptions": {
+		"target": "es2019",
+		"lib": ["esnext"],
+		"module": "commonjs",
+		"rootDir": ".",
+		"moduleResolution": "node",
+		"allowJs": true,
+		"outDir": "./dist",
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"strict": true,
+		"strictNullChecks": true,
+		"noImplicitAny": false,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"inlineSources": true,
+		"sourceRoot": "/"
+	},
+	"exclude": ["node_modules"]
 }

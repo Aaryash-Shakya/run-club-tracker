@@ -1,4 +1,3 @@
-import axios from "axios";
 import { Activity } from "../models/activity.model";
 import { User } from "../models/user.model";
 import stravaService from "./strava.service";
@@ -22,19 +21,6 @@ export type StravaClubActivity = {
 	workout_type: number;
 };
 
-async function getLastActivityFromDB() {
-	try {
-		const lastActivity = await Activity.findOne()
-			.sort({ createdAt: -1, _id: -1 }) // Sort by activity date descending (most recent first), id is tie breaker
-			.exec();
-
-		return lastActivity;
-	} catch (error) {
-		console.error("❌ Error fetching last activity from database:", error);
-		throw error;
-	}
-}
-
 async function findNewActivities(): Promise<StravaClubActivity[]> {
 	try {
 		console.log("🔍 Looking for new activities...");
@@ -43,15 +29,18 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava(1, 30);
 
 		// Fetch recent activities from DB (last 30 for better coverage) - newest first
-		const recentDbActivities = await Activity.find().sort({ createdAt: -1, _id: -1 }).limit(30).exec();
+		const recentDbActivities = await Activity.find()
+			.sort({ createdAt: -1, _id: -1 })
+			.limit(30)
+			.exec();
 
-		let newActivities: StravaClubActivity[] = [];
+		const newActivities: StravaClubActivity[] = [];
 		let matchCount = 0;
 
 		// Process Strava activities in order (newest first)
 		for (const stravaActivity of stravaActivities) {
 			const matchFound = recentDbActivities.some(
-				dbActivity =>
+				(dbActivity) =>
 					stravaActivity.distance === dbActivity.distance &&
 					stravaActivity.moving_time === dbActivity.movingTime &&
 					stravaActivity.elapsed_time === dbActivity.elapsedTime &&
@@ -96,7 +85,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 
 		// 2. Convert users array into object with firstName_lastName as key
 		const userMap: { [key: string]: any } = {};
-		users.forEach(user => {
+		users.forEach((user) => {
 			const key = `${user.firstName}_${user.lastName}`;
 			userMap[key] = user;
 		});
@@ -125,7 +114,10 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 
 			let isValid: boolean = true;
 			let note: string | null = null;
-			const pace = paceUtilities.getPaceFromTimeAndDistance(stravaActivity.moving_time, stravaActivity.distance);
+			const pace = paceUtilities.getPaceFromTimeAndDistance(
+				stravaActivity.moving_time,
+				stravaActivity.distance
+			);
 			const paceString = paceUtilities.formatPaceToString(pace);
 			if (associatedUser) {
 				// Pace above 10 min/km is considered walking
@@ -199,7 +191,9 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 		// 4. Bulk insert all activities to database
 		if (activitiesToSave.length > 0) {
 			const savedActivities = await Activity.insertMany(activitiesToSave);
-			console.log(`🎉 Successfully saved ${savedActivities.length} new activities to database`);
+			console.log(
+				`🎉 Successfully saved ${savedActivities.length} new activities to database`
+			);
 			return savedActivities;
 		} else {
 			console.log("⏭️ No activities to save");
@@ -215,4 +209,3 @@ export default {
 	findNewActivities,
 	addNewActivitiesToDatabase,
 };
-

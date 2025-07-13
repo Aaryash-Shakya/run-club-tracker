@@ -41,4 +41,3 @@ const ActivitySchema = new Schema<IActivity>(
 );
 
 export const Activity = model<IActivity>("Activity", ActivitySchema);
-
