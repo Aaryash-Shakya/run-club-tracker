@@ -1,11 +1,17 @@
-import { retryPolicies, WebClient } from "@slack/web-api";
+import { WebClient } from "@slack/web-api";
 import { config } from "../../config";
 
 const client = new WebClient(config.SLACK_BOT_TOKEN, {
-	retryConfig: retryPolicies.fiveRetriesInFiveMinutes,
+	retryConfig: {
+		retries: 3,
+		factor: 2,
+		minTimeout: 1000,
+		maxTimeout: 5000,
+		randomize: true,
+	},
 });
 
-async function sendMessage(channelName: string, message: string) {
+async function sendMessage(message: string, channelName: string = config.SLACK_CHANNEL_NAME) {
 	try {
 		const result = await client.chat.postMessage({
 			channel: channelName,
@@ -44,4 +50,3 @@ export default {
 	sendMessage,
 	updateMessage,
 };
-

@@ -46,7 +46,7 @@ async function getValidAccessToken(): Promise<string> {
 			client_secret: config.STRAVA_CLIENT_SECRET,
 			grant_type: "refresh_token",
 			refresh_token: config.STRAVA_REFRESH_TOKEN,
-		});[]
+		});
 
 		const responseData: TokenResponse = res.data;
 
@@ -61,20 +61,26 @@ async function getValidAccessToken(): Promise<string> {
 	return tokens.accessToken;
 }
 
-async function fetchClubActivitiesFromStrava(page: number = 1, perPage: number = 50): Promise<StravaClubActivity[]> {
+async function fetchClubActivitiesFromStrava(
+	page: number = 1,
+	perPage: number = 50
+): Promise<StravaClubActivity[]> {
 	const accessToken = await getValidAccessToken();
 
 	console.log(`🔄 Fetching club activities from Strava (page: ${page}, per_page: ${perPage})...`);
 
-	const response = await axios.get(`https://www.strava.com/api/v3/clubs/${config.STRAVA_CLUB_ID}/activities`, {
-		headers: {
-			Authorization: `Bearer ${accessToken}`,
-		},
-		params: {
-			page,
-			per_page: perPage,
-		},
-	});
+	const response = await axios.get(
+		`https://www.strava.com/api/v3/clubs/${config.STRAVA_CLUB_ID}/activities`,
+		{
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+			params: {
+				page,
+				per_page: perPage,
+			},
+		}
+	);
 
 	console.log(`✅ Fetched ${response.data.length} activities from Strava`);
 	return response.data;

@@ -5,7 +5,9 @@ async function fetchAndStoreActivities() {
 		const newActivities = await activityService.findNewActivities();
 		if (newActivities.length > 0) {
 			await activityService.addNewActivitiesToDatabase(newActivities);
-			console.log(`✅ Successfully added ${newActivities.length} new activities to the database.`);
+			console.log(
+				`✅ Successfully added ${newActivities.length} new activities to the database.`
+			);
 		} else {
 			console.log("ℹ️ No new activities found.");
 		}

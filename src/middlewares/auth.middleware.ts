@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from "express";
 import { config } from "../../config";
 
-export function authenticateApiKey(req: Request, res: Response, next: NextFunction) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function authenticateApiKey(req: any, res: any, next: any) {
 	const tokenPrefix = "bearer ";
 	const { authorization } = req.headers;
 
@@ -23,4 +23,3 @@ export function authenticateApiKey(req: Request, res: Response, next: NextFuncti
 export default {
 	authenticateApiKey,
 };
-

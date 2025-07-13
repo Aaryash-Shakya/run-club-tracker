@@ -12,25 +12,24 @@ async function sendMessageToSlack(req: Request, res: Response, next: NextFunctio
 			return;
 		}
 		console.log(`📬 Sending message to channel: ${channelName}`);
-		const result = await slackService.sendMessage(channelName, message);
+		const result = await slackService.sendMessage(message, channelName);
 		res.json({
 			status: "OK",
 			message: "Message sent successfully",
 			result,
 		});
 	} catch (error) {
-		console.error("❌ Error sending message:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to send message",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
+		next(error);
 	}
 }
 
 async function updateMessage(req: Request, res: Response, next: NextFunction): Promise<void> {
 	try {
-		const { channelId, ts, message } = req.body as { channelId?: string; ts?: string; message?: string };
+		const { channelId, ts, message } = req.body as {
+			channelId?: string;
+			ts?: string;
+			message?: string;
+		};
 		if (!channelId || !ts || !message) {
 			res.status(400).json({
 				status: "error",
@@ -46,17 +45,11 @@ async function updateMessage(req: Request, res: Response, next: NextFunction): P
 			result,
 		});
 	} catch (error) {
-		console.error("❌ Error updating message:", error);
-		res.status(500).json({
-			status: "error",
-			message: "Failed to update message",
-			error: error instanceof Error ? error.message : "Unknown error",
-		});
+		next(error);
 	}
 }
 
 export default {
 	sendMessageToSlack,
-	updateMessage
+	updateMessage,
 };
-

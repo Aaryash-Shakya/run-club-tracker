@@ -2,7 +2,10 @@ import { Activity } from "../models/activity.model";
 import { TActivityWithUser } from "../types/activity";
 import { PipelineStage } from "mongoose";
 
-async function listAllActivitiesInRange(startDate: Date, endDate: Date): Promise<TActivityWithUser[]> {
+async function listAllActivitiesInRange(
+	startDate: Date,
+	endDate: Date
+): Promise<TActivityWithUser[]> {
 	const pipeline: PipelineStage[] = [
 		{
 			$match: {

@@ -1,6 +1,7 @@
 {
 	"name": "strava-club-activity-tracker",
 	"version": "1.0.0",
+	"type": "module",
 	"main": "dist/app.js",
 	"repository": "https://github.com/Aaryash-Shakya/strava-club-activity-tracker.git",
 	"author": "Aaryash-Shakya <aaryashshakya.dev@gmail.com>",
@@ -11,7 +12,11 @@
 		"check-spelling": "cspell '**/*' --config ./cspell.json --no-progress --unique",
 		"clean": "npx rimraf ./dist",
 		"build-ts": "tsc",
-		"build": "yarn clean && yarn install && yarn build-ts"
+		"build": "yarn clean && yarn install && yarn build-ts",
+		"lint": "eslint . --ext .ts,.js",
+		"lint:fix": "eslint . --ext .ts,.js --fix",
+		"format": "prettier --write .",
+		"format:check": "prettier --check ."
 	},
 	"dependencies": {
 		"@slack/web-api": "^7.9.3",
@@ -23,16 +28,25 @@
 		"mongoose": "^8.16.1"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.31.0",
 		"@types/cron": "^2.4.3",
 		"@types/express": "^5.0.3",
 		"@types/luxon": "^3.6.2",
 		"@types/mongoose": "^5.11.97",
 		"@types/node": "^24.0.7",
+		"@typescript-eslint/eslint-plugin": "^8.36.0",
+		"@typescript-eslint/parser": "^8.36.0",
 		"cspell": "^9.1.2",
 		"envalid": "^8.0.0",
+		"eslint": "^9.31.0",
+		"eslint-config-prettier": "^10.1.5",
+		"eslint-plugin-prettier": "^5.5.1",
+		"globals": "^16.3.0",
 		"nodemon": "^3.1.10",
+		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
 		"ts-node": "^10.9.2",
+		"tsx": "^4.20.3",
 		"typescript": "^5.8.3"
 	}
 }

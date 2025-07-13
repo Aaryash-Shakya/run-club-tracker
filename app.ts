@@ -1,10 +1,9 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application } from "express";
 import mongoose from "mongoose";
 import { config } from "./config";
-import { CronJob } from "cron";
-import stravaController from "./src/controller/strava.controller";
-import activityController from "./src/controller/activity.controller";
-import slackController from "./src/controller/slack.controller";
+import { startStravaJob } from "./src/jobs/strava.job";
+import router from "./src/routes/index.route";
+import { errorHandler, notFoundHandler } from "./src/middleware/errorHandler";
 
 const app: Application = express();
 const PORT = process.env.PORT || 8000;
@@ -14,29 +13,13 @@ app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
 // Routes
-app.get("/", (req: Request, res: Response) => {
-	res.json({
-		message: "Strava Club Activity Tracker API",
-		status: "running",
-		timestamp: new Date().toISOString(),
-	});
-});
+app.use("/api/", router);
 
-app.get("/health", (req: Request, res: Response) => {
-	res.json({
-		status: "OK",
-		timestamp: new Date().toISOString(),
-		database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-	});
-});
+// 404 handler (must be after all routes)
+app.use(notFoundHandler);
 
-app.get("/monthly-activities", activityController.fetchMonthlyActivities);
-
-app.get("/daily-activities", activityController.fetchDailyActivities);
-
-app.post("/send-message", slackController.sendMessageToSlack);
-
-app.post("/update-message", slackController.updateMessage);
+// Global error handler (must be last)
+app.use(errorHandler);
 
 async function connectDB() {
 	console.log("🔄 Connecting to MongoDB...");
@@ -49,32 +32,45 @@ async function connectDB() {
 
 async function main() {
 	console.log("🚀 Starting application...");
-	await connectDB();
 
-	app.listen(PORT, () => {
-		console.log(`🚀 Server running on port ${PORT}`);
-	});
+	try {
+		await connectDB();
 
-	new CronJob(
-		"*/30 * * * *",
-		async () => {
-			console.log("⏰ Running scheduled fetchAndStoreActivities...");
-			await stravaController.fetchAndStoreActivities();
-		},
-		null,
-		true,
-		"Asia/Kathmandu"
-	);
+		const server = app.listen(PORT, () => {
+			console.log(`🚀 Server running on port ${PORT}`);
+		});
 
-	await stravaController.fetchAndStoreActivities();
+		// Handle server errors
+		server.on("error", (error: Error) => {
+			console.error("❌ Server error:", error);
+			process.exit(1);
+		});
 
-	console.log("✨ Cron scheduled, app ready.");
+		startStravaJob();
+		console.log("✨ Cron scheduled, app ready.");
+	} catch (error) {
+		console.error("❌ Failed to start application:", error);
+		process.exit(1);
+	}
 }
 
 main();
 
-process.on("unhandledRejection", reason => {
-	console.error("❌ Unhandled Rejection:", reason);
+// Enhanced error handlers
+process.on("unhandledRejection", (reason: unknown, promise: Promise<unknown>) => {
+	console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+	process.exit(1);
+});
+
+process.on("uncaughtException", (error: Error) => {
+	console.error("❌ Uncaught Exception:", error);
+	process.exit(1);
+});
+
+process.on("SIGTERM", async () => {
+	console.log("👋 SIGTERM received, shutting down gracefully...");
+	await mongoose.disconnect();
+	process.exit(0);
 });
 
 process.on("SIGINT", async () => {
@@ -82,4 +78,3 @@ process.on("SIGINT", async () => {
 	await mongoose.disconnect();
 	process.exit(0);
 });
-
