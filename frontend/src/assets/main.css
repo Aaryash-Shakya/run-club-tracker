@@ -1,53 +1,10 @@
 @import 'tailwindcss';
 
 /* Custom base styles */
-@layer base {
-  
+body {
+  background-color: #141316;
+  color: #e0e0e0;
 }
-
-/* Custom component styles */
-/* @layer components {
-  .leaderboard-container {
-    @apply max-w-6xl mx-auto p-6 bg-dark-surface rounded-lg;
-  }
-
-  .leaderboard-table {
-    @apply w-full border-collapse bg-dark-table rounded-lg overflow-hidden;
-  }
-
-  .leaderboard-table th {
-    @apply bg-dark-header text-dark-text-muted font-medium text-xs uppercase tracking-wide p-4 text-left border-b border-dark-border;
-  }
-
-  .leaderboard-table td {
-    @apply p-4 border-b border-dark-border text-dark-text-primary;
-  }
-
-  .player-row:hover {
-    @apply bg-gray-700/50;
-  }
-
-  .rank-number {
-    @apply font-semibold text-sm text-dark-text-secondary;
-  }
-
-  .player-info {
-    @apply flex items-center gap-3;
-  }
-
-  .player-avatar {
-    @apply w-8 h-8 rounded-full overflow-hidden flex-shrink-0;
-  }
-
-  .player-name {
-    @apply font-medium text-dark-text-primary;
-  }
-
-  .stat-value {
-    @apply font-normal text-dark-text-secondary;
-  }
-} */
-
 #app {
   max-width: 1280px;
   margin: 0 auto;
