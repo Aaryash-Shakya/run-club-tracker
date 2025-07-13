@@ -38,13 +38,15 @@ async function sendWeeklyUpdate(): Promise<void> {
 	try {
 		console.log("📊 Sending weekly update...");
 
-		const { startDate, endDate } = dateUtils.getDateRange("weekly");
+		const yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		const { startDate, endDate } = dateUtils.getDateRange("weekly", yesterday);
 
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 
 		if (activities.length === 0) {
 			await slackService.sendMessage(
-				"No runs logged this week… :cry:\nYour leaderboard misses you — lace up and make me happy again! :man_running::blue_heart:"
+				"No runs logged last week… :cry:\nYour leaderboard misses you — lace up and make me happy again! :man_running::blue_heart:"
 			);
 			return;
 		}

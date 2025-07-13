@@ -18,9 +18,9 @@ export function startNotificationJobs(): void {
 		"Asia/Kathmandu"
 	);
 
-	// Weekly update every Saturday at 9:01 PM Nepal time
+	// Last week's update every Sunday at 8:00 AM Nepal time
 	new CronJob(
-		"1 21 * * 6", // 9:01 PM every Saturday (6 = Saturday)
+		"0 8 * * 0", // 8:00 AM every Sunday (0 = Sunday)
 		async () => {
 			try {
 				console.log("⏰ Running weekly notification job...");

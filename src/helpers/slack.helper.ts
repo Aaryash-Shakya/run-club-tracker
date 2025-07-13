@@ -1,4 +1,5 @@
 import paceUtils from "../utils/pace.utils";
+import dateUtils from "../utils/date.utils";
 import { TGroupedUserActivitiesWithStats } from "./activity.helper";
 import { DateTime } from "luxon";
 
@@ -47,11 +48,7 @@ async function formatDailyUpdateMessage(
 async function formatWeeklyUpdateMessage(
 	userActivitiesWithStats: TGroupedUserActivitiesWithStats[]
 ): Promise<string> {
-	const today = new Date();
-	const weekStart = new Date(today.setDate(today.getDate() - today.getDay()));
-	const weekEnd = new Date(today.setDate(today.getDate() - today.getDay() + 6));
-
-	const weekRange = `${weekStart.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${weekEnd.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+	const weekRange = dateUtils.formatWeekRange();
 
 	const header = `:trophy: *Weekly Run Summary — ${weekRange}* :calendar:\n\n`;
 	const activityList = await generateActivityList(userActivitiesWithStats);
