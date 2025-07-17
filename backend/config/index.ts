@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import { cleanEnv, str, num } from "envalid";
+import { cleanEnv, str, num, bool } from "envalid";
 
 // Load .env
 dotenv.config();
@@ -14,4 +14,5 @@ export const config = cleanEnv(process.env, {
 	SLACK_BOT_TOKEN: str(),
 	SLACK_CHANNEL_NAME: str(),
 	API_KEY: str(),
+	START_CRON_JOB: bool({ default: true }),
 });
