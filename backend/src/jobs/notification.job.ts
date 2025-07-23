@@ -2,9 +2,9 @@ import { CronJob } from "cron";
 import notificationService from "../services/notification.service";
 
 export function startNotificationJobs(): void {
-	// Daily update every night at 9:00 PM Nepal time
+	// Daily update every morning at 8:00 AM Nepal time
 	new CronJob(
-		"0 21 * * *", // 9:00 PM every day
+		"0 8 * * *", // 8:00 AM every day
 		async () => {
 			try {
 				console.log("⏰ Running daily notification job...");

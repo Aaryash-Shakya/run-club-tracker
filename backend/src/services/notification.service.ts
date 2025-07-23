@@ -8,12 +8,14 @@ async function sendDailyUpdate(): Promise<void> {
 	try {
 		console.log("📱 Sending daily update...");
 
-		const { startDate, endDate } = dateUtils.getDateRange("daily");
+		const yesterday = new Date();
+		yesterday.setDate(yesterday.getDate() - 1);
+		const { startDate, endDate } = dateUtils.getDateRange("daily", yesterday);
 
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 		if (activities.length === 0) {
 			await slackService.sendMessage(
-				"No runs today! :eyes: Lace up and let's fix that tomorrow! :man-running: :dash:"
+				"No runs yesterday! :eyes: Lace up and let's fix that today! :man-running: :dash:"
 			);
 			return;
 		}
