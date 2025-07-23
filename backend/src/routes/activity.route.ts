@@ -1,12 +1,11 @@
 import { Router } from "express";
 import activityController from "../controller/activity.controller";
+import { validateActivityQuery } from "../middleware/validation.middleware";
 
 const router = Router();
 
-router.get("/monthly-activities", activityController.fetchMonthlyActivities);
-
-router.get("/weekly-activities", activityController.fetchWeeklyActivities);
-
-router.get("/daily-activities", activityController.fetchDailyActivities);
+// Single route for fetching activities with query parameters
+// Usage: GET /activities?period=daily|weekly|monthly&date=yyyy-mm-dd (date is optional)
+router.get("", validateActivityQuery, activityController.fetchActivities);
 
 export default router;

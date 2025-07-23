@@ -49,8 +49,10 @@ async function main() {
 			process.exit(1);
 		});
 
-		startStravaJob();
-		startNotificationJobs();
+		if (config.START_CRON_JOB) {
+			startStravaJob();
+			startNotificationJobs();
+		}
 	} catch (error) {
 		console.error("❌ Failed to start application:", error);
 		process.exit(1);
