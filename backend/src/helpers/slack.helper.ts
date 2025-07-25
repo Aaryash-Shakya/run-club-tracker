@@ -32,14 +32,14 @@ async function generateActivityList(
 async function formatDailyUpdateMessage(
 	userActivitiesWithStats: TGroupedUserActivitiesWithStats[]
 ): Promise<string> {
-	const today = DateTime.now()
+	const yesterday = DateTime.now()
 		.setZone("Asia/Kathmandu")
+		.minus({ days: 1 })
 		.toLocaleString({ month: "long", day: "numeric" });
 
-	const header = `:man-running: *Daily Run Update — ${today}* :spiral_calendar_pad:\n\n`;
+	const header = `:sunrise: Run Recap — *${yesterday}*:\n\n`;
 	const activityList = await generateActivityList(userActivitiesWithStats);
-	const footer =
-		"Keep up the awesome work — see you all tomorrow night with more updates! :rocket:";
+	const footer = "Keep up the awesome work — see you all tomorrow morning! :rocket:";
 
 	return header + activityList + footer;
 }
