@@ -34,6 +34,38 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
+async function fetchUserActivities(req: Request, res: Response, next: NextFunction) {
+	try {
+		const userId = req.params.userId;
+		const { period, date } = req.validatedQuery as ActivityQueryParams;
+
+		const { startDate, endDate } = dateUtils.getDateRange(period, date);
+
+		const activities = await activityRepository.listUserActivitiesInRange(
+			userId,
+			startDate,
+			endDate
+		);
+		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
+		const activitiesWithStats = activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+
+		const periodMessages = {
+			daily: "User activities for the day fetched successfully",
+			weekly: "User weekly activities fetched successfully",
+			monthly: "User monthly activities fetched successfully",
+		};
+
+		res.json({
+			status: "OK",
+			message: periodMessages[period],
+			activities: activitiesWithStats[0],
+		});
+	} catch (error) {
+		next(error);
+	}
+}
+
 export default {
 	fetchActivities,
+	fetchUserActivities,
 };
