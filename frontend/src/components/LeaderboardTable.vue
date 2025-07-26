@@ -2,7 +2,7 @@
 	<div class="bg-[#181C2A] rounded-xl shadow-lg px-2 overflow-hidden mt-5">
 		<div class="flex items-center justify-end p-4">
 			<label class="flex items-center gap-2 cursor-pointer text-white/70 text-sm">
-				<input type="checkbox" v-model="showParticipantsOnly" class="accent-green-500" />
+				<input type="checkbox" v-model="showParticipantsOnly" class="#6366F1 h-4 w-4" />
 				Show Participants only
 			</label>
 		</div>
@@ -46,11 +46,14 @@
 								<img
 									:src="getAvatarUrl(record.user.firstName)"
 									:alt="record.user.firstName"
-									class="w-10 h-10 rounded-full object-cover"
+									class="w-10 h-10 rounded-full object-cover hidden md:block"
 								/>
-								<span class="text-white font-medium"
-									>{{ record.user.firstName }} {{ record.user.lastName }}</span
-								>
+								<span class="hidden md:inline">
+									{{ record.user.firstName }} {{ record.user.lastName }}
+								</span>
+								<span class="inline md:hidden">
+									{{ record.user.firstName.split(' ')[0] }}
+								</span>
 							</div>
 						</td>
 						<td class="py-2 px-2">
