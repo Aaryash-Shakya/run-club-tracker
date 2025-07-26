@@ -32,6 +32,8 @@ export type Stats = {
 	averagePace: number
 	totalActivities: number
 	invalidActivities: number
+	runningDistance: number
+	walkingDistance: number
 }
 
 export type UserActivitiesWithStats = {

@@ -10,12 +10,19 @@
 			<table class="w-full border-separate border-spacing-y-2">
 				<thead>
 					<tr class="bg-[#282F45] text-white text-sm">
-						<th class="py-3 px-2 text-left font-medium first:rounded-l-lg last:rounded-r-lg">Rank</th>
+						<th class="py-3 px-2 text-left font-medium rounded-l-lg">Rank</th>
 						<th class="py-3 px-2 text-left font-medium">Runner</th>
-						<th class="py-3 px-2 text-left font-medium">Distance (km)</th>
-						<th class="py-3 px-2 text-left font-medium">Avg. Pace (km/min)</th>
-						<th class="py-3 px-2 text-left font-medium">Activities</th>
-						<th class="py-3 px-2 text-left font-medium first:rounded-l-lg last:rounded-r-lg">Duration</th>
+						<th class="py-3 px-2 text-left font-medium">Distance</th>
+						<th class="py-3 px-2 text-left font-medium">Run : Walk</th>
+						<th class="py-3 px-2 text-left font-medium">Avg. Pace</th>
+						<th class="py-3 px-2 text-left font-medium hidden md:table-cell">
+							Activities
+						</th>
+						<th
+							class="py-3 px-2 text-left font-medium rounded-r-lg hidden md:table-cell"
+						>
+							Duration
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -31,7 +38,9 @@
 							},
 						]"
 					>
-						<td class="py-2 px-2 text-white/60 font-semibold text-center first:rounded-l-lg">
+						<td
+							class="py-2 px-2 text-white/60 font-semibold text-center rounded-l-lg"
+						>
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
@@ -48,34 +57,80 @@
 						</td>
 						<td class="py-2 px-2">
 							<div class="flex items-center gap-2">
-								<span
-									class="font-medium w-12"
-									:class="{
-										'text-green-500':
-											record.stats.totalDistance >= targetDistance,
-										'text-white/60':
-											record.stats.totalDistance < targetDistance,
-									}"
-								>
-									{{ (record.stats.totalDistance / 1000).toFixed(2) }}
-								</span>
-								<div
-									class="flex-1 h-1 bg-[#23232a] rounded ml-2 mr-2 min-w-[60px] max-w-[100px] relative"
-								>
+								<div class="font-medium text-white/80">
+									{{ (record.stats.totalDistance / 1000).toFixed(1) }} km
+								</div>
+							</div>
+						</td>
+						<td class="py-2 px-2">
+							<div class="flex flex-col gap-2">
+								<div class="flex items-center gap-3">
+									<!-- Running Distance -->
+									<div class="flex flex-col items-center gap-1">
+										<img
+											src="../assets/running-shoes.svg"
+											alt="Running"
+											class="w-4 h-4 filter brightness-0 invert opacity-70"
+										/>
+										<span class="text-xs text-white/60 font-medium">
+											{{
+												(
+													(record.stats.runningDistance || 0) / 1000
+												).toFixed(1)
+											}}
+										</span>
+									</div>
+
+									<!-- Separator -->
+									<span class="text-white/40 text-sm">:</span>
+
+									<!-- Walking Distance -->
+									<div class="flex flex-col items-center gap-1">
+										<img
+											src="../assets/walking-shoes.svg"
+											alt="Walking"
+											class="w-4 h-4 filter brightness-0 invert opacity-70"
+										/>
+										<span class="text-xs text-white/60 font-medium">
+											{{
+												(
+													(record.stats.walkingDistance || 0) / 1000
+												).toFixed(1)
+											}}
+										</span>
+									</div>
+								</div>
+
+								<!-- Ratio Bar -->
+								<div class="flex flex-col gap-2 w-20">
 									<div
-										class="absolute left-0 top-0 h-1 rounded bg-green-500"
-										:style="{
-											width:
-												Math.min(
-													100,
-													Math.round(
-														(record.stats.totalDistance /
-															targetDistance) *
-															100,
-													),
-												) + '%',
-										}"
-									></div>
+										class="w-full h-2 bg-[#23232a] rounded-full overflow-hidden relative"
+									>
+										<!-- Running portion (blue) -->
+										<div
+											class="absolute left-0 top-0 h-full bg-[#6366F1] rounded-l-full"
+											:style="{
+												width:
+													(record.stats.totalDistance > 0
+														? ((record.stats.runningDistance || 0) /
+																record.stats.totalDistance) *
+															100
+														: 0) + '%',
+											}"
+										></div>
+										<!-- Walking portion (orange) -->
+										<div
+											class="absolute right-0 top-0 h-full bg-[#FBBF24] rounded-r-full"
+											:style="{
+												width:
+													(record.stats.totalDistance > 0
+														? ((record.stats.walkingDistance || 0) /
+																record.stats.totalDistance) *
+															100
+														: 0) + '%',
+											}"
+										></div>
+									</div>
 								</div>
 							</div>
 						</td>
@@ -86,14 +141,14 @@
 								}}</span>
 							</div>
 						</td>
-						<td class="p-2">
+						<td class="p-2 hidden md:table-cell">
 							<div class="flex items-center gap-2">
 								<span class="text-white/60 font-medium">{{
 									record.stats.totalActivities
 								}}</span>
 							</div>
 						</td>
-						<td class="p-2 last:rounded-r-lg">
+						<td class="p-2 rounded-r-lg hidden md:table-cell">
 							<div class="flex items-center gap-2">
 								<span class="text-white/60 font-medium">{{
 									formatSecondsToHMS(record.stats.totalMovingTime)

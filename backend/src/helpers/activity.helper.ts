@@ -7,6 +7,8 @@ interface UserStats {
 	averagePace: number;
 	totalActivities: number;
 	invalidActivities: number;
+	runningDistance: number;
+	walkingDistance: number;
 }
 
 export interface TGroupedUserActivitiesWithStats extends TGroupedUserActivities {
@@ -59,6 +61,12 @@ function calculateUserStatsAndSort(
 			(sum, activity) => sum + activity.movingTime,
 			0
 		);
+		const runningDistance = validActivities.reduce((sum, activity) => {
+			if (activity.movingPace < 10) {
+				return sum + activity.distance;
+			}
+			return sum;
+		}, 0);
 
 		// Calculate average pace (weighted by distance, only for valid activities)
 		let totalWeightedPace = 0;
@@ -79,6 +87,8 @@ function calculateUserStatsAndSort(
 			averagePace,
 			totalActivities: validActivities.length,
 			invalidActivities: invalidActivities.length,
+			runningDistance,
+			walkingDistance: totalDistance - runningDistance,
 		};
 
 		return {
