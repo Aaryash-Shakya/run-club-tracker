@@ -3,24 +3,32 @@
 
 /* Custom base styles */
 body {
-    background-color: #0e0f15;
-    color: #e0e0e0;
-    font-family: 'Inter', sans-serif;
+	background-color: #0e0f15;
+	color: #e0e0e0;
+	font-family: 'Inter', sans-serif;
 }
 #app {
-    margin: 0 auto;
-    font-weight: normal;
+	font-weight: normal;
+	width: 100%;
 }
 
 .navbar-item {
-    @apply inline-flex items-center px-6 py-3 text-base font-normal rounded-lg text-white leading-snug;
+	@apply inline-flex items-center px-6 py-3 text-base font-normal rounded-lg text-white leading-snug;
 }
 
 .navbar-item:hover {
-    @apply bg-[#1B243690];
+	@apply bg-[#1B243690];
 }
 
 .navbar-item-selected {
-    @apply bg-[#1B2436];
-    box-shadow: inset 1px 3px 4px 0 rgb(82, 111, 127, 0.25);
+	@apply bg-[#1B2436];
+	box-shadow: inset 1px 3px 4px 0 rgb(82, 111, 127, 0.25);
+}
+
+.period-toggle-button {
+	@apply inline-flex items-center justify-center w-36  text-center py-3 text-base font-normal rounded-lg text-white leading-snug;
+}
+
+.period-toggle-button:hover {
+	@apply bg-[#282F4580] cursor-pointer;
 }

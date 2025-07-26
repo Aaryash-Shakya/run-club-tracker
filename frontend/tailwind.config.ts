@@ -1,25 +1,22 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-    theme: {
-        extend: {
-            colors: {
-                // Backgrounds
-                background: {
-                    DEFAULT: '#0E0F15', // Main background
-                    soft: '#181C2A', // Cards / inner containers
-                    surface: '#282F45', // Slightly lighter for contrast
-                },
-                // Text colors
-                text: {
-                    DEFAULT: '#FFFFFF', // Main text color
-                    muted: 'rgba(255,255,255,0.6)', // Muted text for less emphasis
-                },
-            },
-            fontFamily: {
-                inter: ['Inter', 'sans-serif'],
-            },
-        },
-    },
-    plugins: [],
+	content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+	theme: {
+		extend: {
+			container: {
+				center: true,
+			},
+			colors: {
+				background: '#0E0F15',
+				soft: '#181C2A',
+				surface: '#282F45',
+				text: '#FFFFFF',
+				muted: 'rgba(255,255,255,0.6)',
+			},
+			fontFamily: {
+				inter: ['Inter', 'sans-serif'],
+			},
+		},
+	},
+	plugins: [],
 }
