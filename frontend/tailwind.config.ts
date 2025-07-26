@@ -4,10 +4,17 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#2563eb', // Tailwind blue-600
-        secondary: '#9333ea', // Tailwind purple-600
-        accent: '#facc15', // Tailwind yellow-400
-        neutral: '#1f2937', // Tailwind gray-800
+        // Backgrounds
+        background: {
+          DEFAULT: '#0E0F15', // Main background
+          soft: '#181C2A', // Cards / inner containers
+          surface: '#282F45', // Slightly lighter for contrast
+        },
+        // Text colors
+        text: {
+          DEFAULT: '#FFFFFF', // Main text color
+          muted: 'rgba(255,255,255,0.6)', // Muted text for less emphasis
+        },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],

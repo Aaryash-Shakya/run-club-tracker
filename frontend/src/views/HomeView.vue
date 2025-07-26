@@ -65,7 +65,7 @@ const leaderboard = ref<UserActivitiesWithStats[]>([])
 onMounted(async () => {
   try {
     const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    const res = await fetch(`${apiBaseUrl}/activities/monthly-activities`)
+    const res = await fetch(`${apiBaseUrl}/activities?period=monthly&date=2025-07-25`)
     const response: ActivitiesResponse = await res.json()
     leaderboard.value = response.userActivitiesWithStats
   } catch {
