@@ -10,7 +10,7 @@
 			<table class="w-full border-separate border-spacing-y-2">
 				<thead>
 					<tr class="bg-[#282F45] text-white text-sm">
-						<th class="py-3 px-2 text-left font-medium rounded-l-lg">Rank</th>
+						<th class="py-3 px-2 text-center font-medium rounded-l-lg">Rank</th>
 						<th class="py-3 px-2 text-left font-medium">Runner</th>
 						<th class="py-3 px-2 text-left font-medium">Distance</th>
 						<th class="py-3 px-2 text-left font-medium">Run : Walk</th>
@@ -42,16 +42,19 @@
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
-							<div class="flex items-center gap-3">
+							<div
+								class="flex items-center gap-3 group"
+								v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
+							>
 								<img
 									:src="getAvatarUrl(record.user.firstName)"
 									:alt="record.user.firstName"
 									class="w-10 h-10 rounded-full object-cover hidden md:block"
 								/>
-								<span class="hidden md:inline">
+								<span class="hidden md:inline group-hover:underline">
 									{{ record.user.firstName }} {{ record.user.lastName }}
 								</span>
-								<span class="inline md:hidden">
+								<span class="inline md:hidden group-hover:underline">
 									{{ record.user.firstName.split(' ')[0] }}
 								</span>
 							</div>
