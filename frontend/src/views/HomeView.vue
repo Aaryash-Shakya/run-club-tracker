@@ -1,22 +1,25 @@
 <template>
 	<div class="container mx-auto px-2">
 		<div class="flex items-center justify-center">
-			<div class="p-2 bg-[#181C2A] rounded-xl flex items-center justify-center gap-2 w-fit">
-				<div 
+			<div
+				class="p-2 bg-[#181C2A] rounded-xl flex items-center justify-center gap-2 w-fit"
+				style="box-shadow: 0 0 100px 50px #29304750"
+			>
+				<div
 					class="period-toggle-button cursor-pointer transition-colors"
 					:class="{ 'bg-[#282F45]': activityPeriod === 'daily' }"
 					@click="setActivityPeriod('daily')"
 				>
 					Daily
 				</div>
-				<div 
+				<div
 					class="period-toggle-button cursor-pointer transition-colors"
 					:class="{ 'bg-[#282F45]': activityPeriod === 'weekly' }"
 					@click="setActivityPeriod('weekly')"
 				>
 					Weekly
 				</div>
-				<div 
+				<div
 					class="period-toggle-button cursor-pointer transition-colors"
 					:class="{ 'bg-[#282F45]': activityPeriod === 'monthly' }"
 					@click="setActivityPeriod('monthly')"

@@ -1,5 +1,5 @@
 <template>
-    <nav class="relative h-[150px] overflow-clip">
+    <nav class="relative h-[150px] overflow-x-clip">
         <div
             class="absolute top-0 -left-1/10 -translate-y-1/2 z-0"
             :style="{
@@ -26,6 +26,13 @@
                     :class="[$route.name === 'runners' ? 'navbar-item-selected' : '']"
                 >
                     Runners
+                </router-link>
+                <router-link
+                    to="/rules"
+                    class="navbar-item"
+                    :class="[$route.name === 'rules' ? 'navbar-item-selected' : '']"
+                >
+                    Rules
                 </router-link>
             </div>
         </div>

@@ -38,9 +38,7 @@
 							},
 						]"
 					>
-						<td
-							class="py-2 px-2 text-white/60 font-semibold text-center rounded-l-lg"
-						>
+						<td class="py-2 px-2 text-white/60 font-semibold text-center rounded-l-lg">
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
@@ -229,7 +227,7 @@ const fetchLeaderboardData = async () => {
 		const url = new URL(`${apiBaseUrl}/activities`)
 		url.searchParams.set('period', activityPeriod.value)
 		url.searchParams.set('date', today)
-		const res = await fetch(url.toString())
+		const res = await fetch(url.toString(), { cache: 'default' })
 		const response: ActivitiesResponse = await res.json()
 
 		leaderboard.value = response.userActivitiesWithStats
