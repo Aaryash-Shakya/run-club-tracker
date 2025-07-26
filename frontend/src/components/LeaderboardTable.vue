@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-[#181C2A] rounded-xl shadow-lg p-0 overflow-hidden mt-5">
+	<div class="bg-[#181C2A] rounded-xl shadow-lg px-2 overflow-hidden mt-5">
 		<div class="flex items-center justify-end p-4">
 			<label class="flex items-center gap-2 cursor-pointer text-white/70 text-sm">
 				<input type="checkbox" v-model="showParticipantsOnly" class="accent-green-500" />
@@ -7,15 +7,15 @@
 			</label>
 		</div>
 		<div class="overflow-x-auto">
-			<table class="w-full border-separate border-spacing-0">
+			<table class="w-full border-separate border-spacing-y-2">
 				<thead>
 					<tr class="bg-[#282F45] text-white text-sm">
-						<th class="py-3 px-2 text-left font-medium">Rank</th>
+						<th class="py-3 px-2 text-left font-medium first:rounded-l-lg last:rounded-r-lg">Rank</th>
 						<th class="py-3 px-2 text-left font-medium">Runner</th>
 						<th class="py-3 px-2 text-left font-medium">Distance (km)</th>
 						<th class="py-3 px-2 text-left font-medium">Avg. Pace (km/min)</th>
 						<th class="py-3 px-2 text-left font-medium">Activities</th>
-						<th class="py-3 px-2 text-left font-medium">Duration</th>
+						<th class="py-3 px-2 text-left font-medium first:rounded-l-lg last:rounded-r-lg">Duration</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -23,11 +23,15 @@
 						v-for="(record, index) in filteredLeaderboard"
 						:key="record.user._id"
 						:class="[
-							'border-b border-[#23232a] hover:bg-[#282F4570]',
-							{ 'opacity-40 cursor-not-allowed': !participantIds.includes(record.user._id) }
+							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg',
+							{
+								'opacity-40 cursor-not-allowed': !participantIds.includes(
+									record.user._id,
+								),
+							},
 						]"
 					>
-						<td class="py-2 px-2 text-white/60 font-semibold text-center">
+						<td class="py-2 px-2 text-white/60 font-semibold text-center first:rounded-l-lg">
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
@@ -35,7 +39,7 @@
 								<img
 									:src="getAvatarUrl(record.user.firstName)"
 									:alt="record.user.firstName"
-									class="w-8 h-8 rounded-full object-cover"
+									class="w-10 h-10 rounded-full object-cover"
 								/>
 								<span class="text-white font-medium"
 									>{{ record.user.firstName }} {{ record.user.lastName }}</span
@@ -89,7 +93,7 @@
 								}}</span>
 							</div>
 						</td>
-						<td class="p-2">
+						<td class="p-2 last:rounded-r-lg">
 							<div class="flex items-center gap-2">
 								<span class="text-white/60 font-medium">{{
 									formatSecondsToHMS(record.stats.totalMovingTime)
@@ -104,54 +108,13 @@
 </template>
 
 <script lang="ts" setup>
+import type { UserActivitiesWithStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import { ref, onMounted, watch, computed } from 'vue'
 
 interface Props {
 	targetDistance?: number
-}
-
-type Activity = {
-	_id: string
-	name: string
-	distance: number
-	movingTime: number
-	elapsedTime: number
-	totalElevationGain: number
-	movingPace: number
-	type: string
-	sportType: string
-	workoutType: number
-	activityDate: string
-	isValid: boolean
-	note: string
-	__v: number
-	createdAt: string
-	updatedAt: string
-}
-
-type User = {
-	_id: string
-	firstName: string
-	lastName: string
-	createdAt: string
-	updatedAt: string
-	__v: number
-}
-
-type Stats = {
-	totalDistance: number
-	totalMovingTime: number
-	averagePace: number
-	totalActivities: number
-	invalidActivities: number
-}
-
-type UserActivitiesWithStats = {
-	user: User
-	activities: Activity[]
-	stats: Stats
 }
 
 type ActivitiesResponse = {
