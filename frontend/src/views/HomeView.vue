@@ -1,75 +1,55 @@
 <template>
-  <div class="min-h-screen py-6">
-    <LeaderboardTable
-      title="July 70KM Leaderboard"
-      :leaderboard="leaderboard"
-      :target-distance="70000"
-    />
-  </div>
+	<div class="container mx-auto px-2 py-6">
+		<div class="flex items-center justify-center">
+			<div
+				class="p-2 bg-[#181C2A] rounded-xl flex items-center justify-center gap-2 w-fit"
+				style="box-shadow: 0 0 100px 50px #29304750"
+			>
+				<div
+					class="period-toggle-button cursor-pointer transition-colors"
+					:class="{ 'bg-[#282F45]': activityPeriod === 'daily' }"
+					@click="setActivityPeriod('daily')"
+				>
+					Daily
+				</div>
+				<div
+					class="period-toggle-button cursor-pointer transition-colors"
+					:class="{ 'bg-[#282F45]': activityPeriod === 'weekly' }"
+					@click="setActivityPeriod('weekly')"
+				>
+					Weekly
+				</div>
+				<div
+					class="period-toggle-button cursor-pointer transition-colors"
+					:class="{ 'bg-[#282F45]': activityPeriod === 'monthly' }"
+					@click="setActivityPeriod('monthly')"
+				>
+					Monthly
+				</div>
+			</div>
+		</div>
+		<CountDown />
+		<LeaderboardTable ref="leaderboardTableRef" :target-distance="70000" />
+	</div>
 </template>
 
 <script lang="ts" setup>
+import CountDown from '@/components/CountDown.vue'
 import LeaderboardTable from '@/components/LeaderboardTable.vue'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 
-type Activity = {
-  _id: string
-  name: string
-  distance: number
-  movingTime: number
-  elapsedTime: number
-  totalElevationGain: number
-  movingPace: number
-  type: string
-  sportType: string
-  workoutType: number
-  activityDate: string // ISO string
-  isValid: boolean
-  note: string
-  __v: number
-  createdAt: string
-  updatedAt: string
+type ActivityPeriod = 'daily' | 'weekly' | 'monthly'
+
+// State
+const activityPeriod = ref<ActivityPeriod>('monthly')
+const leaderboardTableRef = ref<InstanceType<typeof LeaderboardTable>>()
+
+// Function to change the activity period
+const setActivityPeriod = (period: ActivityPeriod) => {
+	activityPeriod.value = period
+	// Update the LeaderboardTable's period
+	if (leaderboardTableRef.value) {
+		leaderboardTableRef.value.setActivityPeriod(period)
+	}
 }
-
-type User = {
-  _id: string
-  firstName: string
-  lastName: string
-  createdAt: string
-  updatedAt: string
-  __v: number
-}
-
-type Stats = {
-  totalDistance: number
-  totalMovingTime: number
-  averagePace: number
-  totalActivities: number
-  invalidActivities: number
-}
-
-type UserActivitiesWithStats = {
-  user: User
-  activities: Activity[]
-  stats: Stats
-}
-
-type ActivitiesResponse = {
-  status: string
-  message: string
-  userActivitiesWithStats: UserActivitiesWithStats[]
-}
-
-const leaderboard = ref<UserActivitiesWithStats[]>([])
-
-onMounted(async () => {
-  try {
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-    const res = await fetch(`${apiBaseUrl}/activities/monthly-activities`)
-    const response: ActivitiesResponse = await res.json()
-    leaderboard.value = response.userActivitiesWithStats
-  } catch {
-    leaderboard.value = []
-  }
-})
 </script>

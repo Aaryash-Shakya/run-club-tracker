@@ -16,27 +16,17 @@ function getMonthBasedWeekRange(date: Date = new Date()): {
 	weekStart: DateTime;
 	weekEnd: DateTime;
 } {
-	const nptDate = DateTime.fromJSDate(date).setZone(TIME_ZONE);
-	const startOfMonth = nptDate.startOf("month");
-	const dayOfWeekMonthStarts = startOfMonth.weekday; // Monday = 1, Sunday = 7
+	const nptDate = DateTime.fromJSDate(date).setZone("Asia/Kathmandu");
 
-	// Calculate how many days into the current "month-based week" we are
-	const currentDay = nptDate.weekday;
-	let daysFromWeekStart: number;
+	// Get how many days to go back to reach Sunday
+	const daysFromSunday = nptDate.weekday % 7; // Sunday => 0
+	let weekStart = nptDate.minus({ days: daysFromSunday }).startOf("day");
 
-	if (dayOfWeekMonthStarts === 7) {
-		// Month starts on Sunday
-		daysFromWeekStart = currentDay === 7 ? 0 : currentDay;
-	} else {
-		// Month starts on any other day
-		if (currentDay >= dayOfWeekMonthStarts) {
-			daysFromWeekStart = currentDay - dayOfWeekMonthStarts;
-		} else {
-			daysFromWeekStart = 7 - dayOfWeekMonthStarts + currentDay;
-		}
+	// If weekStart is in the previous month, override it with 1st of current month
+	if (weekStart.month !== nptDate.month) {
+		weekStart = nptDate.startOf("month");
 	}
 
-	const weekStart = nptDate.minus({ days: daysFromWeekStart }).startOf("day");
 	const weekEnd = weekStart.plus({ days: 6 }).endOf("day");
 
 	return { weekStart, weekEnd };
