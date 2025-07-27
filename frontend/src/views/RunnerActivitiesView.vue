@@ -1,5 +1,23 @@
 <template>
 	<div class="container mx-auto py-6 px-2">
+		<!-- Navigation -->
+		<div class="mb-6">
+			<button
+				@click="$router.push('/')"
+				class="flex items-center gap-2 px-4 py-2 cursor-pointer bg-[#282F45] hover:bg-[#323852] text-white rounded-lg transition-colors"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M15 19l-7-7 7-7"
+					></path>
+				</svg>
+				Back to Leaderboard
+			</button>
+		</div>
+
 		<!-- Loading State -->
 		<div v-if="loading" class="flex justify-center items-center py-12">
 			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
@@ -7,13 +25,22 @@
 		</div>
 
 		<!-- Activity Data -->
-		<div v-else-if="activityData" class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden">
+		<div
+			v-else-if="activityData"
+			class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden px-2"
+		>
 			<!-- User Header -->
 			<div class="p-6 border-b border-[#282F45]">
-				<h2 class="text-2xl font-semibold text-white mb-4">
-					{{ activityData.user.firstName }} {{ activityData.user.lastName }}
-				</h2>
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+				<div class="flex items-center gap-4 mb-4">
+					<UiAvatar
+						:name="`${activityData.user.firstName} ${activityData.user.lastName}`"
+						:size="50"
+					/>
+					<h2 class="text-2xl font-semibold text-white">
+						{{ activityData.user.firstName }} {{ activityData.user.lastName }}
+					</h2>
+				</div>
+				<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
 					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
 						<p class="text-sm text-white/60">Total Distance</p>
 						<p class="text-lg font-semibold text-white">
@@ -36,6 +63,18 @@
 						<p class="text-sm text-white/60">Running Distance</p>
 						<p class="text-lg font-semibold text-white">
 							{{ (activityData.stats.runningDistance / 1000).toFixed(2) }} km
+						</p>
+					</div>
+					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
+						<p class="text-sm text-white/60">Total Moving Time</p>
+						<p class="text-lg font-semibold text-white">
+							{{ formatSecondsToHMS(activityData.stats.totalMovingTime) }}
+						</p>
+					</div>
+					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
+						<p class="text-sm text-white/60">Invalid Activities</p>
+						<p class="text-lg font-semibold text-red-400">
+							{{ activityData.stats.invalidActivities }}
 						</p>
 					</div>
 				</div>
@@ -145,6 +184,8 @@ import { ref, onMounted } from 'vue'
 import type { UserActivitiesWithStats } from '@/types/activity'
 import { useRoute } from 'vue-router'
 import paceUtils from '@/utils/pace.utils'
+import { formatSecondsToHMS } from '@/utils/time.utils'
+import UiAvatar from '@/components/UiAvatar.vue'
 
 // Reactive state
 const loading = ref<boolean>(false)

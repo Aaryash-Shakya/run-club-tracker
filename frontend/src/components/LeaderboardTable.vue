@@ -26,8 +26,22 @@
 					</tr>
 				</thead>
 				<tbody>
+					<!-- Loading State -->
+					<tr v-if="loading" class="bg-[#1E2332] rounded-lg">
+						<td colspan="7" class="py-8 px-4 text-center">
+							<div class="flex justify-center items-center">
+								<div
+									class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"
+								></div>
+								<span class="ml-3 text-white/70">Loading activities...</span>
+							</div>
+						</td>
+					</tr>
 					<!-- No activities message -->
-					<tr v-if="filteredLeaderboard.length === 0" class="bg-[#1E2332] rounded-lg">
+					<tr
+						v-else-if="filteredLeaderboard.length === 0"
+						class="bg-[#1E2332] rounded-lg"
+					>
 						<td colspan="7" class="py-8 px-4 text-center">
 							<div class="text-white/60 text-lg">No activities yet</div>
 							<div class="text-white/40 text-sm mt-2">
