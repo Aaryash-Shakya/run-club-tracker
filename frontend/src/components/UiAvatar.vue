@@ -7,7 +7,7 @@
 		{{ initials }}
 	</div>
 </template>
-F
+
 <script lang="ts" setup>
 import { computed } from 'vue'
 
