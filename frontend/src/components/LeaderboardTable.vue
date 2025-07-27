@@ -87,7 +87,15 @@
 						</td>
 						<td class="px-2 py-2">
 							<div class="flex items-center gap-2">
-								<div class="text-muted-light font-medium">
+								<div
+									class="font-medium"
+									:class="{
+										'text-green-500':
+											record.stats.totalDistance >= TARGET_DISTANCE,
+										'text-muted-light':
+											record.stats.totalDistance < TARGET_DISTANCE,
+									}"
+								>
 									{{ (record.stats.totalDistance / 1000).toFixed(1) }} km
 								</div>
 							</div>
@@ -198,9 +206,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import UiAvatar from './UiAvatar.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
-interface Props {
-	targetDistance?: number
-}
+const TARGET_DISTANCE = 70000
 
 type ActivitiesResponse = {
 	status: string
@@ -209,11 +215,6 @@ type ActivitiesResponse = {
 }
 
 type ActivityPeriod = 'daily' | 'weekly' | 'monthly'
-
-// Props
-withDefaults(defineProps<Props>(), {
-	targetDistance: 70000, // 70km in meters
-})
 
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')

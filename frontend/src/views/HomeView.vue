@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<CountDown />
-		<LeaderboardTable ref="leaderboardTableRef" :target-distance="70000" />
+		<LeaderboardTable ref="leaderboardTableRef" />
 	</div>
 </template>
 

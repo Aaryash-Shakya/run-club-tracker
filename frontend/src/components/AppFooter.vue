@@ -3,12 +3,11 @@
 		<div class="container text-center">
 			<p class="text-muted text-sm">
 				<span class="font-medium">Run Tracker</span> built to spark your running fire!
-				Crafted by <span class="text-muted-light">Aaryash</span>, self-proclaimed CTO of the
-				Run Challenge!
+				Crafted by <span class="text-muted-light">Aaryash</span>
 			</p>
 			<p class="text-muted mt-2 text-sm">
-				Got feedback on style, UI, colors, or whatever? Reach out to me anywhere—Slack,
-				office, hallway ambush, carrier pigeon... I'm all ears!
+				Got feedback on style, UI, colors, or whatever? Reach out to me anywhere... I'm all
+				ears!
 			</p>
 		</div>
 	</footer>
