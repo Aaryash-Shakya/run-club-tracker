@@ -39,11 +39,8 @@
 									Not Participating
 								</span>
 							</div>
-							<p v-if="runner.bio" class="text-white/70 text-sm mt-1">
+							<p v-if="runner.bio" class="text-white/70 text-base mt-1">
 								{{ runner.bio }}
-							</p>
-							<p class="text-white/50 text-xs mt-1">
-								Joined {{ formatDate(runner.createdAt) }}
 							</p>
 						</div>
 					</div>
@@ -122,16 +119,6 @@ const fetchRunners = async () => {
 	} finally {
 		loading.value = false
 	}
-}
-
-// Format date helper
-const formatDate = (dateString: string | Date): string => {
-	const date = new Date(dateString)
-	return date.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'short',
-		day: 'numeric',
-	})
 }
 
 // Fetch runners on component mount
