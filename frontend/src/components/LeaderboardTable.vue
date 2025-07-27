@@ -1,5 +1,11 @@
 <template>
+	<!-- Top 3 Podium for Monthly View -->
+	<TopThreePodium
+		v-if="activityPeriod === 'monthly' && !loading && filteredLeaderboard.length > 0"
+		:records="filteredLeaderboard"
+	/>
 	<div class="bg-surface mt-5 overflow-hidden rounded-xl px-2 shadow-lg">
+
 		<div class="flex items-center justify-end p-4">
 			<label class="flex cursor-pointer items-center gap-2 text-sm text-white/70">
 				<input
@@ -262,6 +268,7 @@ import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import { ref, onMounted, watch, computed } from 'vue'
 import UiAvatar from './UiAvatar.vue'
+import TopThreePodium from './TopThreePodium.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 const TARGET_DISTANCE = 70000
