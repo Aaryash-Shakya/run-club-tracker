@@ -10,7 +10,7 @@
 				boxShadow: 'inset 0px 0px 54px 10px #293047',
 			}"
 		></div>
-		<div class="container mx-auto my-5 relative z-1">
+		<div class="container my-5 relative z-1">
 			<div class="w-full flex items-center justify-center gap-4 py-4">
 				<!-- Navigation Links -->
 				<router-link

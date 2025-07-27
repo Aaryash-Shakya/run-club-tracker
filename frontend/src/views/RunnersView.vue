@@ -1,5 +1,5 @@
 <template>
-	<div class="container mx-auto py-6 px-2">
+	<div class="container py-6">
 		<h1 class="text-3xl font-bold text-white mb-6 text-center">Runners</h1>
 
 		<div class="mb-6 text-center">
@@ -47,7 +47,7 @@
 
 					<!-- Show Activities Button -->
 					<button
-						class="px-4 py-2 bg-[#4F51B6] text-white rounded-lg hover:bg-[#6366F1] cursor-pointer transition-colors font-medium w-full md:w-auto"
+						class="px-4 py-2 whitespace-nowrap bg-[#4F51B6] text-sm text-white rounded-lg hover:bg-[#6366F1] cursor-pointer transition-colors font-normal w-full md:w-auto"
 					>
 						Show Activities
 					</button>

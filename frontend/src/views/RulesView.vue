@@ -1,5 +1,5 @@
 <template>
-	<div class="container mx-auto py-6 px-2">
+	<div class="container py-6">
 		<div class="flex items-center justify-center">
 			<div
 				class="p-2 bg-[#181C2A] rounded-xl flex items-center justify-center gap-2 w-fit"

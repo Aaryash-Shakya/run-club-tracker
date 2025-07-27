@@ -1,5 +1,22 @@
-@import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+/* Tailwind v4 Custom Theme Variables */
+@theme {
+	--color-background: #0e0f15;
+	--color-soft: #181c2a;
+	--color-surface: #282f45;
+	--color-text: #ffffff;
+	--color-muted: rgb(255 255 255 / 0.6);
+
+	--font-family-inter: Inter, sans-serif;
+}
+
+@layer utilities {
+	.container {
+		@apply mx-auto px-4;
+	}
+}
 
 /* Custom base styles */
 body {

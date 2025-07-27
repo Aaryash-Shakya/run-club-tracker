@@ -1,5 +1,5 @@
 <template>
-	<div class="container mx-auto py-6 px-2">
+	<div class="container py-6">
 		<!-- Navigation -->
 		<div class="mb-6">
 			<button

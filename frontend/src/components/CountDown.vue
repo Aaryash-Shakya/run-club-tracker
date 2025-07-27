@@ -10,7 +10,7 @@
 		</div>
 
 		<!-- Ends In Text -->
-		<h2 class="text-base font-medium text-text-muted">Ends in</h2>
+		<h2 class="text-base font-medium text-muted">Ends in</h2>
 
 		<!-- Countdown Display -->
 		<div class="text-xl font-bold tracking-wider">

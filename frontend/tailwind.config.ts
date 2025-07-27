@@ -1,22 +1,8 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+// Tailwind CSS v4 configuration
+// Custom theme variables are now defined in src/assets/main.css using @theme
+
+import type { Config } from 'tailwindcss'
+
+export default {
 	content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-	theme: {
-		extend: {
-			container: {
-				center: true,
-			},
-			colors: {
-				background: '#0E0F15',
-				soft: '#181C2A',
-				surface: '#282F45',
-				text: '#FFFFFF',
-				muted: 'rgba(255,255,255,0.6)',
-			},
-			fontFamily: {
-				inter: ['Inter', 'sans-serif'],
-			},
-		},
-	},
-	plugins: [],
-}
+} satisfies Config
