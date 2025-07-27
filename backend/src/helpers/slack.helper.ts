@@ -1,12 +1,10 @@
 import paceUtils from "../utils/pace.utils";
 import dateUtils from "../utils/date.utils";
-import { TGroupedUserActivitiesWithStats } from "./activity.helper";
+import { TUserWithStats } from "./activity.helper";
 import { DateTime } from "luxon";
 
 // Core function that generates the user activity list
-async function generateActivityList(
-	userActivitiesWithStats: TGroupedUserActivitiesWithStats[]
-): Promise<string> {
+async function generateActivityList(userActivitiesWithStats: TUserWithStats[]): Promise<string> {
 	// The data should already be sorted by distance from calculateUserStatsAndSort
 	const userLines = userActivitiesWithStats.map((userStats, index) => {
 		const { user, stats } = userStats;
@@ -30,7 +28,7 @@ async function generateActivityList(
 
 // Function that creates daily update message
 async function formatDailyUpdateMessage(
-	userActivitiesWithStats: TGroupedUserActivitiesWithStats[]
+	userActivitiesWithStats: TUserWithStats[]
 ): Promise<string> {
 	const yesterday = DateTime.now()
 		.setZone("Asia/Kathmandu")
@@ -46,7 +44,7 @@ async function formatDailyUpdateMessage(
 
 // Function that creates weekly update message
 async function formatWeeklyUpdateMessage(
-	userActivitiesWithStats: TGroupedUserActivitiesWithStats[]
+	userActivitiesWithStats: TUserWithStats[]
 ): Promise<string> {
 	const yesterday = new Date();
 	yesterday.setDate(yesterday.getDate() - 1);

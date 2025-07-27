@@ -1,5 +1,5 @@
 import activityRepository from "../repositories/activity.repository";
-import activityHelper from "../helpers/activity.helper";
+import activityHelper, { TUserWithStats } from "../helpers/activity.helper";
 import slackHelper from "../helpers/slack.helper";
 import slackService from "./slack.service";
 import dateUtils from "../utils/date.utils";
@@ -20,8 +20,10 @@ async function sendDailyUpdate(): Promise<void> {
 			return;
 		}
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats =
-			activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
+			userGroupedActivities,
+			false
+		) as TUserWithStats[];
 
 		// Format message using slack helper
 		const message = await slackHelper.formatDailyUpdateMessage(userActivitiesWithStats);
@@ -54,8 +56,10 @@ async function sendWeeklyUpdate(): Promise<void> {
 		}
 
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats =
-			activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
+			userGroupedActivities,
+			false
+		) as TUserWithStats[];
 
 		// Format message using slack helper
 		const message = await slackHelper.formatWeeklyUpdateMessage(userActivitiesWithStats);
