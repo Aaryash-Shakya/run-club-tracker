@@ -39,6 +39,28 @@
 					<h2 class="text-2xl font-semibold text-white">
 						{{ activityData.user.firstName }} {{ activityData.user.lastName }}
 					</h2>
+
+					<!-- Participation Status -->
+					<span
+						class="ml-auto px-3 py-1 rounded-full text-xs font-semibold"
+						:class="
+							PARTICIPANT_IDS.includes(activityData.user._id)
+								? 'bg-green-500/20 text-green-400'
+								: 'bg-red-500/20 text-red-400'
+						"
+					>
+						{{
+							PARTICIPANT_IDS.includes(activityData.user._id)
+								? 'Participating'
+								: 'Not Participating'
+						}}
+					</span>
+				</div>
+				<!-- Bio -->
+				<div v-if="activityData.user.bio" class="w-full my-4">
+					<p class="text-white/80 text-base border-l-2 ps-2 border-[#FFFFFF80]">
+						{{ activityData.user.bio }}
+					</p>
 				</div>
 				<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
 					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
@@ -207,6 +229,7 @@ import { useRoute } from 'vue-router'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import UiAvatar from '@/components/UiAvatar.vue'
+import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 // Reactive state
 const loading = ref<boolean>(false)
@@ -232,7 +255,6 @@ const fetchUserActivityData = async () => {
 		const response: ActivitiesResponse = await res.json()
 
 		activityData.value = response.activities
-		console.log('activityData ==> ', activityData.value)
 	} catch (error) {
 		console.error('Error fetching activityData data:', error)
 		activityData.value = null

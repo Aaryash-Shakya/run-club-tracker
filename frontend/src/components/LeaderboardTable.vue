@@ -61,7 +61,7 @@
 						:class="[
 							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg cursor-pointer',
 							{
-								'opacity-40 cursor-not-allowed': !participantIds.includes(
+								'opacity-40 cursor-not-allowed': !PARTICIPANT_IDS.includes(
 									record.user._id,
 								),
 							},
@@ -198,6 +198,7 @@ import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import { ref, onMounted, watch, computed } from 'vue'
 import UiAvatar from './UiAvatar.vue'
+import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 interface Props {
 	targetDistance?: number
@@ -221,32 +222,11 @@ const activityPeriod = ref<ActivityPeriod>('monthly')
 const leaderboard = ref<UserActivitiesWithStats[]>([])
 const loading = ref(false)
 const showParticipantsOnly = ref(false)
-const participantIds = [
-	'6863716cf8f61725ee9a4f98',
-	'6862b7405f7a41fafa3bcbd3',
-	'6862b7405f7a41fafa3bcbd1',
-	'6862b7405f7a41fafa3bcbd5',
-	'6862b7415f7a41fafa3bcbd9',
-	'6868c2e581932e652aaea23d',
-	'6862b7405f7a41fafa3bcbd7',
-	'6863716cf8f61725ee9a4f96',
-	'6863e71d3db934158bd2525f',
-	'6863feb7e11bd2bd45e8dc13',
-	'6863716cf8f61725ee9a4f94',
-	'6862b7415f7a41fafa3bcbdb',
-	'6862b7405f7a41fafa3bcbcd',
-	'686584407f4fceb59b388235',
-	'68647a05c9399ed6978e7bea',
-	'6863feb7e11bd2bd45e8dc15',
-	'6862b7415f7a41fafa3bcbdd',
-	'68820ead33b122d23b0d61c6',
-	'6862b7405f7a41fafa3bcbcf',
-]
 
 // Computed property to filter leaderboard based on participants
 const filteredLeaderboard = computed(() => {
 	if (showParticipantsOnly.value) {
-		return leaderboard.value.filter((record) => participantIds.includes(record.user._id))
+		return leaderboard.value.filter((record) => PARTICIPANT_IDS.includes(record.user._id))
 	}
 	return leaderboard.value
 })

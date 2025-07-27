@@ -21,6 +21,7 @@ export type User = {
 	_id: string
 	firstName: string
 	lastName: string
+	bio: string | null
 	createdAt: string
 	updatedAt: string
 	__v: number
