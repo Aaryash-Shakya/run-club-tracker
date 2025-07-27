@@ -55,166 +55,183 @@
 						</td>
 					</tr>
 					<!-- Leaderboard data -->
-					<tr
-						v-for="(record, index) in filteredLeaderboard"
-						:key="record.user._id"
-						:class="[
-							'bg-surface-light cursor-pointer rounded-lg hover:bg-[#282F4570]',
-							{
-								'cursor-not-allowed opacity-40': !PARTICIPANT_IDS.includes(
-									record.user._id,
-								),
-							},
-						]"
-						v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
-					>
-						<td class="text-muted rounded-l-lg px-2 py-2 text-center font-semibold">
-							<div class="flex items-center justify-center gap-1">
-								<span>{{ index + 1 }}</span>
-								<!-- Position change indicator -->
-								<div class="flex w-5 items-center">
-									<span
-										v-if="
-											activityPeriod === 'monthly' &&
-											record.positionChange === 'up'
-										"
-										class="text-xs text-green-500"
-									>
-										↑{{ record.positionDiff }}
-									</span>
-									<span
-										v-else-if="
-											activityPeriod === 'monthly' &&
-											record.positionChange === 'down'
-										"
-										class="text-xs text-red-500"
-									>
-										↓{{ record.positionDiff }}
-									</span>
-								</div>
-							</div>
-						</td>
-						<td class="cursor-pointer px-2 py-2">
-							<div class="flex items-center gap-3">
-								<UiAvatar
-									:name="`${record.user.firstName} ${record.user.lastName}`"
-									:size="40"
-								/>
-								<span class="hidden md:inline">
-									{{ record.user.firstName }} {{ record.user.lastName }}
-								</span>
-								<span class="inline md:hidden">
-									{{ record.user.firstName.split(' ')[0] }}
-								</span>
-							</div>
-						</td>
-						<td class="px-2 py-2">
-							<div class="flex items-center gap-2">
-								<div
-									class="font-medium"
-									:class="{
-										'text-green-500':
-											record.stats.totalDistance >= TARGET_DISTANCE,
-										'text-muted-light':
-											record.stats.totalDistance < TARGET_DISTANCE,
-									}"
-								>
-									{{ (record.stats.totalDistance / 1000).toFixed(1) }} km
-								</div>
-							</div>
-						</td>
-						<td class="px-2 py-2">
-							<div class="flex flex-col gap-2">
+					<template v-for="(record, index) in filteredLeaderboard" :key="record.user._id">
+						<!-- Separator for first record under 70km -->
+						<tr v-if="index === separatorIndex" class="bg-transparent">
+							<td colspan="7" class="px-2 py-2">
 								<div class="flex items-center gap-3">
-									<!-- Running Distance -->
-									<div class="flex flex-col items-center gap-1">
-										<img
-											src="../assets/running-shoes.svg"
-											alt="Running"
-											class="h-4 w-4 opacity-70 brightness-0 invert filter"
-										/>
-										<span class="text-muted text-xs font-medium">
-											{{
-												(
-													(record.stats.runningDistance || 0) / 1000
-												).toFixed(1)
-											}}
+									<div class="h-px flex-1 bg-white/20"></div>
+									<span class="text-xs font-medium text-white/50"
+										>Finish Line (70km)</span
+									>
+									<div class="h-px flex-1 bg-white/20"></div>
+								</div>
+							</td>
+						</tr>
+
+						<tr
+							:class="[
+								'bg-surface-light cursor-pointer rounded-lg hover:bg-[#282F4570]',
+								{
+									'cursor-not-allowed opacity-40': !PARTICIPANT_IDS.includes(
+										record.user._id,
+									),
+								},
+							]"
+							v-on:click="
+								() => $router.push(`/runners/${record.user._id}/activities`)
+							"
+						>
+							<td class="text-muted rounded-l-lg px-2 py-2 text-center font-semibold">
+								<div class="flex items-center justify-center gap-1">
+									<span>{{ index + 1 }}</span>
+									<!-- Position change indicator -->
+									<div class="flex w-5 items-center">
+										<span
+											v-if="
+												activityPeriod === 'monthly' &&
+												record.positionChange === 'up'
+											"
+											class="text-xs text-green-500"
+										>
+											↑{{ record.positionDiff }}
 										</span>
-									</div>
-
-									<!-- Separator -->
-									<span class="text-sm text-white/40">:</span>
-
-									<!-- Walking Distance -->
-									<div class="flex flex-col items-center gap-1">
-										<img
-											src="../assets/walking-shoes.svg"
-											alt="Walking"
-											class="h-4 w-4 opacity-70 brightness-0 invert filter"
-										/>
-										<span class="text-muted text-xs font-medium">
-											{{
-												(
-													(record.stats.walkingDistance || 0) / 1000
-												).toFixed(1)
-											}}
+										<span
+											v-else-if="
+												activityPeriod === 'monthly' &&
+												record.positionChange === 'down'
+											"
+											class="text-xs text-red-500"
+										>
+											↓{{ record.positionDiff }}
 										</span>
 									</div>
 								</div>
-
-								<!-- Ratio Bar -->
-								<div class="flex w-20 flex-col gap-2">
-									<div class="relative h-2 w-full overflow-hidden rounded-full">
-										<!-- Running portion -->
-										<div
-											class="bg-accent-run absolute top-0 left-0 h-full rounded-l-full"
-											:style="{
-												width:
-													(record.stats.totalDistance > 0
-														? ((record.stats.runningDistance || 0) /
-																record.stats.totalDistance) *
-															100
-														: 0) + '%',
-											}"
-										></div>
-										<!-- Walking portion -->
-										<div
-											class="bg-accent-walk absolute top-0 right-0 h-full rounded-r-full"
-											:style="{
-												width:
-													(record.stats.totalDistance > 0
-														? ((record.stats.walkingDistance || 0) /
-																record.stats.totalDistance) *
-															100
-														: 0) + '%',
-											}"
-										></div>
+							</td>
+							<td class="cursor-pointer px-2 py-2">
+								<div class="flex items-center gap-3">
+									<UiAvatar
+										:name="`${record.user.firstName} ${record.user.lastName}`"
+										:size="40"
+									/>
+									<span class="hidden md:inline">
+										{{ record.user.firstName }} {{ record.user.lastName }}
+									</span>
+									<span class="inline md:hidden">
+										{{ record.user.firstName.split(' ')[0] }}
+									</span>
+								</div>
+							</td>
+							<td class="px-2 py-2">
+								<div class="flex items-center gap-2">
+									<div
+										class="font-medium"
+										:class="{
+											'text-green-500':
+												record.stats.totalDistance >= TARGET_DISTANCE,
+											'text-muted-light':
+												record.stats.totalDistance < TARGET_DISTANCE,
+										}"
+									>
+										{{ (record.stats.totalDistance / 1000).toFixed(1) }} km
 									</div>
 								</div>
-							</div>
-						</td>
-						<td class="px-2 py-2">
-							<div class="flex items-center gap-2">
-								<span class="text-muted font-medium">{{
-									paceUtils.formatPaceToString(record.stats.averagePace)
-								}}</span>
-							</div>
-						</td>
-						<td class="hidden p-2 md:table-cell">
-							<div class="flex items-center gap-2">
-								<span class="text-muted font-medium">{{
-									record.stats.totalActivities
-								}}</span>
-							</div>
-						</td>
-						<td class="hidden rounded-r-lg p-2 md:table-cell">
-							<div class="flex items-center gap-2">
-								<span class="text-muted font-medium">{{
-									formatSecondsToHMS(record.stats.totalMovingTime)
-								}}</span>
-							</div>
-						</td>
-					</tr>
+							</td>
+							<td class="px-2 py-2">
+								<div class="flex flex-col gap-2">
+									<div class="flex items-center gap-3">
+										<!-- Running Distance -->
+										<div class="flex flex-col items-center gap-1">
+											<img
+												src="../assets/running-shoes.svg"
+												alt="Running"
+												class="h-4 w-4 opacity-70 brightness-0 invert filter"
+											/>
+											<span class="text-muted text-xs font-medium">
+												{{
+													(
+														(record.stats.runningDistance || 0) / 1000
+													).toFixed(1)
+												}}
+											</span>
+										</div>
+
+										<!-- Separator -->
+										<span class="text-sm text-white/40">:</span>
+
+										<!-- Walking Distance -->
+										<div class="flex flex-col items-center gap-1">
+											<img
+												src="../assets/walking-shoes.svg"
+												alt="Walking"
+												class="h-4 w-4 opacity-70 brightness-0 invert filter"
+											/>
+											<span class="text-muted text-xs font-medium">
+												{{
+													(
+														(record.stats.walkingDistance || 0) / 1000
+													).toFixed(1)
+												}}
+											</span>
+										</div>
+									</div>
+
+									<!-- Ratio Bar -->
+									<div class="flex w-20 flex-col gap-2">
+										<div
+											class="relative h-2 w-full overflow-hidden rounded-full"
+										>
+											<!-- Running portion -->
+											<div
+												class="bg-accent-run absolute top-0 left-0 h-full rounded-l-full"
+												:style="{
+													width:
+														(record.stats.totalDistance > 0
+															? ((record.stats.runningDistance || 0) /
+																	record.stats.totalDistance) *
+																100
+															: 0) + '%',
+												}"
+											></div>
+											<!-- Walking portion -->
+											<div
+												class="bg-accent-walk absolute top-0 right-0 h-full rounded-r-full"
+												:style="{
+													width:
+														(record.stats.totalDistance > 0
+															? ((record.stats.walkingDistance || 0) /
+																	record.stats.totalDistance) *
+																100
+															: 0) + '%',
+												}"
+											></div>
+										</div>
+									</div>
+								</div>
+							</td>
+							<td class="px-2 py-2">
+								<div class="flex items-center gap-2">
+									<span class="text-muted font-medium">{{
+										paceUtils.formatPaceToString(record.stats.averagePace)
+									}}</span>
+								</div>
+							</td>
+							<td class="hidden p-2 md:table-cell">
+								<div class="flex items-center gap-2">
+									<span class="text-muted font-medium">{{
+										record.stats.totalActivities
+									}}</span>
+								</div>
+							</td>
+							<td class="hidden rounded-r-lg p-2 md:table-cell">
+								<div class="flex items-center gap-2">
+									<span class="text-muted font-medium">{{
+										formatSecondsToHMS(record.stats.totalMovingTime)
+									}}</span>
+								</div>
+							</td>
+						</tr>
+					</template>
 				</tbody>
 			</table>
 		</div>
@@ -264,6 +281,17 @@ const filteredLeaderboard = computed(() => {
 		return leaderboard.value.filter((record) => PARTICIPANT_IDS.includes(record.user._id))
 	}
 	return leaderboard.value
+})
+
+// Computed property to find the index where separator should be placed (first record under 70km)
+const separatorIndex = computed(() => {
+	if (activityPeriod.value !== 'monthly') return -1
+
+	const index = filteredLeaderboard.value.findIndex(
+		(record) => record.stats.totalDistance < TARGET_DISTANCE,
+	)
+	// If the first record is under 70km, don't show separator
+	return index === 0 ? -1 : index
 })
 
 // Function to fetch recent activities (last 24 hours)
