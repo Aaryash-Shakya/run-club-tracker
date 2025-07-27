@@ -2,7 +2,11 @@
 	<div class="bg-[#181C2A] rounded-xl shadow-lg px-2 overflow-hidden mt-5">
 		<div class="flex items-center justify-end p-4">
 			<label class="flex items-center gap-2 cursor-pointer text-white/70 text-sm">
-				<input type="checkbox" v-model="showParticipantsOnly" class="accent-[#6366F1] h-4 w-4" />
+				<input
+					type="checkbox"
+					v-model="showParticipantsOnly"
+					class="accent-[#6366F1] h-4 w-4"
+				/>
 				Show Participants only
 			</label>
 		</div>
@@ -55,32 +59,28 @@
 						v-for="(record, index) in filteredLeaderboard"
 						:key="record.user._id"
 						:class="[
-							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg',
+							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg cursor-pointer',
 							{
 								'opacity-40 cursor-not-allowed': !participantIds.includes(
 									record.user._id,
 								),
 							},
 						]"
+						v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
 					>
 						<td class="py-2 px-2 text-white/60 font-semibold text-center rounded-l-lg">
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
-							<div
-								class="flex items-center gap-3 group"
-								v-on:click="
-									() => $router.push(`/runners/${record.user._id}/activities`)
-								"
-							>
+							<div class="flex items-center gap-3">
 								<UiAvatar
 									:name="`${record.user.firstName} ${record.user.lastName}`"
 									:size="40"
 								/>
-								<span class="hidden md:inline group-hover:underline">
+								<span class="hidden md:inline">
 									{{ record.user.firstName }} {{ record.user.lastName }}
 								</span>
-								<span class="inline md:hidden group-hover:underline">
+								<span class="inline md:hidden">
 									{{ record.user.firstName.split(' ')[0] }}
 								</span>
 							</div>

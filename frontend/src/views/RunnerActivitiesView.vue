@@ -30,7 +30,7 @@
 			class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden px-2"
 		>
 			<!-- User Header -->
-			<div class="p-6 border-b border-[#282F45]">
+			<div class="py-4 px-2 border-b border-[#282F45]">
 				<div class="flex items-center gap-4 mb-4">
 					<UiAvatar
 						:name="`${activityData.user.firstName} ${activityData.user.lastName}`"
@@ -80,85 +80,106 @@
 				</div>
 			</div>
 
-			<!-- Activities Table -->
-			<div
-				v-if="activityData.activities.length > 0"
-				class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden"
-			>
-				<div class="overflow-x-auto">
-					<table class="w-full border-separate border-spacing-y-2">
-						<thead>
-							<tr class="bg-[#282F45] text-white text-sm">
-								<th class="py-3 px-4 text-left font-medium rounded-l-lg">
-									Activity
-								</th>
-								<th class="py-3 px-4 text-left font-medium">Distance</th>
-								<th class="py-3 px-4 text-left font-medium">Elevation Gain</th>
-								<th class="py-3 px-4 text-left font-medium">Type</th>
-								<th class="py-3 px-4 text-left font-medium">Pace</th>
-								<th class="py-3 px-4 text-left font-medium">Date</th>
-								<th class="py-3 px-4 text-center font-medium rounded-r-lg">
-									Status
-								</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr
-								v-for="activity in activityData.activities"
-								:key="activity._id"
-								class="bg-[#1E2332] hover:bg-[#282F4570] rounded-lg"
+			<!-- Activities Cards -->
+			<div v-if="activityData.activities.length > 0" class="space-y-4 py-4 px-2">
+				<div
+					v-for="activity in activityData.activities"
+					:key="activity._id"
+					class="bg-[#1E2332] hover:bg-[#282F4570] rounded-lg p-4 transition-colors"
+				>
+					<!-- Header with icon, name, status, and type -->
+					<div class="flex items-start gap-3 mb-2">
+						<!-- Activity Type Icon -->
+						<span
+							class="inline-flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 mt-1"
+							:class="activity.type === 'Run' ? 'bg-[#6366F1]' : 'bg-[#FBBF24]'"
+						>
+							<!-- Run or Walk Icon -->
+							<img
+								v-if="activity.type === 'Run'"
+								src="@/assets/running-shoes.svg"
+								alt="Run Icon"
+								class="w-6 h-6 filter brightness-0 invert opacity-70"
+							/>
+							<img
+								v-if="activity.type === 'Walk'"
+								src="@/assets/walking-shoes.svg"
+								alt="Walk Icon"
+								class="w-6 h-6 filter brightness-0 opacity-70"
+							/>
+						</span>
+
+						<!-- Name and Date Container -->
+						<div class="flex-1 min-w-0">
+							<h3 class="text-white/90 font-medium text-lg">
+								{{ activity.name }}
+							</h3>
+							<p class="text-white/50 text-sm">
+								{{ formatDate(activity.activityDate) }}
+							</p>
+						</div>
+
+						<!-- Status Badge -->
+						<div class="flex items-center gap-2 flex-shrink-0">
+							<span
+								class="text-xs px-2 py-1 rounded font-medium"
+								:class="
+									activity.isValid
+										? 'bg-green-500/20 text-green-400'
+										: 'bg-red-500/20 text-red-400'
+								"
 							>
-								<td class="py-3 px-4 rounded-l-lg">
-									<div class="text-white/80 font-medium truncate max-w-xs">
-										{{ activity.name }}
-									</div>
-									<div
-										v-if="activity.note"
-										class="text-white/50 text-sm mt-1 max-w-xs"
-									>
-										{{ activity.note }}
-									</div>
-								</td>
-								<td class="py-3 px-4">
-									<span class="text-white/80 font-medium">
-										{{ (activity.distance / 1000).toFixed(2) }} km
-									</span>
-								</td>
-								<td class="py-3 px-4">
-									<span class="text-white/80 font-medium">
-										{{ activity.totalElevationGain }} m
-									</span>
-								</td>
-								<td class="py-3 px-4">
-									<span class="text-white/80 capitalize">{{
-										activity.type
-									}}</span>
-								</td>
-								<td class="py-3 px-4">
-									<span class="text-white/60 font-medium">
-										{{ paceUtils.formatPaceToString(activity.movingPace) }}
-									</span>
-								</td>
-								<td class="py-3 px-4">
-									<span class="text-white/60">
-										{{ formatDate(activity.activityDate) }}
-									</span>
-								</td>
-								<td class="py-3 px-4 text-center rounded-r-lg">
-									<span
-										class="text-xs px-2 py-1 rounded-full font-medium"
-										:class="
-											activity.isValid
-												? 'bg-green-500/20 text-green-400'
-												: 'bg-red-500/20 text-red-400'
-										"
-									>
-										{{ activity.isValid ? 'Valid' : 'Invalid' }}
-									</span>
-								</td>
-							</tr>
-						</tbody>
-					</table>
+								{{ activity.isValid ? 'Valid' : 'Invalid' }}
+							</span>
+						</div>
+					</div>
+
+					<!-- Stats -->
+					<div
+						class="flex flex-wrap items-center justify-between mt-3 divide-x divide-white/20"
+					>
+						<!-- Distance -->
+						<div class="text-center flex-1 px-2">
+							<p class="text-xs text-white/60 mb-1">Distance</p>
+							<p class="text-white font-semibold text-sm">
+								{{ (activity.distance / 1000).toFixed(2) }} km
+							</p>
+						</div>
+						<!-- Pace -->
+						<div class="text-center flex-1 px-2">
+							<p class="text-xs text-white/60 mb-1">Pace</p>
+							<p class="text-white font-semibold text-sm">
+								{{ paceUtils.formatPaceToString(activity.movingPace) }}
+							</p>
+						</div>
+						<!-- Moving Time -->
+						<div class="text-center flex-1 px-2">
+							<p class="text-xs text-white/60 mb-1">Moving Time</p>
+							<p class="text-white font-semibold text-sm">
+								{{ formatSecondsToHMS(activity.movingTime) }}
+							</p>
+						</div>
+						<!-- Elevation -->
+						<div class="text-center flex-1 px-2">
+							<p class="text-xs text-white/60 mb-1">Elev Gain</p>
+							<p class="text-white font-semibold text-sm">
+								{{ activity.totalElevationGain }} m
+							</p>
+						</div>
+						<!-- Elapsed Time -->
+						<div class="text-center flex-1 px-2">
+							<p class="text-xs text-white/60 mb-1">Elapsed</p>
+							<p class="text-white font-semibold text-sm">
+								{{ formatSecondsToHMS(activity.elapsedTime) }}
+							</p>
+						</div>
+					</div>
+
+					<!-- Note if exists -->
+					<div v-if="activity.note" class="mt-3 p-2 bg-[#282F45] rounded">
+						<p class="text-xs text-white/60 mb-1">Note</p>
+						<p class="text-white/70 text-sm">{{ activity.note }}</p>
+					</div>
 				</div>
 			</div>
 			<div v-else class="text-center py-8 text-white/60">
