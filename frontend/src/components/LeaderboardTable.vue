@@ -26,6 +26,17 @@
 					</tr>
 				</thead>
 				<tbody>
+					<!-- No activities message -->
+					<tr v-if="filteredLeaderboard.length === 0" class="bg-[#1E2332] rounded-lg">
+						<td colspan="7" class="py-8 px-4 text-center">
+							<div class="text-white/60 text-lg">No activities yet</div>
+							<div class="text-white/40 text-sm mt-2">
+								Lace up and log your first activity to claim your spot on the
+								leaderboard!
+							</div>
+						</td>
+					</tr>
+					<!-- Leaderboard data -->
 					<tr
 						v-for="(record, index) in filteredLeaderboard"
 						:key="record.user._id"
@@ -44,12 +55,13 @@
 						<td class="py-2 px-2 cursor-pointer">
 							<div
 								class="flex items-center gap-3 group"
-								v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
+								v-on:click="
+									() => $router.push(`/runners/${record.user._id}/activities`)
+								"
 							>
-								<img
-									:src="getAvatarUrl(record.user.firstName)"
-									:alt="record.user.firstName"
-									class="w-10 h-10 rounded-full object-cover hidden md:block"
+								<UiAvatar
+									:name="`${record.user.firstName} ${record.user.lastName}`"
+									:size="40"
 								/>
 								<span class="hidden md:inline group-hover:underline">
 									{{ record.user.firstName }} {{ record.user.lastName }}
@@ -171,6 +183,7 @@ import type { UserActivitiesWithStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import { ref, onMounted, watch, computed } from 'vue'
+import UiAvatar from './UiAvatar.vue'
 
 interface Props {
 	targetDistance?: number
@@ -262,11 +275,4 @@ defineExpose({
 		activityPeriod.value = period
 	},
 })
-
-/**
- * Generate avatar URL using a placeholder service
- */
-const getAvatarUrl = (name: string): string => {
-	return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=32`
-}
 </script>
