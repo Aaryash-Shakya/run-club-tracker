@@ -22,7 +22,7 @@
 				class="bg-[#181C2A] rounded-xl shadow-lg p-6 hover:bg-[#1E2332] transition-colors cursor-pointer"
 				@click="$router.push(`/runners/${runner._id}/activities`)"
 			>
-				<div class="flex items-center justify-between">
+				<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 					<!-- Runner Info -->
 					<div class="flex items-center gap-4">
 						<UiAvatar :name="`${runner.firstName} ${runner.lastName}`" :size="50" />
@@ -47,7 +47,7 @@
 
 					<!-- Show Activities Button -->
 					<button
-						class="px-4 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5855eb] cursor-pointer transition-colors font-medium"
+						class="px-4 py-2 bg-[#4F51B6] text-white rounded-lg hover:bg-[#6366F1] cursor-pointer transition-colors font-medium w-full md:w-auto"
 					>
 						Show Activities
 					</button>

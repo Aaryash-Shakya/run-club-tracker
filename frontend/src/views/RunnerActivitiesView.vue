@@ -62,44 +62,7 @@
 						{{ activityData.user.bio }}
 					</p>
 				</div>
-				<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-						<p class="text-sm text-white/60">Total Distance</p>
-						<p class="text-lg font-semibold text-white">
-							{{ (activityData.stats.totalDistance / 1000).toFixed(2) }} km
-						</p>
-					</div>
-					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-						<p class="text-sm text-white/60">Total Activities</p>
-						<p class="text-lg font-semibold text-white">
-							{{ activityData.stats.totalActivities }}
-						</p>
-					</div>
-					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-						<p class="text-sm text-white/60">Average Pace</p>
-						<p class="text-lg font-semibold text-white">
-							{{ paceUtils.formatPaceToString(activityData.stats.averagePace) }}
-						</p>
-					</div>
-					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-						<p class="text-sm text-white/60">Running Distance</p>
-						<p class="text-lg font-semibold text-white">
-							{{ (activityData.stats.runningDistance / 1000).toFixed(2) }} km
-						</p>
-					</div>
-					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-						<p class="text-sm text-white/60">Total Moving Time</p>
-						<p class="text-lg font-semibold text-white">
-							{{ formatSecondsToHMS(activityData.stats.totalMovingTime) }}
-						</p>
-					</div>
-					<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-						<p class="text-sm text-white/60">Invalid Activities</p>
-						<p class="text-lg font-semibold text-red-400">
-							{{ activityData.stats.invalidActivities }}
-						</p>
-					</div>
-				</div>
+				<RunnerHeaderStats :stats="activityData.stats" />
 			</div>
 
 			<!-- Activities Cards -->
@@ -157,45 +120,7 @@
 					</div>
 
 					<!-- Stats -->
-					<div
-						class="flex flex-wrap items-center justify-between mt-3 divide-x divide-white/20"
-					>
-						<!-- Distance -->
-						<div class="text-center flex-1 px-2">
-							<p class="text-xs text-white/60 mb-1">Distance</p>
-							<p class="text-white font-semibold text-sm">
-								{{ (activity.distance / 1000).toFixed(2) }} km
-							</p>
-						</div>
-						<!-- Pace -->
-						<div class="text-center flex-1 px-2">
-							<p class="text-xs text-white/60 mb-1">Pace</p>
-							<p class="text-white font-semibold text-sm">
-								{{ paceUtils.formatPaceToString(activity.movingPace) }}
-							</p>
-						</div>
-						<!-- Moving Time -->
-						<div class="text-center flex-1 px-2">
-							<p class="text-xs text-white/60 mb-1">Moving Time</p>
-							<p class="text-white font-semibold text-sm">
-								{{ formatSecondsToHMS(activity.movingTime) }}
-							</p>
-						</div>
-						<!-- Elevation -->
-						<div class="text-center flex-1 px-2">
-							<p class="text-xs text-white/60 mb-1">Elev Gain</p>
-							<p class="text-white font-semibold text-sm">
-								{{ activity.totalElevationGain }} m
-							</p>
-						</div>
-						<!-- Elapsed Time -->
-						<div class="text-center flex-1 px-2">
-							<p class="text-xs text-white/60 mb-1">Elapsed</p>
-							<p class="text-white font-semibold text-sm">
-								{{ formatSecondsToHMS(activity.elapsedTime) }}
-							</p>
-						</div>
-					</div>
+					<RunnerActivityStats :activity="activity" />
 
 					<!-- Note if exists -->
 					<div v-if="activity.note" class="mt-3 p-2 bg-[#282F45] rounded">
@@ -226,9 +151,9 @@
 import { ref, onMounted } from 'vue'
 import type { UserActivitiesWithStats } from '@/types/activity'
 import { useRoute } from 'vue-router'
-import paceUtils from '@/utils/pace.utils'
-import { formatSecondsToHMS } from '@/utils/time.utils'
 import UiAvatar from '@/components/UiAvatar.vue'
+import RunnerActivityStats from '@/components/RunnerActivityStats.vue'
+import RunnerHeaderStats from '@/components/RunnerHeaderStats.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 // Reactive state

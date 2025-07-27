@@ -63,7 +63,9 @@ const backgroundColor = computed(() => {
 
 const avatarStyle = computed(() => ({
 	width: `${props.size}px`,
+	minWidth: `${props.size}px`,
 	height: `${props.size}px`,
+	minHeight: `${props.size}px`,
 	backgroundColor: backgroundColor.value,
 	fontSize: `${props.size * 0.4}px`,
 }))
