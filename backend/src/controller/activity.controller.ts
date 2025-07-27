@@ -14,8 +14,10 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats =
-			activityHelper.calculateUserStatsAndSort(userGroupedActivities);
+		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
+			userGroupedActivities,
+			false
+		);
 
 		// Generate appropriate message based on period
 		const periodMessages = {
@@ -28,6 +30,33 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 		res.json({
 			status: "OK",
 			message: periodMessages[period],
+			userActivitiesWithStats,
+		});
+	} catch (error) {
+		next(error);
+	}
+}
+
+async function fetchRecentActivities(req: Request, res: Response, next: NextFunction) {
+	try {
+		const now = new Date();
+		const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+		const activities = await activityRepository.listAllActivitiesInRange(
+			twentyFourHoursAgo,
+			now
+		);
+		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
+		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
+			userGroupedActivities,
+			false
+		);
+
+		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.json({
+			status: "OK",
+			message: "Recent activities fetched successfully",
+			activities,
 			userActivitiesWithStats,
 		});
 	} catch (error) {
@@ -69,5 +98,6 @@ async function fetchUserActivities(req: Request, res: Response, next: NextFuncti
 
 export default {
 	fetchActivities,
+	fetchRecentActivities,
 	fetchUserActivities,
 };

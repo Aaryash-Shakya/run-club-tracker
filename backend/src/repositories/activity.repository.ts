@@ -9,14 +9,14 @@ async function listAllActivitiesInRange(
 	const pipeline: PipelineStage[] = [
 		{
 			$match: {
-				createdAt: {
+				activityDate: {
 					$gte: startDate,
 					$lt: endDate,
 				},
 			},
 		},
 		{
-			$sort: { createdAt: -1, _id: -1 },
+			$sort: { activityDate: -1, _id: -1 },
 		},
 		{
 			$lookup: {
