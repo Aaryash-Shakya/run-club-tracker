@@ -2,7 +2,7 @@
 	<div class="bg-[#181C2A] rounded-xl shadow-lg px-2 overflow-hidden mt-5">
 		<div class="flex items-center justify-end p-4">
 			<label class="flex items-center gap-2 cursor-pointer text-white/70 text-sm">
-				<input type="checkbox" v-model="showParticipantsOnly" class="#6366F1 h-4 w-4" />
+				<input type="checkbox" v-model="showParticipantsOnly" class="accent-[#6366F1] h-4 w-4" />
 				Show Participants only
 			</label>
 		</div>
