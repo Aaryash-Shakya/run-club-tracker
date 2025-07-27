@@ -2,6 +2,12 @@
 	<div class="container mx-auto py-6 px-2">
 		<h1 class="text-3xl font-bold text-white mb-6 text-center">Runners</h1>
 
+		<div class="mb-6 text-center">
+			<p class="text-white/70 text-sm">
+				Hand-crafted bios with a sprinkle of fun! Want to tweak one? Ping me on Slack!
+			</p>
+		</div>
+
 		<!-- Loading State -->
 		<div v-if="loading" class="flex justify-center items-center py-12">
 			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
