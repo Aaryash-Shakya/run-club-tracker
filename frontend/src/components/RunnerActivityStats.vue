@@ -80,12 +80,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { Activity } from '@/types/activity'
+import type { TActivity } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 
 interface Props {
-	activity: Activity
+	activity: TActivity
 }
 
 defineProps<Props>()

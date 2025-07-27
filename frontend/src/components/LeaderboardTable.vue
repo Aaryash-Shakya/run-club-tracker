@@ -191,7 +191,7 @@
 </template>
 
 <script lang="ts" setup>
-import type { UserActivitiesWithStats } from '@/types/activity'
+import type { TUserWithStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import { ref, onMounted, watch, computed } from 'vue'
@@ -205,7 +205,7 @@ interface Props {
 type ActivitiesResponse = {
 	status: string
 	message: string
-	userActivitiesWithStats: UserActivitiesWithStats[]
+	userActivitiesWithStats: TUserWithStats[]
 }
 
 type ActivityPeriod = 'daily' | 'weekly' | 'monthly'
@@ -217,7 +217,7 @@ withDefaults(defineProps<Props>(), {
 
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')
-const leaderboard = ref<UserActivitiesWithStats[]>([])
+const leaderboard = ref<TUserWithStats[]>([])
 const loading = ref(false)
 const showParticipantsOnly = ref(false)
 

@@ -83,11 +83,11 @@
 import { ref, onMounted } from 'vue'
 import UiAvatar from '@/components/UiAvatar.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
-import type { User } from '@/types/activity'
+import type { TUser } from '@/types/activity'
 
 // Reactive state
 const loading = ref<boolean>(false)
-const runners = ref<User[]>([])
+const runners = ref<TUser[]>([])
 const error = ref<string | null>(null)
 
 // Fetch runners from API
@@ -107,7 +107,7 @@ const fetchRunners = async () => {
 			status: number
 			message: string
 			data: {
-				users: User[]
+				users: TUser[]
 				count: number
 			}
 		} = await response.json()

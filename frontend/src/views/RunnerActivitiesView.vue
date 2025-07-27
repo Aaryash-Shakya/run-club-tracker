@@ -144,7 +144,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import type { UserActivitiesWithStats } from '@/types/activity'
+import type { TUserActivitiesWithStats } from '@/types/activity'
 import { useRoute } from 'vue-router'
 import UiAvatar from '@/components/UiAvatar.vue'
 import RunnerActivityStats from '@/components/RunnerActivityStats.vue'
@@ -153,12 +153,12 @@ import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 // Reactive state
 const loading = ref<boolean>(false)
-const activityData = ref<UserActivitiesWithStats | null>(null)
+const activityData = ref<TUserActivitiesWithStats | null>(null)
 
 type ActivitiesResponse = {
 	status: string
 	message: string
-	activities: UserActivitiesWithStats
+	activities: TUserActivitiesWithStats
 }
 
 const fetchUserActivityData = async () => {

@@ -90,12 +90,12 @@
 </template>
 
 <script lang="ts" setup>
-import type { Stats } from '@/types/activity'
+import type { TStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 
 interface Props {
-	stats: Stats
+	stats: TStats
 }
 
 defineProps<Props>()
