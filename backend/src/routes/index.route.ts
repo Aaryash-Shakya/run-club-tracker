@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import mongoose from "mongoose";
 import activityRoutes from "./activity.route";
+import userRoutes from "./user.route";
 import slackRoutes from "./slack.route";
 import authMiddleware from "../middlewares/auth.middleware";
 
@@ -23,6 +24,8 @@ router.get("/health", (req: Request, res: Response) => {
 });
 
 router.use("/activities", activityRoutes);
+
+router.use("/users", userRoutes);
 
 router.use("/slack", authMiddleware.authenticateApiKey, slackRoutes);
 
