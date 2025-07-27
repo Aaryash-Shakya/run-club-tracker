@@ -69,7 +69,30 @@
 						v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
 					>
 						<td class="text-muted rounded-l-lg px-2 py-2 text-center font-semibold">
-							{{ index + 1 }}
+							<div class="flex items-center justify-center gap-1">
+								<span>{{ index + 1 }}</span>
+								<!-- Position change indicator -->
+								<div class="flex w-5 items-center">
+									<span
+										v-if="
+											activityPeriod === 'monthly' &&
+											record.positionChange === 'up'
+										"
+										class="text-xs text-green-500"
+									>
+										↑{{ record.positionDiff }}
+									</span>
+									<span
+										v-else-if="
+											activityPeriod === 'monthly' &&
+											record.positionChange === 'down'
+										"
+										class="text-xs text-red-500"
+									>
+										↓{{ record.positionDiff }}
+									</span>
+								</div>
+							</div>
 						</td>
 						<td class="cursor-pointer px-2 py-2">
 							<div class="flex items-center gap-3">
@@ -216,9 +239,22 @@ type ActivitiesResponse = {
 
 type ActivityPeriod = 'daily' | 'weekly' | 'monthly'
 
+type LeaderboardEntry = {
+	userId: string
+	distance: number
+	activities: number
+}
+
+type PositionChange = 'up' | 'down' | 'neutral'
+
+type LeaderboardWithPosition = TUserWithStats & {
+	positionChange?: PositionChange
+	positionDiff?: number
+}
+
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')
-const leaderboard = ref<TUserWithStats[]>([])
+const leaderboard = ref<LeaderboardWithPosition[]>([])
 const loading = ref(false)
 const showParticipantsOnly = ref(false)
 
@@ -230,20 +266,135 @@ const filteredLeaderboard = computed(() => {
 	return leaderboard.value
 })
 
+// Function to fetch recent activities (last 24 hours)
+const fetchRecentActivities = async (): Promise<TUserWithStats[]> => {
+	try {
+		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
+		const res = await fetch(`${apiBaseUrl}/activities/recent`, { cache: 'default' })
+		const response: ActivitiesResponse = await res.json()
+		return response.userActivitiesWithStats
+	} catch (error) {
+		console.error('Error fetching recent activities:', error)
+		return []
+	}
+}
+
+// Function to get changes from current leaderboard
+const getChanges = (records: TUserWithStats[]): LeaderboardEntry[] => {
+	return records
+		.map((record) => ({
+			userId: record.user._id,
+			distance: record.stats.totalDistance,
+			activities: record.stats.totalActivities,
+		}))
+		.sort((a, b) => b.distance - a.distance)
+}
+
+// Function to calculate previous leaderboard by subtracting recent activities
+const calculatePreviousLeaderboard = (
+	currentData: LeaderboardEntry[],
+	recentData: TUserWithStats[],
+): LeaderboardEntry[] => {
+	const recentMap = new Map<string, TUserWithStats>()
+	recentData.forEach((record) => {
+		recentMap.set(record.user._id, record)
+	})
+
+	return currentData
+		.map((current) => {
+			const recent = recentMap.get(current.userId)
+			if (recent) {
+				return {
+					userId: current.userId,
+					distance: current.distance - recent.stats.totalDistance,
+					activities: current.activities - recent.stats.totalActivities,
+				}
+			}
+			return current
+		})
+		.sort((a, b) => b.distance - a.distance)
+}
+
+// Function to check position changes
+const checkPositionChanges = (
+	currentLeaderboard: LeaderboardEntry[],
+	previousLeaderboard: LeaderboardEntry[],
+): Map<string, { change: PositionChange; diff: number }> => {
+	const previousPositions = new Map<string, number>()
+	previousLeaderboard.forEach((entry, index) => {
+		previousPositions.set(entry.userId, index)
+	})
+
+	const positionChanges = new Map<string, { change: PositionChange; diff: number }>()
+
+	currentLeaderboard.forEach((entry, currentIndex) => {
+		const previousIndex = previousPositions.get(entry.userId)
+
+		if (previousIndex !== undefined) {
+			const diff = previousIndex - currentIndex
+			let change: PositionChange = 'neutral'
+
+			if (diff > 0) {
+				change = 'up'
+			} else if (diff < 0) {
+				change = 'down'
+			}
+
+			positionChanges.set(entry.userId, { change, diff: Math.abs(diff) })
+		} else {
+			// New entry, consider as neutral
+			positionChanges.set(entry.userId, { change: 'neutral', diff: 0 })
+		}
+	})
+
+	return positionChanges
+}
+
 // API call function
 const fetchLeaderboardData = async () => {
 	try {
 		loading.value = true
 		leaderboard.value = [] // Clear existing data when starting new fetch
 		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-		const today = new Date().toISOString().split('T')[0]
-		const url = new URL(`${apiBaseUrl}/activities`)
-		url.searchParams.set('period', activityPeriod.value)
-		url.searchParams.set('date', today)
-		const res = await fetch(url.toString(), { cache: 'default' })
-		const response: ActivitiesResponse = await res.json()
 
-		leaderboard.value = response.userActivitiesWithStats
+		let response: ActivitiesResponse
+
+		if (activityPeriod.value === 'monthly') {
+			// For monthly period, fetch recent activities and calculate position changes
+			const [currentRes, recentData] = await Promise.all([
+				fetch(
+					`${apiBaseUrl}/activities?period=monthly&date=${new Date().toISOString().split('T')[0]}`,
+					{ cache: 'default' },
+				),
+				fetchRecentActivities(),
+			])
+
+			response = await currentRes.json()
+			const currentLeaderboard = getChanges(response.userActivitiesWithStats)
+			const previousLeaderboard = calculatePreviousLeaderboard(currentLeaderboard, recentData)
+			const positionChanges = checkPositionChanges(currentLeaderboard, previousLeaderboard)
+
+			// Add position change information to leaderboard data
+			leaderboard.value = response.userActivitiesWithStats.map((record) => ({
+				...record,
+				positionChange: positionChanges.get(record.user._id)?.change || 'neutral',
+				positionDiff: positionChanges.get(record.user._id)?.diff || 0,
+			}))
+		} else {
+			// For daily and weekly periods, use existing logic
+			const today = new Date().toISOString().split('T')[0]
+			const url = new URL(`${apiBaseUrl}/activities`)
+			url.searchParams.set('period', activityPeriod.value)
+			url.searchParams.set('date', today)
+			const res = await fetch(url.toString(), { cache: 'default' })
+			response = await res.json()
+
+			leaderboard.value = response.userActivitiesWithStats.map((record) => ({
+				...record,
+				positionChange: 'neutral' as PositionChange,
+				positionDiff: 0,
+			}))
+		}
 	} catch (error) {
 		console.error('Error fetching leaderboard data:', error)
 		leaderboard.value = []
