@@ -1,31 +1,31 @@
 <template>
 	<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-		<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-			<p class="text-sm text-white/60">Total Distance</p>
+		<div class="text-center p-3 bg-surface-light rounded-lg">
+			<p class="text-sm text-muted">Total Distance</p>
 			<p class="text-lg font-semibold text-white">
 				{{ (stats.totalDistance / 1000).toFixed(2) }} km
 			</p>
 		</div>
-		<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-			<p class="text-sm text-white/60">Total Activities</p>
+		<div class="text-center p-3 bg-surface-light rounded-lg">
+			<p class="text-sm text-muted">Total Activities</p>
 			<p class="text-lg font-semibold text-white">
 				{{ stats.totalActivities }}
 			</p>
 		</div>
-		<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-			<p class="text-sm text-white/60">Average Pace</p>
+		<div class="text-center p-3 bg-surface-light rounded-lg">
+			<p class="text-sm text-muted">Average Pace</p>
 			<p class="text-lg font-semibold text-white">
 				{{ paceUtils.formatPaceToString(stats.averagePace) }}
 			</p>
 		</div>
-		<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-			<p class="text-sm text-white/60">Run : Walk Ratio</p>
+		<div class="text-center p-3 bg-surface-light rounded-lg">
+			<p class="text-sm text-muted">Run : Walk Ratio</p>
 			<div class="flex flex-col items-center">
 				<!-- Ratio Bar with embedded numbers -->
-				<div class="relative w-full max-w-52 h-6 bg-[#23232a] rounded-full overflow-hidden">
+				<div class="relative w-full max-w-52 h-6 rounded-full overflow-hidden">
 					<!-- Running portion (blue) -->
 					<div
-						class="absolute left-0 top-0 h-full bg-[#6366F1] rounded-l-full transition-all duration-300"
+						class="absolute left-0 top-0 h-full bg-accent-run rounded-l-full transition-all duration-300"
 						:style="{
 							width:
 								(stats.totalDistance > 0
@@ -35,7 +35,7 @@
 					></div>
 					<!-- Walking portion (orange) -->
 					<div
-						class="absolute right-0 top-0 h-full bg-[#FBBF24] rounded-r-full transition-all duration-300"
+						class="absolute right-0 top-0 h-full bg-accent-walk rounded-r-full transition-all duration-300"
 						:style="{
 							width:
 								(stats.totalDistance > 0
@@ -74,14 +74,14 @@
 				</div>
 			</div>
 		</div>
-		<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-			<p class="text-sm text-white/60">Total Moving Time</p>
+		<div class="text-center p-3 bg-surface-light rounded-lg">
+			<p class="text-sm text-muted">Total Moving Time</p>
 			<p class="text-lg font-semibold text-white">
 				{{ formatSecondsToHMS(stats.totalMovingTime) }}
 			</p>
 		</div>
-		<div class="text-center p-3 bg-[#1E2332] rounded-lg">
-			<p class="text-sm text-white/60">Invalid Activities</p>
+		<div class="text-center p-3 bg-surface-light rounded-lg">
+			<p class="text-sm text-muted">Invalid Activities</p>
 			<p class="text-lg font-semibold text-red-400">
 				{{ stats.invalidActivities }}
 			</p>

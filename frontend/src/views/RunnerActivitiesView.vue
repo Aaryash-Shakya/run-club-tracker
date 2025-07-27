@@ -4,7 +4,7 @@
 		<div class="mb-6">
 			<button
 				@click="$router.push('/')"
-				class="flex items-center gap-2 px-4 py-2 cursor-pointer bg-[#282F45] hover:bg-[#323852] text-white rounded-lg transition-colors"
+				class="flex items-center gap-2 px-4 py-2 cursor-pointer bg-soft hover:bg-[#323852] text-white rounded-lg transition-colors"
 			>
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
@@ -25,12 +25,9 @@
 		</div>
 
 		<!-- Activity Data -->
-		<div
-			v-else-if="activityData"
-			class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden px-2"
-		>
+		<div v-else-if="activityData" class="bg-surface rounded-xl shadow-lg overflow-hidden px-2">
 			<!-- User Header -->
-			<div class="py-4 px-2 border-b border-[#282F45]">
+			<div class="py-4 px-2 border-b border-soft">
 				<div class="flex items-center gap-4 mb-4">
 					<UiAvatar
 						:name="`${activityData.user.firstName} ${activityData.user.lastName}`"
@@ -58,7 +55,7 @@
 				</div>
 				<!-- Bio -->
 				<div v-if="activityData.user.bio" class="w-full my-4">
-					<p class="text-white/80 text-base border-l-2 ps-2 border-[#FFFFFF80]">
+					<p class="text-muted-light text-base border-l-2 ps-2 border-muted-light">
 						{{ activityData.user.bio }}
 					</p>
 				</div>
@@ -70,14 +67,14 @@
 				<div
 					v-for="activity in activityData.activities"
 					:key="activity._id"
-					class="bg-[#1E2332] hover:bg-[#282F4570] rounded-lg p-4 transition-colors"
+					class="bg-surface-light hover:bg-[#282F4570] rounded-lg p-4 transition-colors"
 				>
 					<!-- Header with icon, name, status, and type -->
 					<div class="flex items-start gap-3 mb-2">
 						<!-- Activity Type Icon -->
 						<span
 							class="inline-flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 mt-1"
-							:class="activity.type === 'Run' ? 'bg-[#6366F1]' : 'bg-[#FBBF24]'"
+							:class="activity.type === 'Run' ? 'bg-accent-run' : 'bg-accent-walk'"
 						>
 							<!-- Run or Walk Icon -->
 							<img
@@ -123,15 +120,13 @@
 					<RunnerActivityStats :activity="activity" />
 
 					<!-- Note if exists -->
-					<div v-if="activity.note" class="mt-3 p-2 bg-[#282F45] rounded">
-						<p class="text-xs text-white/60 mb-1">Note</p>
+					<div v-if="activity.note" class="mt-3 p-2 bg-soft rounded">
+						<p class="text-xs text-muted mb-1">Note</p>
 						<p class="text-white/70 text-sm">{{ activity.note }}</p>
 					</div>
 				</div>
 			</div>
-			<div v-else class="text-center py-8 text-white/60">
-				No activities found for this user
-			</div>
+			<div v-else class="text-center py-8 text-muted">No activities found for this user</div>
 		</div>
 
 		<!-- Empty State -->
@@ -139,7 +134,7 @@
 			<p class="text-white/70 text-lg">No activity data available</p>
 			<button
 				@click="fetchUserActivityData"
-				class="mt-4 px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5855eb] transition-colors"
+				class="mt-4 px-6 py-2 bg-accent-run text-white rounded-lg hover:bg-accent-run-hover transition-colors"
 			>
 				Refresh Data
 			</button>

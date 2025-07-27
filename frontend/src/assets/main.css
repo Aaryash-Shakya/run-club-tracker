@@ -4,10 +4,16 @@
 /* Tailwind v4 Custom Theme Variables */
 @theme {
 	--color-background: #0e0f15;
-	--color-soft: #181c2a;
-	--color-surface: #282f45;
+	--color-surface: #181c2a;
+	--color-surface-light: #1e2332;
+	--color-soft: #282f45;
+	--color-soft-hover: #323852;
+	--color-accent-run: #6366f1;
+	--color-accent-run-hover: #5855eb;
+	--color-accent-walk: #fbbf24;
 	--color-text: #ffffff;
 	--color-muted: rgb(255 255 255 / 0.6);
+	--color-muted-light: rgb(255 255 255 / 0.8);
 
 	--font-family-inter: Inter, sans-serif;
 }
@@ -21,7 +27,7 @@
 /* Custom base styles */
 body {
 	background-color: #0e0f15;
-	color: #e0e0e0;
+	color: #ffffff;
 	font-family: 'Inter', sans-serif;
 }
 #app {

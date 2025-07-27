@@ -1,7 +1,7 @@
 <template>
-	<div class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden mt-10">
+	<div class="bg-surface rounded-xl shadow-lg overflow-hidden mt-10">
 		<!-- Header -->
-		<div class="bg-[#282F45] p-4">
+		<div class="bg-soft p-4">
 			<h2 class="text-3xl font-bold text-white">Reminders</h2>
 			<p class="text-white/70 mt-2">
 				Tips and suggestions to enhance your running experience
@@ -13,12 +13,12 @@
 			<div
 				v-for="(recommendation, index) in runClubReminders"
 				:key="index"
-				class="bg-[#1E2332] rounded-lg p-4 border border-[#23232a]"
+				class="bg-surface-light rounded-lg p-4 border border-soft shadow"
 			>
 				<!-- Recommendation Header -->
 				<div class="flex items-start gap-4">
 					<div
-						class="bg-[#FBBF24] text-gray-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-1"
+						class="bg-accent-walk text-gray-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-1"
 					>
 						{{ index + 1 }}
 					</div>
@@ -26,7 +26,7 @@
 						<h3 class="text-xl font-semibold text-white mb-2">
 							{{ recommendation.title }}
 						</h3>
-						<p class="text-white/80 leading-relaxed">
+						<p class="text-muted-light leading-relaxed">
 							{{ recommendation.description }}
 						</p>
 					</div>
@@ -35,8 +35,8 @@
 		</div>
 
 		<!-- Reminders Footer -->
-		<div class="bg-[#282F45] p-4 text-center">
-			<p class="text-white/60 text-sm">
+		<div class="bg-soft p-4 text-center">
+			<p class="text-muted text-sm">
 				Remember: The goal is to have fun and stay healthy! 🏃‍♂️💪
 			</p>
 		</div>

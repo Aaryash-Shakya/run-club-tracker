@@ -1,7 +1,7 @@
 <template>
-	<div class="bg-[#181C2A] rounded-xl shadow-lg overflow-hidden mt-10">
+	<div class="bg-surface rounded-xl shadow-lg overflow-hidden mt-10">
 		<!-- Header -->
-		<div class="bg-[#282F45] p-4">
+		<div class="bg-soft p-4">
 			<h1 class="text-3xl font-bold text-white">Rules</h1>
 			<p class="text-white/70 mt-2">
 				Follow these guidelines to ensure your activities are tracked properly
@@ -13,25 +13,25 @@
 			<div
 				v-for="(rule, index) in runClubRules"
 				:key="index"
-				class="bg-[#1E2332] rounded-lg p-4 border border-[#23232a]"
+				class="bg-surface-light rounded-lg p-4 border border-soft shadow"
 			>
 				<!-- Rule Header -->
 				<div class="flex items-start gap-4">
 					<div
-						class="bg-[#6366F1] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-1"
+						class="bg-accent-run text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-1"
 					>
 						{{ index + 1 }}
 					</div>
 					<div class="flex-1">
 						<h3 class="text-xl font-semibold text-white mb-2">{{ rule.title }}</h3>
-						<p class="text-white/80 leading-relaxed">{{ rule.description }}</p>
+						<p class="text-muted-light leading-relaxed">{{ rule.description }}</p>
 
 						<!-- Details Section -->
 						<div v-if="rule.details" class="mt-4 space-y-2">
 							<div
 								v-for="(detail, detailIndex) in rule.details"
 								:key="detailIndex"
-								class="bg-[#282F45] rounded-lg p-3 flex items-center gap-3"
+								class="bg-soft rounded-lg p-3 flex items-center gap-3"
 							>
 								<!-- Activity Icon -->
 								<div
@@ -43,7 +43,7 @@
 										alt="Running"
 										class="w-5 h-5 filter brightness-0 invert opacity-70"
 									/>
-									<span class="text-[#6366F1] font-medium"
+									<span class="text-accent-run font-medium"
 										>{{ detail.activity }}:</span
 									>
 								</div>
@@ -56,7 +56,7 @@
 										alt="Walking"
 										class="w-5 h-5 filter brightness-0 invert opacity-70"
 									/>
-									<span class="text-[#FBBF24] font-medium"
+									<span class="text-accent-walk font-medium"
 										>{{ detail.activity }}:</span
 									>
 								</div>
@@ -69,8 +69,8 @@
 		</div>
 
 		<!-- Footer -->
-		<div class="bg-[#282F45] p-4 text-center">
-			<p class="text-white/60 text-sm">
+		<div class="bg-soft p-4 text-center">
+			<p class="text-muted text-sm">
 				Questions? Contact the maintainer or ask in the Strava club discussions or the Slack
 				channel.
 			</p>

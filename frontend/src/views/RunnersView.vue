@@ -19,7 +19,7 @@
 			<div
 				v-for="runner in runners"
 				:key="runner._id"
-				class="bg-[#181C2A] rounded-xl shadow-lg p-6 hover:bg-[#1E2332] transition-colors cursor-pointer"
+				class="bg-surface rounded-xl shadow-lg p-6 hover:bg-surface-light transition-colors cursor-pointer"
 				@click="$router.push(`/runners/${runner._id}/activities`)"
 			>
 				<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -47,7 +47,7 @@
 
 					<!-- Show Activities Button -->
 					<button
-						class="px-4 py-2 whitespace-nowrap bg-[#4F51B6] text-sm text-white rounded-lg hover:bg-[#6366F1] cursor-pointer transition-colors font-normal w-full md:w-auto"
+						class="px-4 py-2 whitespace-nowrap bg-[#4F51B6] text-sm text-white rounded-lg hover:bg-accent-run cursor-pointer transition-colors font-normal w-full md:w-auto"
 					>
 						Show Activities
 					</button>
@@ -60,7 +60,7 @@
 			<p class="text-white/70 text-lg">No runners found</p>
 			<button
 				@click="fetchRunners"
-				class="mt-4 px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5855eb] transition-colors"
+				class="mt-4 px-6 py-2 bg-accent-run text-white rounded-lg hover:bg-accent-run-hover transition-colors"
 			>
 				Refresh
 			</button>
@@ -71,7 +71,7 @@
 			<p class="text-red-400 text-lg mb-4">{{ error }}</p>
 			<button
 				@click="fetchRunners"
-				class="px-6 py-2 bg-[#6366F1] text-white rounded-lg hover:bg-[#5855eb] transition-colors"
+				class="px-6 py-2 bg-accent-run text-white rounded-lg hover:bg-accent-run-hover transition-colors"
 			>
 				Try Again
 			</button>

@@ -1,11 +1,11 @@
 <template>
-	<div class="bg-[#181C2A] rounded-xl shadow-lg px-2 overflow-hidden mt-5">
+	<div class="bg-surface rounded-xl shadow-lg px-2 overflow-hidden mt-5">
 		<div class="flex items-center justify-end p-4">
 			<label class="flex items-center gap-2 cursor-pointer text-white/70 text-sm">
 				<input
 					type="checkbox"
 					v-model="showParticipantsOnly"
-					class="accent-[#6366F1] h-4 w-4"
+					class="accent-accent-run h-4 w-4"
 				/>
 				Show Participants only
 			</label>
@@ -13,7 +13,7 @@
 		<div class="overflow-x-auto">
 			<table class="w-full border-separate border-spacing-y-2">
 				<thead>
-					<tr class="bg-[#282F45] text-white text-sm">
+					<tr class="bg-soft text-white text-sm">
 						<th class="py-3 px-2 text-center font-medium rounded-l-lg">Rank</th>
 						<th class="py-3 px-2 text-left font-medium">Runner</th>
 						<th class="py-3 px-2 text-left font-medium">Distance</th>
@@ -31,7 +31,7 @@
 				</thead>
 				<tbody>
 					<!-- Loading State -->
-					<tr v-if="loading" class="bg-[#1E2332] rounded-lg">
+					<tr v-if="loading" class="bg-surface-light rounded-lg">
 						<td colspan="7" class="py-8 px-4 text-center">
 							<div class="flex justify-center items-center">
 								<div
@@ -44,10 +44,10 @@
 					<!-- No activities message -->
 					<tr
 						v-else-if="filteredLeaderboard.length === 0"
-						class="bg-[#1E2332] rounded-lg"
+						class="bg-surface-light rounded-lg"
 					>
 						<td colspan="7" class="py-8 px-4 text-center">
-							<div class="text-white/60 text-lg">No activities yet</div>
+							<div class="text-muted text-lg">No activities yet</div>
 							<div class="text-white/40 text-sm mt-2">
 								Lace up and log your first activity to claim your spot on the
 								leaderboard!
@@ -59,7 +59,7 @@
 						v-for="(record, index) in filteredLeaderboard"
 						:key="record.user._id"
 						:class="[
-							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg cursor-pointer',
+							'bg-surface-light hover:bg-[#282F4570] rounded-lg cursor-pointer',
 							{
 								'opacity-40 cursor-not-allowed': !PARTICIPANT_IDS.includes(
 									record.user._id,
@@ -68,7 +68,7 @@
 						]"
 						v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
 					>
-						<td class="py-2 px-2 text-white/60 font-semibold text-center rounded-l-lg">
+						<td class="py-2 px-2 text-muted font-semibold text-center rounded-l-lg">
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
@@ -87,7 +87,7 @@
 						</td>
 						<td class="py-2 px-2">
 							<div class="flex items-center gap-2">
-								<div class="font-medium text-white/80">
+								<div class="font-medium text-muted-light">
 									{{ (record.stats.totalDistance / 1000).toFixed(1) }} km
 								</div>
 							</div>
@@ -102,7 +102,7 @@
 											alt="Running"
 											class="w-4 h-4 filter brightness-0 invert opacity-70"
 										/>
-										<span class="text-xs text-white/60 font-medium">
+										<span class="text-xs text-muted font-medium">
 											{{
 												(
 													(record.stats.runningDistance || 0) / 1000
@@ -121,7 +121,7 @@
 											alt="Walking"
 											class="w-4 h-4 filter brightness-0 invert opacity-70"
 										/>
-										<span class="text-xs text-white/60 font-medium">
+										<span class="text-xs text-muted font-medium">
 											{{
 												(
 													(record.stats.walkingDistance || 0) / 1000
@@ -133,12 +133,10 @@
 
 								<!-- Ratio Bar -->
 								<div class="flex flex-col gap-2 w-20">
-									<div
-										class="w-full h-2 bg-[#23232a] rounded-full overflow-hidden relative"
-									>
-										<!-- Running portion (blue) -->
+									<div class="w-full h-2 rounded-full overflow-hidden relative">
+										<!-- Running portion -->
 										<div
-											class="absolute left-0 top-0 h-full bg-[#6366F1] rounded-l-full"
+											class="absolute left-0 top-0 h-full bg-accent-run rounded-l-full"
 											:style="{
 												width:
 													(record.stats.totalDistance > 0
@@ -148,9 +146,9 @@
 														: 0) + '%',
 											}"
 										></div>
-										<!-- Walking portion (orange) -->
+										<!-- Walking portion -->
 										<div
-											class="absolute right-0 top-0 h-full bg-[#FBBF24] rounded-r-full"
+											class="absolute right-0 top-0 h-full bg-accent-walk rounded-r-full"
 											:style="{
 												width:
 													(record.stats.totalDistance > 0
@@ -166,21 +164,21 @@
 						</td>
 						<td class="py-2 px-2">
 							<div class="flex items-center gap-2">
-								<span class="text-white/60 font-medium">{{
+								<span class="text-muted font-medium">{{
 									paceUtils.formatPaceToString(record.stats.averagePace)
 								}}</span>
 							</div>
 						</td>
 						<td class="p-2 hidden md:table-cell">
 							<div class="flex items-center gap-2">
-								<span class="text-white/60 font-medium">{{
+								<span class="text-muted font-medium">{{
 									record.stats.totalActivities
 								}}</span>
 							</div>
 						</td>
 						<td class="p-2 rounded-r-lg hidden md:table-cell">
 							<div class="flex items-center gap-2">
-								<span class="text-white/60 font-medium">{{
+								<span class="text-muted font-medium">{{
 									formatSecondsToHMS(record.stats.totalMovingTime)
 								}}</span>
 							</div>
