@@ -235,6 +235,7 @@ const filteredLeaderboard = computed(() => {
 const fetchLeaderboardData = async () => {
 	try {
 		loading.value = true
+		leaderboard.value = [] // Clear existing data when starting new fetch
 		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 		const today = new Date().toISOString().split('T')[0]
 		const url = new URL(`${apiBaseUrl}/activities`)
