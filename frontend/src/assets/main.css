@@ -32,3 +32,29 @@ body {
 .period-toggle-button:hover {
 	@apply bg-[#282F4580] cursor-pointer;
 }
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+	width: 14px;
+	background: #23263a;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #3a4d6c;
+	border-radius: 8px;
+	border: 2px solid #23263a;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #31405e;
+}
+
+::-webkit-scrollbar-corner {
+	background: #23263a;
+}
+
+/* Firefox */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #3a4d6c #23263a;
+}

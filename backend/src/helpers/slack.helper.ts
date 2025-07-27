@@ -48,7 +48,9 @@ async function formatDailyUpdateMessage(
 async function formatWeeklyUpdateMessage(
 	userActivitiesWithStats: TGroupedUserActivitiesWithStats[]
 ): Promise<string> {
-	const weekRange = dateUtils.formatWeekRange();
+	const yesterday = new Date();
+	yesterday.setDate(yesterday.getDate() - 1);
+	const weekRange = dateUtils.formatWeekRange(yesterday);
 
 	const header = `:trophy: *Weekly Run Summary — ${weekRange}* :calendar:\n\n`;
 	const activityList = await generateActivityList(userActivitiesWithStats);

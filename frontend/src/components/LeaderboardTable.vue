@@ -2,7 +2,11 @@
 	<div class="bg-[#181C2A] rounded-xl shadow-lg px-2 overflow-hidden mt-5">
 		<div class="flex items-center justify-end p-4">
 			<label class="flex items-center gap-2 cursor-pointer text-white/70 text-sm">
-				<input type="checkbox" v-model="showParticipantsOnly" class="#6366F1 h-4 w-4" />
+				<input
+					type="checkbox"
+					v-model="showParticipantsOnly"
+					class="accent-[#6366F1] h-4 w-4"
+				/>
 				Show Participants only
 			</label>
 		</div>
@@ -26,35 +30,57 @@
 					</tr>
 				</thead>
 				<tbody>
+					<!-- Loading State -->
+					<tr v-if="loading" class="bg-[#1E2332] rounded-lg">
+						<td colspan="7" class="py-8 px-4 text-center">
+							<div class="flex justify-center items-center">
+								<div
+									class="animate-spin rounded-full h-8 w-8 border-b-2 border-white"
+								></div>
+								<span class="ml-3 text-white/70">Loading activities...</span>
+							</div>
+						</td>
+					</tr>
+					<!-- No activities message -->
+					<tr
+						v-else-if="filteredLeaderboard.length === 0"
+						class="bg-[#1E2332] rounded-lg"
+					>
+						<td colspan="7" class="py-8 px-4 text-center">
+							<div class="text-white/60 text-lg">No activities yet</div>
+							<div class="text-white/40 text-sm mt-2">
+								Lace up and log your first activity to claim your spot on the
+								leaderboard!
+							</div>
+						</td>
+					</tr>
+					<!-- Leaderboard data -->
 					<tr
 						v-for="(record, index) in filteredLeaderboard"
 						:key="record.user._id"
 						:class="[
-							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg',
+							'bg-[#1E2332] hover:bg-[#282F4570] rounded-lg cursor-pointer',
 							{
-								'opacity-40 cursor-not-allowed': !participantIds.includes(
+								'opacity-40 cursor-not-allowed': !PARTICIPANT_IDS.includes(
 									record.user._id,
 								),
 							},
 						]"
+						v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
 					>
 						<td class="py-2 px-2 text-white/60 font-semibold text-center rounded-l-lg">
 							{{ index + 1 }}
 						</td>
 						<td class="py-2 px-2 cursor-pointer">
-							<div
-								class="flex items-center gap-3 group"
-								v-on:click="() => $router.push(`/runners/${record.user._id}/activities`)"
-							>
-								<img
-									:src="getAvatarUrl(record.user.firstName)"
-									:alt="record.user.firstName"
-									class="w-10 h-10 rounded-full object-cover hidden md:block"
+							<div class="flex items-center gap-3">
+								<UiAvatar
+									:name="`${record.user.firstName} ${record.user.lastName}`"
+									:size="40"
 								/>
-								<span class="hidden md:inline group-hover:underline">
+								<span class="hidden md:inline">
 									{{ record.user.firstName }} {{ record.user.lastName }}
 								</span>
-								<span class="inline md:hidden group-hover:underline">
+								<span class="inline md:hidden">
 									{{ record.user.firstName.split(' ')[0] }}
 								</span>
 							</div>
@@ -171,6 +197,8 @@ import type { UserActivitiesWithStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
 import { ref, onMounted, watch, computed } from 'vue'
+import UiAvatar from './UiAvatar.vue'
+import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 interface Props {
 	targetDistance?: number
@@ -194,32 +222,11 @@ const activityPeriod = ref<ActivityPeriod>('monthly')
 const leaderboard = ref<UserActivitiesWithStats[]>([])
 const loading = ref(false)
 const showParticipantsOnly = ref(false)
-const participantIds = [
-	'6863716cf8f61725ee9a4f98',
-	'6862b7405f7a41fafa3bcbd3',
-	'6862b7405f7a41fafa3bcbd1',
-	'6862b7405f7a41fafa3bcbd5',
-	'6862b7415f7a41fafa3bcbd9',
-	'6868c2e581932e652aaea23d',
-	'6862b7405f7a41fafa3bcbd7',
-	'6863716cf8f61725ee9a4f96',
-	'6863e71d3db934158bd2525f',
-	'6863feb7e11bd2bd45e8dc13',
-	'6863716cf8f61725ee9a4f94',
-	'6862b7415f7a41fafa3bcbdb',
-	'6862b7405f7a41fafa3bcbcd',
-	'686584407f4fceb59b388235',
-	'68647a05c9399ed6978e7bea',
-	'6863feb7e11bd2bd45e8dc15',
-	'6862b7415f7a41fafa3bcbdd',
-	'68820ead33b122d23b0d61c6',
-	'6862b7405f7a41fafa3bcbcf',
-]
 
 // Computed property to filter leaderboard based on participants
 const filteredLeaderboard = computed(() => {
 	if (showParticipantsOnly.value) {
-		return leaderboard.value.filter((record) => participantIds.includes(record.user._id))
+		return leaderboard.value.filter((record) => PARTICIPANT_IDS.includes(record.user._id))
 	}
 	return leaderboard.value
 })
@@ -262,11 +269,4 @@ defineExpose({
 		activityPeriod.value = period
 	},
 })
-
-/**
- * Generate avatar URL using a placeholder service
- */
-const getAvatarUrl = (name: string): string => {
-	return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=32`
-}
 </script>

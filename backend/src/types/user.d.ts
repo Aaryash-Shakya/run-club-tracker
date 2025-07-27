@@ -5,6 +5,7 @@ export type TGroupedUserActivities = {
 		_id: string;
 		firstName: string;
 		lastName: string;
+		bio: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		__v: number;

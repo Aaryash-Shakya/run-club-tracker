@@ -38,6 +38,7 @@ export type TActivityWithUser = {
 		_id: Types.ObjectId | string;
 		firstName: string;
 		lastName: string;
+		bio: string | null;
 		createdAt: Date;
 		updatedAt: Date;
 		__v: number;

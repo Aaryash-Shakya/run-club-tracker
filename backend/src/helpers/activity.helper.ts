@@ -26,6 +26,7 @@ function groupActivitiesByUser(activities: TActivityWithUser[]): TGroupedUserAct
 						_id: activity.user._id.toString(),
 						firstName: activity.user.firstName,
 						lastName: activity.user.lastName,
+						bio: activity.user.bio,
 						createdAt: activity.user.createdAt,
 						updatedAt: activity.user.updatedAt,
 						__v: activity.user.__v,
