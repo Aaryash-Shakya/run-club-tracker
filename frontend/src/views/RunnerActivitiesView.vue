@@ -4,9 +4,9 @@
 		<div class="mb-6">
 			<button
 				@click="$router.push('/')"
-				class="flex items-center gap-2 px-4 py-2 cursor-pointer bg-soft hover:bg-[#323852] text-white rounded-lg transition-colors"
+				class="bg-soft flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2 text-white transition-colors hover:bg-[#323852]"
 			>
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -19,16 +19,16 @@
 		</div>
 
 		<!-- Loading State -->
-		<div v-if="loading" class="flex justify-center items-center py-12">
-			<div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+		<div v-if="loading" class="flex items-center justify-center py-12">
+			<div class="h-12 w-12 animate-spin rounded-full border-b-2 border-white"></div>
 			<span class="ml-3 text-white/70">Loading activities...</span>
 		</div>
 
 		<!-- Activity Data -->
-		<div v-else-if="activityData" class="bg-surface rounded-xl shadow-lg overflow-hidden px-2">
+		<div v-else-if="activityData" class="bg-surface overflow-hidden rounded-xl px-2 shadow-lg">
 			<!-- User Header -->
-			<div class="py-4 px-2 border-b border-soft">
-				<div class="flex items-center gap-4 mb-4">
+			<div class="border-soft border-b px-2 py-4">
+				<div class="mb-4 flex items-center gap-4">
 					<UiAvatar
 						:name="`${activityData.user.firstName} ${activityData.user.lastName}`"
 						:size="50"
@@ -39,7 +39,7 @@
 
 					<!-- Participation Status -->
 					<span
-						class="ml-auto px-3 py-1 rounded-full text-xs font-semibold"
+						class="ml-auto rounded-full px-3 py-1 text-xs font-semibold"
 						:class="
 							PARTICIPANT_IDS.includes(activityData.user._id)
 								? 'bg-green-500/20 text-green-400'
@@ -54,8 +54,8 @@
 					</span>
 				</div>
 				<!-- Bio -->
-				<div v-if="activityData.user.bio" class="w-full my-4">
-					<p class="text-muted-light text-base border-l-2 ps-2 border-muted-light">
+				<div v-if="activityData.user.bio" class="my-4 w-full">
+					<p class="text-muted-light border-muted-light border-l-2 ps-2 text-base">
 						{{ activityData.user.bio }}
 					</p>
 				</div>
@@ -63,17 +63,17 @@
 			</div>
 
 			<!-- Activities Cards -->
-			<div v-if="activityData.activities.length > 0" class="space-y-4 py-4 px-2">
+			<div v-if="activityData.activities.length > 0" class="space-y-4 px-2 py-4">
 				<div
 					v-for="activity in activityData.activities"
 					:key="activity._id"
-					class="bg-surface-light hover:bg-[#282F4570] rounded-lg p-4 transition-colors"
+					class="bg-surface-light rounded-lg p-4 transition-colors hover:bg-[#282F4570]"
 				>
 					<!-- Header with icon, name, status, and type -->
-					<div class="flex items-start gap-3 mb-2">
+					<div class="mb-2 flex items-start gap-3">
 						<!-- Activity Type Icon -->
 						<span
-							class="inline-flex items-center justify-center w-10 h-10 rounded-full flex-shrink-0 mt-1"
+							class="mt-1 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
 							:class="activity.type === 'Run' ? 'bg-accent-run' : 'bg-accent-walk'"
 						>
 							<!-- Run or Walk Icon -->
@@ -81,30 +81,30 @@
 								v-if="activity.type === 'Run'"
 								src="@/assets/running-shoes.svg"
 								alt="Run Icon"
-								class="w-6 h-6 filter brightness-0 invert opacity-70"
+								class="h-6 w-6 opacity-70 brightness-0 invert filter"
 							/>
 							<img
 								v-if="activity.type === 'Walk'"
 								src="@/assets/walking-shoes.svg"
 								alt="Walk Icon"
-								class="w-6 h-6 filter brightness-0 opacity-70"
+								class="h-6 w-6 opacity-70 brightness-0 filter"
 							/>
 						</span>
 
 						<!-- Name and Date Container -->
-						<div class="flex-1 min-w-0">
-							<h3 class="text-white/90 font-medium text-lg">
+						<div class="min-w-0 flex-1">
+							<h3 class="text-lg font-medium text-white/90">
 								{{ activity.name }}
 							</h3>
-							<p class="text-white/50 text-sm">
+							<p class="text-sm text-white/50">
 								{{ formatDate(activity.activityDate) }}
 							</p>
 						</div>
 
 						<!-- Status Badge -->
-						<div class="flex items-center gap-2 flex-shrink-0">
+						<div class="flex flex-shrink-0 items-center gap-2">
 							<span
-								class="text-xs px-2 py-1 rounded font-medium"
+								class="rounded px-2 py-1 text-xs font-medium"
 								:class="
 									activity.isValid
 										? 'bg-green-500/20 text-green-400'
@@ -120,21 +120,21 @@
 					<RunnerActivityStats :activity="activity" />
 
 					<!-- Note if exists -->
-					<div v-if="activity.note" class="mt-3 p-2 bg-soft rounded">
-						<p class="text-xs text-muted mb-1">Note</p>
-						<p class="text-white/70 text-sm">{{ activity.note }}</p>
+					<div v-if="activity.note" class="bg-soft mt-3 rounded p-2">
+						<p class="text-muted mb-1 text-xs">Note</p>
+						<p class="text-sm text-white/70">{{ activity.note }}</p>
 					</div>
 				</div>
 			</div>
-			<div v-else class="text-center py-8 text-muted">No activities found for this user</div>
+			<div v-else class="text-muted py-8 text-center">No activities found for this user</div>
 		</div>
 
 		<!-- Empty State -->
-		<div v-else class="text-center py-12">
-			<p class="text-white/70 text-lg">No activity data available</p>
+		<div v-else class="py-12 text-center">
+			<p class="text-lg text-white/70">No activity data available</p>
 			<button
 				@click="fetchUserActivityData"
-				class="mt-4 px-6 py-2 bg-accent-run text-white rounded-lg hover:bg-accent-run-hover transition-colors"
+				class="bg-accent-run hover:bg-accent-run-hover mt-4 rounded-lg px-6 py-2 text-white transition-colors"
 			>
 				Refresh Data
 			</button>

@@ -1,29 +1,29 @@
 <template>
-	<div class="bg-surface rounded-xl shadow-lg overflow-hidden mt-10">
+	<div class="bg-surface mt-10 overflow-hidden rounded-xl shadow-lg">
 		<!-- Header -->
 		<div class="bg-soft p-4">
 			<h2 class="text-3xl font-bold text-white">Reminders</h2>
-			<p class="text-white/70 mt-2">
+			<p class="mt-2 text-white/70">
 				Tips and suggestions to enhance your running experience
 			</p>
 		</div>
 
 		<!-- Reminders List -->
-		<div class="p-4 flex flex-col gap-3">
+		<div class="flex flex-col gap-3 p-4">
 			<div
 				v-for="(recommendation, index) in runClubReminders"
 				:key="index"
-				class="bg-surface-light rounded-lg p-4 border border-soft shadow"
+				class="bg-surface-light border-soft rounded-lg border p-4 shadow"
 			>
 				<!-- Recommendation Header -->
 				<div class="flex items-start gap-4">
 					<div
-						class="bg-accent-walk text-gray-800 rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-1"
+						class="bg-accent-walk mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-lg font-bold text-gray-800"
 					>
 						{{ index + 1 }}
 					</div>
 					<div class="flex-1">
-						<h3 class="text-xl font-semibold text-white mb-2">
+						<h3 class="mb-2 text-xl font-semibold text-white">
 							{{ recommendation.title }}
 						</h3>
 						<p class="text-muted-light leading-relaxed">

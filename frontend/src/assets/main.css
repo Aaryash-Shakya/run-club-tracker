@@ -36,7 +36,7 @@ body {
 }
 
 .navbar-item {
-	@apply inline-flex items-center px-6 py-3 text-base font-normal rounded-lg text-white leading-snug;
+	@apply inline-flex items-center rounded-lg px-6 py-3 text-base leading-snug font-normal text-white;
 }
 
 .navbar-item:hover {
@@ -49,11 +49,11 @@ body {
 }
 
 .period-toggle-button {
-	@apply inline-flex items-center justify-center w-28 md:w-36 text-center py-3 text-base font-normal rounded-lg text-white leading-snug;
+	@apply inline-flex w-28 items-center justify-center rounded-lg py-3 text-center text-base leading-snug font-normal text-white md:w-36;
 }
 
 .period-toggle-button:hover {
-	@apply bg-[#282F4580] cursor-pointer;
+	@apply cursor-pointer bg-[#282F4580];
 }
 
 /* Custom scrollbar styles */

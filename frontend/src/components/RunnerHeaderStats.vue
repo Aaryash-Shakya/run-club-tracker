@@ -1,31 +1,31 @@
 <template>
-	<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-		<div class="text-center p-3 bg-surface-light rounded-lg">
-			<p class="text-sm text-muted">Total Distance</p>
+	<div class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+		<div class="bg-surface-light rounded-lg p-3 text-center">
+			<p class="text-muted text-sm">Total Distance</p>
 			<p class="text-lg font-semibold text-white">
 				{{ (stats.totalDistance / 1000).toFixed(2) }} km
 			</p>
 		</div>
-		<div class="text-center p-3 bg-surface-light rounded-lg">
-			<p class="text-sm text-muted">Total Activities</p>
+		<div class="bg-surface-light rounded-lg p-3 text-center">
+			<p class="text-muted text-sm">Total Activities</p>
 			<p class="text-lg font-semibold text-white">
 				{{ stats.totalActivities }}
 			</p>
 		</div>
-		<div class="text-center p-3 bg-surface-light rounded-lg">
-			<p class="text-sm text-muted">Average Pace</p>
+		<div class="bg-surface-light rounded-lg p-3 text-center">
+			<p class="text-muted text-sm">Average Pace</p>
 			<p class="text-lg font-semibold text-white">
 				{{ paceUtils.formatPaceToString(stats.averagePace) }}
 			</p>
 		</div>
-		<div class="text-center p-3 bg-surface-light rounded-lg">
-			<p class="text-sm text-muted">Run : Walk Ratio</p>
+		<div class="bg-surface-light rounded-lg p-3 text-center">
+			<p class="text-muted text-sm">Run : Walk Ratio</p>
 			<div class="flex flex-col items-center">
 				<!-- Ratio Bar with embedded numbers -->
-				<div class="relative w-full max-w-52 h-6 rounded-full overflow-hidden">
+				<div class="relative h-6 w-full max-w-52 overflow-hidden rounded-full">
 					<!-- Running portion (blue) -->
 					<div
-						class="absolute left-0 top-0 h-full bg-accent-run rounded-l-full transition-all duration-300"
+						class="bg-accent-run absolute top-0 left-0 h-full rounded-l-full transition-all duration-300"
 						:style="{
 							width:
 								(stats.totalDistance > 0
@@ -35,7 +35,7 @@
 					></div>
 					<!-- Walking portion (orange) -->
 					<div
-						class="absolute right-0 top-0 h-full bg-accent-walk rounded-r-full transition-all duration-300"
+						class="bg-accent-walk absolute top-0 right-0 h-full rounded-r-full transition-all duration-300"
 						:style="{
 							width:
 								(stats.totalDistance > 0
@@ -46,42 +46,42 @@
 
 					<!-- Running number (left side) -->
 					<div
-						class="absolute left-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1"
+						class="absolute top-1/2 left-2 flex -translate-y-1/2 transform items-center gap-1"
 					>
 						<img
 							src="@/assets/running-shoes.svg"
 							alt="Running"
-							class="w-3 h-3 filter brightness-0 invert"
+							class="h-3 w-3 brightness-0 invert filter"
 						/>
-						<span class="text-white text-xs font-bold drop-shadow-lg">
+						<span class="text-xs font-bold text-white drop-shadow-lg">
 							{{ (stats.runningDistance / 1000).toFixed(1) }}
 						</span>
 					</div>
 
 					<!-- Walking number (right side) -->
 					<div
-						class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1"
+						class="absolute top-1/2 right-2 flex -translate-y-1/2 transform items-center gap-1"
 					>
-						<span class="text-gray-800 text-xs font-bold drop-shadow-lg">
+						<span class="text-xs font-bold text-gray-800 drop-shadow-lg">
 							{{ (stats.walkingDistance / 1000).toFixed(1) }}
 						</span>
 						<img
 							src="@/assets/walking-shoes.svg"
 							alt="Walking"
-							class="w-3 h-3 filter brightness-0"
+							class="h-3 w-3 brightness-0 filter"
 						/>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="text-center p-3 bg-surface-light rounded-lg">
-			<p class="text-sm text-muted">Total Moving Time</p>
+		<div class="bg-surface-light rounded-lg p-3 text-center">
+			<p class="text-muted text-sm">Total Moving Time</p>
 			<p class="text-lg font-semibold text-white">
 				{{ formatSecondsToHMS(stats.totalMovingTime) }}
 			</p>
 		</div>
-		<div class="text-center p-3 bg-surface-light rounded-lg">
-			<p class="text-sm text-muted">Invalid Activities</p>
+		<div class="bg-surface-light rounded-lg p-3 text-center">
+			<p class="text-muted text-sm">Invalid Activities</p>
 			<p class="text-lg font-semibold text-red-400">
 				{{ stats.invalidActivities }}
 			</p>

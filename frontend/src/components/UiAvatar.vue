@@ -1,8 +1,12 @@
 <template>
 	<div
-		class="flex items-center justify-center rounded-full text-white font-medium"
+		class="flex items-center justify-center rounded-full font-medium text-white"
 		:style="avatarStyle"
-		style="box-shadow: inset 1px 4px 12px 0 rgba(255,255,255,0.3), inset -1px -4px 12px 0 rgba(0,0,0,0.4);"
+		style="
+			box-shadow:
+				inset 1px 4px 12px 0 rgba(255, 255, 255, 0.3),
+				inset -1px -4px 12px 0 rgba(0, 0, 0, 0.4);
+		"
 	>
 		{{ initials }}
 	</div>

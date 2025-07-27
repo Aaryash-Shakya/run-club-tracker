@@ -2,7 +2,7 @@
 	<div class="container py-6">
 		<div class="flex items-center justify-center">
 			<div
-				class="p-2 bg-surface rounded-xl flex items-center justify-center gap-2 w-fit"
+				class="bg-surface flex w-fit items-center justify-center gap-2 rounded-xl p-2"
 				style="box-shadow: 0 0 100px 50px #29304750"
 			>
 				<div

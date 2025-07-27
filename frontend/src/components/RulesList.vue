@@ -1,29 +1,29 @@
 <template>
-	<div class="bg-surface rounded-xl shadow-lg overflow-hidden mt-10">
+	<div class="bg-surface mt-10 overflow-hidden rounded-xl shadow-lg">
 		<!-- Header -->
 		<div class="bg-soft p-4">
 			<h1 class="text-3xl font-bold text-white">Rules</h1>
-			<p class="text-white/70 mt-2">
+			<p class="mt-2 text-white/70">
 				Follow these guidelines to ensure your activities are tracked properly
 			</p>
 		</div>
 
 		<!-- Rules List -->
-		<div class="p-4 flex flex-col gap-3">
+		<div class="flex flex-col gap-3 p-4">
 			<div
 				v-for="(rule, index) in runClubRules"
 				:key="index"
-				class="bg-surface-light rounded-lg p-4 border border-soft shadow"
+				class="bg-surface-light border-soft rounded-lg border p-4 shadow"
 			>
 				<!-- Rule Header -->
 				<div class="flex items-start gap-4">
 					<div
-						class="bg-accent-run text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-lg flex-shrink-0 mt-1"
+						class="bg-accent-run mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-lg font-bold text-white"
 					>
 						{{ index + 1 }}
 					</div>
 					<div class="flex-1">
-						<h3 class="text-xl font-semibold text-white mb-2">{{ rule.title }}</h3>
+						<h3 class="mb-2 text-xl font-semibold text-white">{{ rule.title }}</h3>
 						<p class="text-muted-light leading-relaxed">{{ rule.description }}</p>
 
 						<!-- Details Section -->
@@ -31,7 +31,7 @@
 							<div
 								v-for="(detail, detailIndex) in rule.details"
 								:key="detailIndex"
-								class="bg-soft rounded-lg p-3 flex items-center gap-3"
+								class="bg-soft flex items-center gap-3 rounded-lg p-3"
 							>
 								<!-- Activity Icon -->
 								<div
@@ -41,7 +41,7 @@
 									<img
 										src="@/assets/running-shoes.svg"
 										alt="Running"
-										class="w-5 h-5 filter brightness-0 invert opacity-70"
+										class="h-5 w-5 opacity-70 brightness-0 invert filter"
 									/>
 									<span class="text-accent-run font-medium"
 										>{{ detail.activity }}:</span
@@ -54,7 +54,7 @@
 									<img
 										src="@/assets/walking-shoes.svg"
 										alt="Walking"
-										class="w-5 h-5 filter brightness-0 invert opacity-70"
+										class="h-5 w-5 opacity-70 brightness-0 invert filter"
 									/>
 									<span class="text-accent-walk font-medium"
 										>{{ detail.activity }}:</span
