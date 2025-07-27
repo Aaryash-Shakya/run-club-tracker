@@ -93,6 +93,7 @@
 												record.positionChange === 'up'
 											"
 											class="text-xs text-green-500"
+											:title="`+${((record.distanceAdded || 0) / 1000).toFixed(1)}km, +${record.activitiesAdded || 0} activities`"
 										>
 											↑{{ record.positionDiff }}
 										</span>
@@ -102,6 +103,7 @@
 												record.positionChange === 'down'
 											"
 											class="text-xs text-red-500"
+											:title="`+${((record.distanceAdded || 0) / 1000).toFixed(1)}km, +${record.activitiesAdded || 0} activities`"
 										>
 											↓{{ record.positionDiff }}
 										</span>
@@ -125,15 +127,24 @@
 							<td class="px-2 py-2">
 								<div class="flex items-center gap-2">
 									<div
-										class="font-medium"
+										class="font-normal"
 										:class="{
-											'text-green-500':
+											'text-white':
 												record.stats.totalDistance >= TARGET_DISTANCE,
 											'text-muted-light':
 												record.stats.totalDistance < TARGET_DISTANCE,
 										}"
 									>
-										{{ (record.stats.totalDistance / 1000).toFixed(1) }} km
+										{{ (record.stats.totalDistance / 1000).toFixed(1) }}
+										<span
+											class="relative -top-1 text-xs font-light text-green-500 hidden md:inline-block"
+										>
+											{{
+												record.distanceAdded
+													? `+${Number((record.distanceAdded / 1000).toFixed(1))}`
+													: ''
+											}}
+										</span>
 									</div>
 								</div>
 							</td>
@@ -221,6 +232,13 @@
 									<span class="text-muted font-medium">{{
 										record.stats.totalActivities
 									}}</span>
+									<span class="relative -top-1 text-xs font-light text-green-500 hidden md:inline-block">
+										{{
+											record.distanceAdded
+												? `+${Number((record.distanceAdded / 1000).toFixed(1))}`
+												: ''
+										}}
+									</span>
 								</div>
 							</td>
 							<td class="hidden rounded-r-lg p-2 md:table-cell">
@@ -267,6 +285,8 @@ type PositionChange = 'up' | 'down' | 'neutral'
 type LeaderboardWithPosition = TUserWithStats & {
 	positionChange?: PositionChange
 	positionDiff?: number
+	distanceAdded?: number
+	activitiesAdded?: number
 }
 
 // State
@@ -308,7 +328,7 @@ const fetchRecentActivities = async (): Promise<TUserWithStats[]> => {
 }
 
 // Function to get changes from current leaderboard
-const getChanges = (records: TUserWithStats[]): LeaderboardEntry[] => {
+const getCurrentLeaderboard = (records: TUserWithStats[]): LeaderboardEntry[] => {
 	return records
 		.map((record) => ({
 			userId: record.user._id,
@@ -398,16 +418,30 @@ const fetchLeaderboardData = async () => {
 			])
 
 			response = await currentRes.json()
-			const currentLeaderboard = getChanges(response.userActivitiesWithStats)
+			const currentLeaderboard = getCurrentLeaderboard(response.userActivitiesWithStats)
 			const previousLeaderboard = calculatePreviousLeaderboard(currentLeaderboard, recentData)
 			const positionChanges = checkPositionChanges(currentLeaderboard, previousLeaderboard)
 
+			// Create a map of recent activities for easy lookup
+			const recentMap = new Map<string, TUserWithStats>()
+			recentData.forEach((record) => {
+				recentMap.set(record.user._id, record)
+			})
+
 			// Add position change information to leaderboard data
-			leaderboard.value = response.userActivitiesWithStats.map((record) => ({
-				...record,
-				positionChange: positionChanges.get(record.user._id)?.change || 'neutral',
-				positionDiff: positionChanges.get(record.user._id)?.diff || 0,
-			}))
+			leaderboard.value = response.userActivitiesWithStats.map((record) => {
+				const recent = recentMap.get(record.user._id)
+				const distanceAdded = recent ? recent.stats.totalDistance : 0
+				const activitiesAdded = recent ? recent.stats.totalActivities : 0
+
+				return {
+					...record,
+					positionChange: positionChanges.get(record.user._id)?.change || 'neutral',
+					positionDiff: positionChanges.get(record.user._id)?.diff || 0,
+					distanceAdded,
+					activitiesAdded,
+				}
+			})
 		} else {
 			// For daily and weekly periods, use existing logic
 			const today = new Date().toISOString().split('T')[0]
@@ -421,6 +455,8 @@ const fetchLeaderboardData = async () => {
 				...record,
 				positionChange: 'neutral' as PositionChange,
 				positionDiff: 0,
+				distanceAdded: 0,
+				activitiesAdded: 0,
 			}))
 		}
 	} catch (error) {
