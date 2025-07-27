@@ -1,4 +1,4 @@
-export type Activity = {
+export type TActivity = {
 	_id: string
 	name: string
 	distance: number
@@ -17,7 +17,7 @@ export type Activity = {
 	updatedAt: string
 }
 
-export type User = {
+export type TUser = {
 	_id: string
 	firstName: string
 	lastName: string
@@ -27,7 +27,7 @@ export type User = {
 	__v: number
 }
 
-export type Stats = {
+export type TStats = {
 	totalDistance: number
 	totalMovingTime: number
 	averagePace: number
@@ -37,8 +37,11 @@ export type Stats = {
 	walkingDistance: number
 }
 
-export type UserActivitiesWithStats = {
-	user: User
-	activities: Activity[]
-	stats: Stats
+export type TUserWithStats = {
+	user: TUser
+	stats: TStats
+}
+
+export type TUserActivitiesWithStats = TUserWithStats & {
+	activities: TActivity[]
 }

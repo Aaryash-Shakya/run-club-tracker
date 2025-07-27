@@ -1,10 +1,33 @@
-@import 'tailwindcss';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+/* Tailwind v4 Custom Theme Variables */
+@theme {
+	--color-background: #0e0f15;
+	--color-surface: #181c2a;
+	--color-surface-light: #1e2332;
+	--color-soft: #282f45;
+	--color-soft-hover: #323852;
+	--color-accent-run: #6366f1;
+	--color-accent-run-hover: #5855eb;
+	--color-accent-walk: #fbbf24;
+	--color-text: #ffffff;
+	--color-muted: rgb(255 255 255 / 0.6);
+	--color-muted-light: rgb(255 255 255 / 0.8);
+
+	--font-family-inter: Inter, sans-serif;
+}
+
+@layer utilities {
+	.container {
+		@apply mx-auto px-4;
+	}
+}
 
 /* Custom base styles */
 body {
 	background-color: #0e0f15;
-	color: #e0e0e0;
+	color: #ffffff;
 	font-family: 'Inter', sans-serif;
 }
 #app {
@@ -13,7 +36,7 @@ body {
 }
 
 .navbar-item {
-	@apply inline-flex items-center px-6 py-3 text-base font-normal rounded-lg text-white leading-snug;
+	@apply inline-flex items-center rounded-lg px-6 py-3 text-base leading-snug font-normal text-white;
 }
 
 .navbar-item:hover {
@@ -26,11 +49,11 @@ body {
 }
 
 .period-toggle-button {
-	@apply inline-flex items-center justify-center w-28 md:w-36 text-center py-3 text-base font-normal rounded-lg text-white leading-snug;
+	@apply inline-flex w-28 items-center justify-center rounded-lg py-3 text-center text-base leading-snug font-normal text-white md:w-36;
 }
 
 .period-toggle-button:hover {
-	@apply bg-[#282F4580] cursor-pointer;
+	@apply cursor-pointer bg-[#282F4580];
 }
 
 /* Custom scrollbar styles */

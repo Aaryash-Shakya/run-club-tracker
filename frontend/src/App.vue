@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import Navbar from '@/components/Navbar.vue'
+import AppNavbar from '@/components/AppNavbar.vue'
 import AppFooter from '@/components/AppFooter.vue'
 </script>
 
 <template>
-	<div id="app" class="min-h-screen flex flex-col">
-		<Navbar />
+	<div id="app" class="flex min-h-screen flex-col">
+		<AppNavbar />
 		<main class="flex-1">
 			<RouterView />
 		</main>

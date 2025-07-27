@@ -1,27 +1,27 @@
 <template>
-	<div class="container mx-auto px-2 py-6">
+	<div class="container py-6">
 		<div class="flex items-center justify-center">
 			<div
-				class="p-2 bg-[#181C2A] rounded-xl flex items-center justify-center gap-2 w-fit"
+				class="bg-surface flex w-fit items-center justify-center gap-2 rounded-xl p-2"
 				style="box-shadow: 0 0 100px 50px #29304750"
 			>
 				<div
 					class="period-toggle-button cursor-pointer transition-colors"
-					:class="{ 'bg-[#282F45]': activityPeriod === 'daily' }"
+					:class="{ 'bg-soft': activityPeriod === 'daily' }"
 					@click="setActivityPeriod('daily')"
 				>
 					Daily
 				</div>
 				<div
 					class="period-toggle-button cursor-pointer transition-colors"
-					:class="{ 'bg-[#282F45]': activityPeriod === 'weekly' }"
+					:class="{ 'bg-soft': activityPeriod === 'weekly' }"
 					@click="setActivityPeriod('weekly')"
 				>
 					Weekly
 				</div>
 				<div
 					class="period-toggle-button cursor-pointer transition-colors"
-					:class="{ 'bg-[#282F45]': activityPeriod === 'monthly' }"
+					:class="{ 'bg-soft': activityPeriod === 'monthly' }"
 					@click="setActivityPeriod('monthly')"
 				>
 					Monthly
@@ -29,7 +29,7 @@
 			</div>
 		</div>
 		<CountDown />
-		<LeaderboardTable ref="leaderboardTableRef" :target-distance="70000" />
+		<LeaderboardTable ref="leaderboardTableRef" />
 	</div>
 </template>
 

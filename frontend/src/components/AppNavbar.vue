@@ -1,7 +1,7 @@
 <template>
 	<nav class="relative h-[150px] overflow-x-clip">
 		<div
-			class="absolute top-0 -left-1/10 -translate-y-1/2 z-0"
+			class="absolute top-0 -left-1/10 z-0 -translate-y-1/2"
 			:style="{
 				width: '120%',
 				height: '250px',
@@ -10,8 +10,8 @@
 				boxShadow: 'inset 0px 0px 54px 10px #293047',
 			}"
 		></div>
-		<div class="container mx-auto my-5 relative z-1">
-			<div class="w-full flex items-center justify-center gap-4 py-4">
+		<div class="relative z-1 container my-5">
+			<div class="flex w-full items-center justify-center gap-4 py-4">
 				<!-- Navigation Links -->
 				<router-link
 					to="/"

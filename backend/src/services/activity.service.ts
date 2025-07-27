@@ -127,7 +127,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 				}
 
 				// Pace 10 min/km or below is considered running
-				if (pace <= 10 && stravaActivity.distance < 1000) {
+				if (pace <= 10 && stravaActivity.distance < 500) {
 					isValid = false;
 					note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 1 km required for a valid run.`;
 				}

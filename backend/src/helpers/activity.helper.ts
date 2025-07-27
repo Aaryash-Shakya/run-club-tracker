@@ -1,5 +1,5 @@
 import { TActivityWithUser } from "../types/activity";
-import { TGroupedUserActivities } from "../types/user";
+import { TGroupedUserActivities, TUser } from "../types/user";
 
 interface UserStats {
 	totalDistance: number;
@@ -12,6 +12,10 @@ interface UserStats {
 }
 
 export interface TGroupedUserActivitiesWithStats extends TGroupedUserActivities {
+	stats: UserStats;
+}
+
+export interface TUserWithStats extends TUser {
 	stats: UserStats;
 }
 
@@ -47,8 +51,9 @@ function groupActivitiesByUser(activities: TActivityWithUser[]): TGroupedUserAct
 }
 
 function calculateUserStatsAndSort(
-	userGroupedActivities: TGroupedUserActivities[]
-): TGroupedUserActivitiesWithStats[] {
+	userGroupedActivities: TGroupedUserActivities[],
+	includeActivities: boolean = true
+): TGroupedUserActivitiesWithStats[] | TUserWithStats[] {
 	const userActivitiesWithStats = userGroupedActivities.map((userGroup) => {
 		const { activities } = userGroup;
 
@@ -92,8 +97,14 @@ function calculateUserStatsAndSort(
 			walkingDistance: totalDistance - runningDistance,
 		};
 
+		if (includeActivities) {
+			return {
+				...userGroup,
+				stats,
+			};
+		}
 		return {
-			...userGroup,
+			user: userGroup.user,
 			stats,
 		};
 	});

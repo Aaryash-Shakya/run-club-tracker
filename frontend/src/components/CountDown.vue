@@ -1,16 +1,16 @@
 <template>
-	<div class="flex flex-col items-center justify-center gap-1 my-8">
+	<div class="my-8 flex flex-col items-center justify-center gap-1">
 		<!-- Alarm Clock Icon -->
-		<div class="w-8 h-8 text-blue-400">
+		<div class="h-8 w-8 text-blue-400">
 			<img
 				src="../assets/alarm-clock.svg"
 				alt="Alarm Clock"
-				class="w-full h-full filter brightness-0 invert opacity-70"
+				class="h-full w-full opacity-70 brightness-0 invert filter"
 			/>
 		</div>
 
 		<!-- Ends In Text -->
-		<h2 class="text-base font-medium text-text-muted">Ends in</h2>
+		<h2 class="text-muted text-base font-medium">Ends in</h2>
 
 		<!-- Countdown Display -->
 		<div class="text-xl font-bold tracking-wider">

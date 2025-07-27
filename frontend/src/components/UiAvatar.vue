@@ -1,8 +1,12 @@
 <template>
 	<div
-		class="flex items-center justify-center rounded-full text-white font-medium"
+		class="flex items-center justify-center rounded-full font-medium text-white"
 		:style="avatarStyle"
-		style="box-shadow: inset 1px 4px 12px 0 rgba(255,255,255,0.3), inset -1px -4px 12px 0 rgba(0,0,0,0.4);"
+		style="
+			box-shadow:
+				inset 1px 4px 12px 0 rgba(255, 255, 255, 0.3),
+				inset -1px -4px 12px 0 rgba(0, 0, 0, 0.4);
+		"
 	>
 		{{ initials }}
 	</div>
@@ -63,7 +67,9 @@ const backgroundColor = computed(() => {
 
 const avatarStyle = computed(() => ({
 	width: `${props.size}px`,
+	minWidth: `${props.size}px`,
 	height: `${props.size}px`,
+	minHeight: `${props.size}px`,
 	backgroundColor: backgroundColor.value,
 	fontSize: `${props.size * 0.4}px`,
 }))

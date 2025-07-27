@@ -9,6 +9,8 @@ const router = Router();
 // Usage: GET /activities?period=daily|weekly|monthly&date=yyyy-mm-dd (date is optional)
 router.get("", validateActivityQuery, activityController.fetchActivities);
 
+router.get("/recent", activityController.fetchRecentActivities);
+
 router.get(
 	"/users/:userId",
 	validateUserIdParams,
