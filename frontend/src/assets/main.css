@@ -82,21 +82,49 @@ body {
 	scrollbar-color: #3a4d6c #23263a;
 }
 
-.podium-banner {
-	@apply border-muted-light relative mb-2 flex w-28 md:w-32 flex-col items-center justify-center gap-4 rounded-b-3xl border-4 border-t-0 shadow-lg;
+.gold-rank-banner,
+.silver-rank-banner,
+.bronze-rank-banner {
+	@apply border-muted-light relative mb-2 flex aspect-[1/2] w-28 flex-col items-center justify-between rounded-b-3xl border-4 border-t-0 py-4 text-white shadow-lg md:w-32;
 }
 
-.gold-rank {
+.gold-rank-banner {
 	background: linear-gradient(to bottom, #b28900, #d1ac28);
-	@apply aspect-[1/2];
+	@apply relative pt-10;
 }
-
-.silver-rank {
+.silver-rank-banner {
 	background: linear-gradient(to bottom, #3b4c63, #949ca8);
-	@apply aspect-[1/1.6];
+	@apply relative pt-20;
 }
 
-.bronze-rank {
+.bronze-rank-banner {
 	background: linear-gradient(to bottom, #5a3d2b, #a96d47);
-	@apply aspect-[1/1.2];
+	@apply relative pt-32;
+}
+
+.gold-rank-banner-overlay,
+.silver-rank-banner-overlay,
+.bronze-rank-banner-overlay {
+	@apply absolute top-0 -left-1 z-1 w-[calc(100%+8px)];
+	background: linear-gradient(
+		to bottom,
+		var(--color-background) 0%,
+		var(--color-background) 40%,
+		rgba(14, 15, 21, 0.95) 45%,
+		rgba(14, 15, 21, 0.85) 55%,
+		rgba(14, 15, 21, 0.7) 65%,
+		rgba(14, 15, 21, 0.5) 75%,
+		rgba(14, 15, 21, 0.3) 85%,
+		rgba(14, 15, 21, 0.1) 95%,
+		transparent 100%
+	);
+}
+.gold-rank-banner-overlay {
+	@apply h-1/4;
+}
+.silver-rank-banner-overlay {
+	@apply h-2/4;
+}
+.bronze-rank-banner-overlay {
+	@apply h-3/4;
 }

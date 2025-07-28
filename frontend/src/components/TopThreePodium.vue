@@ -3,55 +3,52 @@
 		<div class="flex items-end justify-center gap-3 md:gap-6">
 			<!-- 2nd Place -->
 			<div v-if="topThree[1]" class="flex flex-col items-center">
-				<div class="silver-rank podium-banner">
+				<div class="silver-rank-banner">
 					<LaurealFeatherWithPosition :position="2" :size="80" />
-					<span class="px-2 text-center text-sm font-semibold text-white">
+					<span class="px-2 text-center text-sm font-semibold">
 						{{ getDisplayName(topThree[1]) }}
 					</span>
+					<div class="silver-rank-banner-overlay"></div>
 				</div>
 				<div class="text-center">
-					<div class="text-sm font-medium text-white">
+					<div class="text-sm font-medium">
 						{{ (topThree[1].stats.totalDistance / 1000).toFixed(1) }}km
 					</div>
-					<div class="text-xs text-white/60">
-						{{ topThree[1].stats.totalActivities }} activities
-					</div>
+					<div class="text-xs">{{ topThree[1].stats.totalActivities }} activities</div>
 				</div>
 			</div>
 
 			<!-- 1st Place -->
 			<div v-if="topThree[0]" class="flex flex-col items-center">
-				<div class="gold-rank podium-banner">
+				<div class="gold-rank-banner">
 					<LaurealFeatherWithPosition :position="1" :size="90" />
-					<span class="px-2 text-center text-base font-semibold text-white">
+					<span class="px-2 text-center text-base font-semibold">
 						{{ getDisplayName(topThree[0]) }}
 					</span>
+					<div class="gold-rank-banner-overlay"></div>
 				</div>
 				<div class="text-center">
-					<div class="text-sm font-medium text-white">
+					<div class="text-sm font-medium">
 						{{ (topThree[0].stats.totalDistance / 1000).toFixed(1) }}km
 					</div>
-					<div class="text-xs text-white/60">
-						{{ topThree[0].stats.totalActivities }} activities
-					</div>
+					<div class="text-xs">{{ topThree[0].stats.totalActivities }} activities</div>
 				</div>
 			</div>
 
 			<!-- 3rd Place -->
 			<div v-if="topThree[2]" class="flex flex-col items-center">
-				<div class="bronze-rank podium-banner">
+				<div class="bronze-rank-banner">
 					<LaurealFeatherWithPosition :position="3" :size="70" />
-					<span class="px-2 text-center text-xs font-semibold text-white">
+					<span class="px-2 text-center text-xs font-semibold">
 						{{ getDisplayName(topThree[2]) }}
 					</span>
+					<div class="bronze-rank-banner-overlay"></div>
 				</div>
 				<div class="text-center">
-					<div class="text-sm font-medium text-white">
+					<div class="text-sm font-medium">
 						{{ (topThree[2].stats.totalDistance / 1000).toFixed(1) }}km
 					</div>
-					<div class="text-xs text-white/60">
-						{{ topThree[2].stats.totalActivities }} activities
-					</div>
+					<div class="text-xs">{{ topThree[2].stats.totalActivities }} activities</div>
 				</div>
 			</div>
 		</div>

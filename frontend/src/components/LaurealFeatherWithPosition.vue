@@ -1,5 +1,5 @@
 <template>
-	<div class="relative inline-block" :style="{ width: size + 'px', height: size + 'px' }">
+	<div class="relative z-3 inline-block" :style="{ width: size + 'px', height: size + 'px' }">
 		<!-- Laurel Wreath SVG -->
 		<LaurealFeather :fill="color" :width="size" :height="size" />
 

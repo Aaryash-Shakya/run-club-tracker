@@ -97,7 +97,7 @@
 									<!-- Position change indicator -->
 									<div
 										v-if="activityPeriod === 'monthly'"
-										class="flex w-5 items-center justify-center text-xs leading-none font-normal"
+										class="flex w-5 items-center justify-center text-xs leading-none font-light text-shadow-white"
 									>
 										<span
 											v-if="changes.positionChange === 'up'"
