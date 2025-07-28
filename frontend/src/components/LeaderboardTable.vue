@@ -60,7 +60,10 @@
 						</td>
 					</tr>
 					<!-- Leaderboard data -->
-					<template v-for="(record, index) in filteredLeaderboard" :key="record.user._id">
+					<template
+						v-for="({ user, stats, changes }, index) in filteredLeaderboard"
+						:key="user._id"
+					>
 						<!-- Separator for first record under 70km -->
 						<tr v-if="index === separatorIndex" class="bg-transparent">
 							<td colspan="7" class="px-2 py-2">
@@ -79,55 +82,56 @@
 								'bg-surface-light cursor-pointer rounded-lg hover:bg-[#282F4570]',
 								{
 									'cursor-not-allowed opacity-40': !PARTICIPANT_IDS.includes(
-										record.user._id,
+										user._id,
 									),
 								},
 							]"
-							v-on:click="
-								() => $router.push(`/runners/${record.user._id}/activities`)
-							"
+							v-on:click="() => $router.push(`/runners/${user._id}/activities`)"
 						>
 							<td class="text-muted rounded-l-lg px-2 py-2 text-center font-semibold">
-								<div class="flex items-center justify-center gap-1">
+								<div
+									class="flex items-center justify-center gap-1"
+									:title="`+${(changes.distanceAdded / 1000).toFixed(1)}km, +${changes.activitiesAdded} activities`"
+								>
 									<span>{{ index + 1 }}</span>
 									<!-- Position change indicator -->
 									<div
+										v-if="activityPeriod === 'monthly'"
 										class="flex w-5 items-center justify-center text-xs leading-none font-normal"
 									>
 										<span
-											v-if="
-												activityPeriod === 'monthly' &&
-												record.positionChange === 'up'
-											"
+											v-if="changes.positionChange === 'up'"
 											class="text-green-500"
-											:title="`+${((record.distanceAdded || 0) / 1000).toFixed(1)}km, +${record.activitiesAdded || 0} activities`"
 										>
-											<UpArrow class="h-3 w-3" />{{ record.positionDiff }}
+											<UpArrow class="h-3 w-3" />{{ changes.positionDiff }}
 										</span>
 										<span
-											v-else-if="
-												activityPeriod === 'monthly' &&
-												record.positionChange === 'down'
-											"
+											v-else-if="changes.positionChange === 'down'"
 											class="text-red-500"
-											:title="`+${((record.distanceAdded || 0) / 1000).toFixed(1)}km, +${record.activitiesAdded || 0} activities`"
 										>
-											{{ record.positionDiff }}<DownArrow class="h-3 w-3" />
+											{{ changes.positionDiff }}<DownArrow class="h-3 w-3" />
+										</span>
+										<!-- new activities but no change in position -->
+										<span
+											v-else-if="changes.distanceAdded > 0"
+											class="text-lg text-yellow-300"
+										>
+											=
 										</span>
 									</div>
 								</div>
 							</td>
-							<td class="cursor-pointer px-2 py-2">
+							<td class="px-2 py-2">
 								<div class="flex items-center gap-3">
 									<UiAvatar
-										:name="`${record.user.firstName} ${record.user.lastName}`"
+										:name="`${user.firstName} ${user.lastName}`"
 										:size="40"
 									/>
 									<span class="hidden md:inline">
-										{{ record.user.firstName }} {{ record.user.lastName }}
+										{{ user.firstName }} {{ user.lastName }}
 									</span>
 									<span class="inline md:hidden">
-										{{ record.user.firstName.split(' ')[0] }}
+										{{ user.firstName.split(' ')[0] }}
 									</span>
 								</div>
 							</td>
@@ -136,19 +140,18 @@
 									<div
 										class="font-normal"
 										:class="{
-											'text-white':
-												record.stats.totalDistance >= TARGET_DISTANCE,
+											'text-white': stats.totalDistance >= TARGET_DISTANCE,
 											'text-muted-light':
-												record.stats.totalDistance < TARGET_DISTANCE,
+												stats.totalDistance < TARGET_DISTANCE,
 										}"
 									>
-										{{ (record.stats.totalDistance / 1000).toFixed(1) }}
+										{{ (stats.totalDistance / 1000).toFixed(1) }}
 										<span
 											class="relative -top-1 hidden text-xs font-light text-green-500 md:inline-block"
 										>
 											{{
-												record.distanceAdded
-													? `+${Number((record.distanceAdded / 1000).toFixed(1))}`
+												changes.distanceAdded
+													? `+${Number((changes.distanceAdded / 1000).toFixed(1))}`
 													: ''
 											}}
 										</span>
@@ -167,9 +170,7 @@
 											/>
 											<span class="text-muted text-xs font-medium">
 												{{
-													(
-														(record.stats.runningDistance || 0) / 1000
-													).toFixed(1)
+													((stats.runningDistance || 0) / 1000).toFixed(1)
 												}}
 											</span>
 										</div>
@@ -186,9 +187,7 @@
 											/>
 											<span class="text-muted text-xs font-medium">
 												{{
-													(
-														(record.stats.walkingDistance || 0) / 1000
-													).toFixed(1)
+													((stats.walkingDistance || 0) / 1000).toFixed(1)
 												}}
 											</span>
 										</div>
@@ -204,9 +203,9 @@
 												class="bg-accent-run absolute top-0 left-0 h-full rounded-l-full"
 												:style="{
 													width:
-														(record.stats.totalDistance > 0
-															? ((record.stats.runningDistance || 0) /
-																	record.stats.totalDistance) *
+														(stats.totalDistance > 0
+															? ((stats.runningDistance || 0) /
+																	stats.totalDistance) *
 																100
 															: 0) + '%',
 												}"
@@ -216,9 +215,9 @@
 												class="bg-accent-walk absolute top-0 right-0 h-full rounded-r-full"
 												:style="{
 													width:
-														(record.stats.totalDistance > 0
-															? ((record.stats.walkingDistance || 0) /
-																	record.stats.totalDistance) *
+														(stats.totalDistance > 0
+															? ((stats.walkingDistance || 0) /
+																	stats.totalDistance) *
 																100
 															: 0) + '%',
 												}"
@@ -230,21 +229,21 @@
 							<td class="px-2 py-2">
 								<div class="flex items-center gap-2">
 									<span class="text-muted font-medium">{{
-										paceUtils.formatPaceToString(record.stats.averagePace)
+										paceUtils.formatPaceToString(stats.averagePace)
 									}}</span>
 								</div>
 							</td>
 							<td class="hidden p-2 md:table-cell">
 								<div class="flex items-center gap-2">
 									<span class="text-muted font-medium">{{
-										record.stats.totalActivities
+										stats.totalActivities
 									}}</span>
 									<span
 										class="relative -top-1 hidden text-xs font-light text-green-500 md:inline-block"
 									>
 										{{
-											record.activitiesAdded
-												? `+${record.activitiesAdded}`
+											changes.activitiesAdded
+												? `+${changes.activitiesAdded}`
 												: ''
 										}}
 									</span>
@@ -253,7 +252,7 @@
 							<td class="hidden rounded-r-lg p-2 md:table-cell">
 								<div class="flex items-center gap-2">
 									<span class="text-muted font-medium">{{
-										formatSecondsToHMS(record.stats.totalMovingTime)
+										formatSecondsToHMS(stats.totalMovingTime)
 									}}</span>
 								</div>
 							</td>
@@ -295,10 +294,12 @@ type LeaderboardEntry = {
 type PositionChange = 'up' | 'down' | 'neutral'
 
 type LeaderboardWithPosition = TUserWithStats & {
-	positionChange?: PositionChange
-	positionDiff?: number
-	distanceAdded?: number
-	activitiesAdded?: number
+	changes: {
+		positionChange: PositionChange
+		positionDiff: number
+		distanceAdded: number
+		activitiesAdded: number
+	}
 }
 
 // State
@@ -446,12 +447,15 @@ const fetchLeaderboardData = async () => {
 				const distanceAdded = recent ? recent.stats.totalDistance : 0
 				const activitiesAdded = recent ? recent.stats.totalActivities : 0
 
-				return {
-					...record,
+				const changes = {
 					positionChange: positionChanges.get(record.user._id)?.change || 'neutral',
 					positionDiff: positionChanges.get(record.user._id)?.diff || 0,
 					distanceAdded,
 					activitiesAdded,
+				}
+				return {
+					...record,
+					changes,
 				}
 			})
 		} else {
@@ -463,12 +467,15 @@ const fetchLeaderboardData = async () => {
 			const res = await fetch(url.toString(), { cache: 'default' })
 			response = await res.json()
 
-			leaderboard.value = response.userActivitiesWithStats.map((record) => ({
-				...record,
+			const noChange = {
 				positionChange: 'neutral' as PositionChange,
 				positionDiff: 0,
 				distanceAdded: 0,
 				activitiesAdded: 0,
+			}
+			leaderboard.value = response.userActivitiesWithStats.map((record) => ({
+				...record,
+				changes: noChange,
 			}))
 		}
 	} catch (error) {
