@@ -5,7 +5,6 @@
 		:records="filteredLeaderboard"
 	/>
 	<div class="bg-surface mt-5 overflow-hidden rounded-xl px-2 shadow-lg">
-
 		<div class="flex items-center justify-end p-4">
 			<label class="flex cursor-pointer items-center gap-2 text-sm text-white/70">
 				<input
@@ -92,26 +91,28 @@
 								<div class="flex items-center justify-center gap-1">
 									<span>{{ index + 1 }}</span>
 									<!-- Position change indicator -->
-									<div class="flex w-5 items-center">
+									<div
+										class="flex w-5 items-center justify-center text-xs leading-none font-normal"
+									>
 										<span
 											v-if="
 												activityPeriod === 'monthly' &&
 												record.positionChange === 'up'
 											"
-											class="text-xs text-green-500"
+											class="text-green-500"
 											:title="`+${((record.distanceAdded || 0) / 1000).toFixed(1)}km, +${record.activitiesAdded || 0} activities`"
 										>
-											↑{{ record.positionDiff }}
+											<UpArrow class="h-3 w-3" />{{ record.positionDiff }}
 										</span>
 										<span
 											v-else-if="
 												activityPeriod === 'monthly' &&
 												record.positionChange === 'down'
 											"
-											class="text-xs text-red-500"
+											class="text-red-500"
 											:title="`+${((record.distanceAdded || 0) / 1000).toFixed(1)}km, +${record.activitiesAdded || 0} activities`"
 										>
-											↓{{ record.positionDiff }}
+											{{ record.positionDiff }}<DownArrow class="h-3 w-3" />
 										</span>
 									</div>
 								</div>
@@ -143,7 +144,7 @@
 									>
 										{{ (record.stats.totalDistance / 1000).toFixed(1) }}
 										<span
-											class="relative -top-1 text-xs font-light text-green-500 hidden md:inline-block"
+											class="relative -top-1 hidden text-xs font-light text-green-500 md:inline-block"
 										>
 											{{
 												record.distanceAdded
@@ -238,10 +239,12 @@
 									<span class="text-muted font-medium">{{
 										record.stats.totalActivities
 									}}</span>
-									<span class="relative -top-1 text-xs font-light text-green-500 hidden md:inline-block">
+									<span
+										class="relative -top-1 hidden text-xs font-light text-green-500 md:inline-block"
+									>
 										{{
-											record.distanceAdded
-												? `+${Number((record.distanceAdded / 1000).toFixed(1))}`
+											record.activitiesAdded
+												? `+${record.activitiesAdded}`
 												: ''
 										}}
 									</span>
@@ -270,6 +273,8 @@ import { ref, onMounted, watch, computed } from 'vue'
 import UiAvatar from './UiAvatar.vue'
 import TopThreePodium from './TopThreePodium.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
+import UpArrow from './icons/UpArrow.vue'
+import DownArrow from './icons/DownArrow.vue'
 
 const TARGET_DISTANCE = 70000
 
