@@ -1,21 +1,13 @@
 <template>
 	<div v-if="topThree.length > 0" class="my-10 px-4">
-		<div class="flex items-end justify-center gap-4">
+		<div class="flex items-end justify-center gap-3 md:gap-6">
 			<!-- 2nd Place -->
 			<div v-if="topThree[1]" class="flex flex-col items-center">
-				<div
-					class="relative mb-2 flex h-24 w-24 items-center justify-center rounded-xl border-4 border-white shadow-lg"
-					style="background-color: #a395ee"
-				>
+				<div class="silver-rank podium-banner">
+					<LaurealFeatherWithPosition :position="2" :size="80" />
 					<span class="px-2 text-center text-sm font-semibold text-white">
 						{{ getDisplayName(topThree[1]) }}
 					</span>
-					<div
-						class="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs font-bold"
-						style="color: #a395ee"
-					>
-						2
-					</div>
 				</div>
 				<div class="text-center">
 					<div class="text-sm font-medium text-white">
@@ -29,29 +21,17 @@
 
 			<!-- 1st Place -->
 			<div v-if="topThree[0]" class="flex flex-col items-center">
-				<div
-					class="relative mb-2 flex h-32 w-32 items-center justify-center rounded-xl border-4 border-white bg-gradient-to-br from-yellow-300 to-yellow-600 shadow-xl"
-				>
+				<div class="gold-rank podium-banner">
+					<LaurealFeatherWithPosition :position="1" :size="90" />
 					<span class="px-2 text-center text-base font-semibold text-white">
 						{{ getDisplayName(topThree[0]) }}
 					</span>
-					<div
-						class="absolute -top-3 -right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-bold text-yellow-600"
-					>
-						1
-					</div>
-					<!-- Crown -->
-					<div
-						class="absolute -top-6 left-1/2 -translate-x-1/2 transform text-2xl text-yellow-400"
-					>
-						👑
-					</div>
 				</div>
 				<div class="text-center">
-					<div class="text-base font-medium text-white">
+					<div class="text-sm font-medium text-white">
 						{{ (topThree[0].stats.totalDistance / 1000).toFixed(1) }}km
 					</div>
-					<div class="text-sm text-white/60">
+					<div class="text-xs text-white/60">
 						{{ topThree[0].stats.totalActivities }} activities
 					</div>
 				</div>
@@ -59,19 +39,11 @@
 
 			<!-- 3rd Place -->
 			<div v-if="topThree[2]" class="flex flex-col items-center">
-				<div
-					class="relative mb-2 flex h-20 w-20 items-center justify-center rounded-xl border-4 border-white shadow-lg"
-					style="background-color: #832ab4"
-				>
+				<div class="bronze-rank podium-banner">
+					<LaurealFeatherWithPosition :position="3" :size="70" />
 					<span class="px-2 text-center text-xs font-semibold text-white">
 						{{ getDisplayName(topThree[2]) }}
 					</span>
-					<div
-						class="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white text-xs font-bold"
-						style="color: #832ab4"
-					>
-						3
-					</div>
 				</div>
 				<div class="text-center">
 					<div class="text-sm font-medium text-white">
@@ -89,6 +61,7 @@
 <script lang="ts" setup>
 import type { TUserWithStats } from '@/types/activity'
 import { computed } from 'vue'
+import LaurealFeatherWithPosition from './LaurealFeatherWithPosition.vue'
 
 interface Props {
 	records: TUserWithStats[]
