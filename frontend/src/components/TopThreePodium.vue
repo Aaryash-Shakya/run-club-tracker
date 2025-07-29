@@ -4,7 +4,7 @@
 			<!-- 2nd Place -->
 			<div v-if="topThree[1]" class="flex flex-col items-center">
 				<div class="silver-rank-banner">
-					<LaurealFeatherWithPosition :position="2" :size="80" />
+					<LaurealFeatherWithPosition :position="2" />
 					<span class="px-2 text-center text-sm font-semibold">
 						{{ getDisplayName(topThree[1]) }}
 					</span>
@@ -21,7 +21,7 @@
 			<!-- 1st Place -->
 			<div v-if="topThree[0]" class="flex flex-col items-center">
 				<div class="gold-rank-banner">
-					<LaurealFeatherWithPosition :position="1" :size="90" />
+					<LaurealFeatherWithPosition :position="1" />
 					<span class="px-2 text-center text-base font-semibold">
 						{{ getDisplayName(topThree[0]) }}
 					</span>
@@ -38,7 +38,7 @@
 			<!-- 3rd Place -->
 			<div v-if="topThree[2]" class="flex flex-col items-center">
 				<div class="bronze-rank-banner">
-					<LaurealFeatherWithPosition :position="3" :size="70" />
+					<LaurealFeatherWithPosition :position="3" />
 					<span class="px-2 text-center text-xs font-semibold">
 						{{ getDisplayName(topThree[2]) }}
 					</span>
