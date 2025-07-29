@@ -74,17 +74,17 @@
 						<!-- Activity Type Icon -->
 						<span
 							class="mt-1 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-							:class="activity.type === 'Run' ? 'bg-accent-run' : 'bg-accent-walk'"
+							:class="activity.movingPace <= 10 ? 'bg-accent-run' : 'bg-accent-walk'"
 						>
 							<!-- Run or Walk Icon -->
 							<img
-								v-if="activity.type === 'Run'"
+								v-if="activity.movingPace <= 10"
 								src="@/assets/running-shoes.svg"
 								alt="Run Icon"
 								class="h-6 w-6 opacity-70 brightness-0 invert filter"
 							/>
 							<img
-								v-if="activity.type === 'Walk'"
+								v-else
 								src="@/assets/walking-shoes.svg"
 								alt="Walk Icon"
 								class="h-6 w-6 opacity-70 brightness-0 filter"
@@ -99,12 +99,25 @@
 							<p class="text-sm text-white/50">
 								{{ formatDate(activity.activityDate) }}
 							</p>
+							<span
+								v-if="
+									(activity.movingPace > 10 && activity.type === 'Run') ||
+									(activity.movingPace < 10 && activity.type === 'Walk')
+								"
+								class="text-muted-light hidden text-sm md:inline"
+							>
+								{{
+									activity.movingPace > 10 && activity.type === 'Run'
+										? 'Pace suggests this run was more of a walk.'
+										: 'Pace suggests this walk was more of a run.'
+								}}
+							</span>
 						</div>
 
 						<!-- Status Badge -->
-						<div class="flex flex-shrink-0 items-center gap-2">
+						<div class="flex flex-shrink-0 items-center gap-2 text-xs">
 							<span
-								class="rounded px-2 py-1 text-xs font-medium"
+								class="rounded px-2 py-1 font-medium"
 								:class="
 									activity.isValid
 										? 'bg-green-500/20 text-green-400'
@@ -185,10 +198,12 @@ const fetchUserActivityData = async () => {
 
 const formatDate = (dateString: string): string => {
 	const date = new Date(dateString)
-	return date.toLocaleDateString('en-US', {
+	return date.toLocaleString('en-US', {
 		year: 'numeric',
 		month: 'short',
 		day: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit',
 	})
 }
 
