@@ -52,6 +52,13 @@
 					Runners
 				</router-link>
 				<router-link
+					to="/visualization"
+					class="navbar-item"
+					:class="[$route.name === 'visualization' ? 'navbar-item-selected' : '']"
+				>
+					Visualization
+				</router-link>
+				<router-link
 					to="/rules"
 					class="navbar-item"
 					:class="[$route.name === 'rules' ? 'navbar-item-selected' : '']"

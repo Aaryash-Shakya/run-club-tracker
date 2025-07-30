@@ -37,6 +37,24 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
+async function fetchAllActivitiesOfJuly(req: Request, res: Response, next: NextFunction) {
+	console.log(1);
+	try {
+		const { startDate, endDate } = dateUtils.getDateRange("monthly", new Date("2025-07-15"));
+
+		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
+
+		// res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.json({
+			status: "OK",
+			message: "Monthly activities for July fetched successfully",
+			activities,
+		});
+	} catch (error) {
+		next(error);
+	}
+}
+
 async function fetchRecentActivities(req: Request, res: Response, next: NextFunction) {
 	try {
 		const now = new Date();
@@ -98,6 +116,7 @@ async function fetchUserActivities(req: Request, res: Response, next: NextFuncti
 
 export default {
 	fetchActivities,
+	fetchAllActivitiesOfJuly,
 	fetchRecentActivities,
 	fetchUserActivities,
 };
