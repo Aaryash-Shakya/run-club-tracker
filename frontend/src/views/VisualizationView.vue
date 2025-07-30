@@ -1,5 +1,5 @@
 <template>
-	<div class="container mx-auto px-4 py-8">
+	<div class="container mx-auto px-4 py-6">
 		<h1 class="mb-8 text-center text-3xl font-bold">Activity Visualization</h1>
 
 		<div v-if="loading" class="flex h-64 items-center justify-center">
@@ -12,28 +12,26 @@
 
 		<div v-else class="space-y-8">
 			<!-- Test Visualization Section -->
-			<div class="rounded-lg bg-white p-6 shadow-md">
-				<h2 class="mb-4 text-2xl font-semibold">Test Visualization</h2>
-
+			<div class="rounded-lg bg-white p-2 shadow-md">
 				<!-- Simple Bar Chart Representation -->
 				<BarChartRace :data="activitiesArray" class="h-fit w-full" />
+			</div>
 
-				<!-- Activities Summary -->
-				<div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-					<div class="rounded-lg bg-gray-50 p-4 text-center">
-						<div class="text-2xl font-bold text-blue-600">{{ activities.length }}</div>
-						<div class="text-sm text-gray-600">Total Activities</div>
+			<!-- Activities Summary -->
+			<div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+				<div class="rounded-lg bg-gray-50 p-4 text-center">
+					<div class="text-2xl font-bold text-blue-600">{{ activities.length }}</div>
+					<div class="text-sm text-gray-600">Total Activities</div>
+				</div>
+				<div class="rounded-lg bg-gray-50 p-4 text-center">
+					<div class="text-2xl font-bold text-green-600">
+						{{ totalDistance.toFixed(1) }} km
 					</div>
-					<div class="rounded-lg bg-gray-50 p-4 text-center">
-						<div class="text-2xl font-bold text-green-600">
-							{{ totalDistance.toFixed(1) }} km
-						</div>
-						<div class="text-sm text-gray-600">Total Distance</div>
-					</div>
-					<div class="rounded-lg bg-gray-50 p-4 text-center">
-						<div class="text-2xl font-bold text-purple-600">{{ validActivities }}</div>
-						<div class="text-sm text-gray-600">Valid Activities</div>
-					</div>
+					<div class="text-sm text-gray-600">Total Distance</div>
+				</div>
+				<div class="rounded-lg bg-gray-50 p-4 text-center">
+					<div class="text-2xl font-bold text-purple-600">{{ validActivities }}</div>
+					<div class="text-sm text-gray-600">Valid Activities</div>
 				</div>
 			</div>
 		</div>
@@ -86,12 +84,26 @@ const validActivities = computed(() => {
 	return activities.value.filter((activity) => activity.isValid).length
 })
 
-// Function to convert UTC date to Nepal time and format as YYYY-MM-DD
-const convertToNepalDate = (dateString: string) => {
-	const utcDate = new Date(dateString)
-	// Nepal is UTC+5:45
-	const nepalTime = new Date(utcDate.getTime() + (5 * 60 + 45) * 60 * 1000)
-	return nepalTime.toISOString().split('T')[0]
+const generateDateIndex = (dateString: string) => {
+	const dt = new Date(dateString)
+	// Convert to Asia/Kathmandu timezone offset (+5:45)
+	const kathmanduOffset = 5.75 * 60 // in minutes
+	const utc = dt.getTime() + dt.getTimezoneOffset() * 60000
+	const kathmanduTime = new Date(utc + kathmanduOffset * 60000)
+
+	const hour = kathmanduTime.getHours()
+	let suffix = ''
+	if (hour >= 4 && hour < 12) {
+		suffix = 'morning'
+	} else if (hour >= 12 && hour < 20) {
+		suffix = 'day'
+	} else {
+		suffix = 'night'
+	}
+	const year = kathmanduTime.getFullYear()
+	const month = String(kathmanduTime.getMonth() + 1).padStart(2, '0')
+	const day = String(kathmanduTime.getDate()).padStart(2, '0')
+	return `${year}-${month}-${day}-${suffix}`
 }
 
 // Sorted activities by date (ascending)
@@ -101,22 +113,29 @@ const sortedActivities = computed(() => {
 	)
 })
 
-// Create one array for all valid activities: [Distance, Name, Date]
+// Create one array for all valid activities: [Distance, Id, Name, Date]
 const activitiesArray = computed(() => {
-	const result: Array<[number, string, string]> = []
+	const result: Array<[number, string, string, string]> = []
 
 	sortedActivities.value.forEach((activity) => {
 		// Only include valid activities
 		if (activity.isValid) {
-			const userName = `${activity.user.firstName} ${activity.user.lastName}`
+			const userId = activity.user._id
+			let userName = ''
+			if (activity.user.firstName.split(' ').length > 1) {
+				const formattedFirstName = activity.user.firstName.split(' ')[0]
+				const formattedLastName = activity.user.firstName.split(' ')[1].slice(0, 1)
+				userName = `${formattedFirstName} ${formattedLastName}.`
+			} else {
+				userName = `${activity.user.firstName} ${activity.user.lastName}`
+			}
 			const distanceKm = activity.distance / 1000 // Convert to km
-			const nepalDate = convertToNepalDate(activity.activityDate.toString())
+			const dateIndex = generateDateIndex(activity.activityDate.toString())
 
-			result.push([distanceKm, userName, nepalDate])
+			result.push([distanceKm, userId, userName, dateIndex])
 		}
 	})
 
-	console.log('Activities Array:', result)
 	return result
 })
 

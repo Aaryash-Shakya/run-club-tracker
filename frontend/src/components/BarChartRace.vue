@@ -1,19 +1,53 @@
 <template>
 	<div class="bar-chart-race">
-		<div ref="chartContainer" class="h-[600px] w-full"></div>
-		<div class="mt-4 flex justify-center space-x-4">
-			<button
-				@click="togglePlay"
-				class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-			>
-				{{ isPlaying ? 'Pause' : 'Play' }}
-			</button>
-			<button
-				@click="resetAnimation"
-				class="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
-			>
-				Reset
-			</button>
+		<div ref="chartContainer" class="h-[700px] w-full"></div>
+		<div class="mt-4 space-y-4">
+			<!-- Controls -->
+			<div class="flex justify-center space-x-4">
+				<button
+					@click="togglePlay"
+					class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+				>
+					{{ isPlaying ? 'Pause' : 'Play' }}
+				</button>
+				<button
+					@click="resetAnimation"
+					class="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
+				>
+					Reset
+				</button>
+			</div>
+
+			<!-- Settings -->
+			<div class="flex flex-col items-center space-y-3">
+				<!-- Participants Only Toggle -->
+				<div class="flex items-center space-x-3">
+					<label class="flex cursor-pointer items-center space-x-2">
+						<input
+							type="checkbox"
+							v-model="participantsOnly"
+							class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+						/>
+						<span class="text-sm font-medium text-gray-700">Participants Only</span>
+					</label>
+				</div>
+
+				<!-- Speed Control -->
+				<div class="flex items-center space-x-3">
+					<span class="text-sm font-medium text-gray-700">Speed:</span>
+					<span class="text-xs text-gray-500">Fast</span>
+					<input
+						type="range"
+						v-model="speedControl"
+						min="500"
+						max="3000"
+						step="100"
+						class="slider h-2 w-32 cursor-pointer appearance-none rounded-lg bg-gray-200"
+					/>
+					<span class="text-xs text-gray-500">Slow</span>
+					<span class="w-12 text-xs text-gray-600">{{ speedControl }}ms</span>
+				</div>
+			</div>
 		</div>
 		<div class="mt-2 text-center text-sm text-gray-600">
 			{{ currentDate }} ({{ currentIndex + 1 }} / {{ uniqueDates.length }})
@@ -24,9 +58,10 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import * as echarts from 'echarts'
+import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 interface Props {
-	data: Array<[number, string, string]> // [distance, name, date]
+	data: Array<[number, string, string, string]> // [distance, id, name, date]
 }
 
 const props = defineProps<Props>()
@@ -37,39 +72,44 @@ let animationTimer: number | null = null
 
 const isPlaying = ref(false)
 const currentIndex = ref(0)
-const updateFrequency = 1500 // milliseconds between updates
-const barWidthAnimationDuration = 2000 // slower width changes
+const participantsOnly = ref(true)
+const speedControl = ref(2000) // Default speed in milliseconds
+
+const updateFrequency = computed(() => speedControl.value) // Use reactive speed
+const barWidthAnimationDuration = 2500 // slower width changes
 const sortAnimationDuration = 500 // faster horizontal/sorting changes
 
 // Generate consistent colors for users
 const userColors: Record<string, string> = {}
-const colorPalette = [
-	'#5470c6',
-	'#91cc75',
-	'#fac858',
-	'#ee6666',
-	'#73c0de',
-	'#3ba272',
-	'#fc8452',
-	'#9a60b4',
-	'#ea7ccc',
-	'#ff9f7f',
-	'#ffdb5c',
-	'#37a2da',
-	'#32c5e9',
-	'#67e0e3',
-	'#9fe6b8',
-	'#ffcc5c',
-	'#ff6e76',
-	'#ff9f7f',
-	'#ffb347',
-	'#87ceeb',
+const baseColors = [
+	'#6a88c8', // softened blue
+	'#a4d88a', // muted green
+	'#f7d372', // light gold
+	'#f18888', // light red
+	'#92d4e9', // soft cyan
+	'#5ab98a', // dusty teal
+	'#fca67e', // peach
+	'#b58cc6', // lavender
+	'#f0a7d1', // pink
+	'#ffc1a6', // light coral
+	'#ffe58a', // pastel yellow
+	'#6fc2e5', // calm sky
+	'#63d6f1', // aqua blue
+	'#90f1f3', // icy blue
+	'#b4f1d0', // mint
+	'#ffe799', // cream yellow
+	'#ff9999', // soft pink red
+	'#ffc1a6', // coral (again)
+	'#ffcc80', // light orange
+	'#b0e0ff', // baby blue
 ]
+
+// const highlightedColor = '#FFD700' // Gold (strong highlight)
 
 const getUserColor = (name: string): string => {
 	if (!userColors[name]) {
-		const colorIndex = Object.keys(userColors).length % colorPalette.length
-		userColors[name] = colorPalette[colorIndex]
+		const colorIndex = Object.keys(userColors).length % baseColors.length
+		userColors[name] = baseColors[colorIndex]
 	}
 	return userColors[name]
 }
@@ -78,8 +118,16 @@ const getUserColor = (name: string): string => {
 const processedData = computed(() => {
 	const dateMap = new Map<string, Map<string, number>>()
 
+	// Filter data based on participants only toggle
+	const filteredData = participantsOnly.value
+		? props.data.filter(([, id]) => {
+				// Check if the user ID matches any participant ID
+				return PARTICIPANT_IDS.some((participantId) => participantId === id)
+			})
+		: props.data
+
 	// Group activities by date and accumulate distances for each user
-	props.data.forEach(([distance, name, date]) => {
+	filteredData.forEach(([distance, , name, date]) => {
 		if (!dateMap.has(date)) {
 			dateMap.set(date, new Map())
 		}
@@ -138,7 +186,7 @@ const updateChart = () => {
 			type: 'value',
 			max: maxValue * 1.1,
 			axisLabel: {
-				formatter: (value: number) => Number(value.toFixed(1)) + ' km',
+				formatter: (value: number) => Number(value.toFixed(2)) + ' km',
 				fontSize: 12,
 				fontWeight: 'normal',
 			},
@@ -182,7 +230,7 @@ const updateChart = () => {
 				label: {
 					show: true,
 					position: 'right',
-					formatter: (params: { value: number }) => params.value.toFixed(1) + ' km',
+					formatter: (params: { value: number }) => params.value.toFixed(2) + ' km',
 					fontSize: 12,
 					fontWeight: 'normal',
 					color: '#333',
@@ -204,11 +252,22 @@ const updateChart = () => {
 				{
 					type: 'text',
 					right: 80,
+					bottom: 80,
+					style: {
+						text: currentData.date.slice(0, 10),
+						font: 'bold 28px monospace',
+						fill: 'rgba(0, 0, 0, 0.6)',
+					},
+					z: 100,
+				},
+				{
+					type: 'text',
+					right: 80,
 					bottom: 60,
 					style: {
-						text: currentData.date,
-						font: 'bold 32px monospace',
-						fill: 'rgba(0, 0, 0, 0.3)',
+						text: currentData.date.slice(11),
+						font: 'bold 18px monospace',
+						fill: 'rgba(0, 0, 0, 0.6)',
 					},
 					z: 100,
 				},
@@ -249,7 +308,7 @@ const startAnimation = () => {
 			return
 		}
 
-		animationTimer = window.setTimeout(animate, updateFrequency)
+		animationTimer = window.setTimeout(animate, updateFrequency.value)
 	}
 
 	animate()
@@ -281,6 +340,16 @@ watch(
 	{ deep: true },
 )
 
+// Watch for participants only toggle
+watch(participantsOnly, () => {
+	if (chart) {
+		// Reset animation when filter changes
+		pauseAnimation()
+		currentIndex.value = 0
+		updateChart()
+	}
+})
+
 // Watch for current index changes
 watch(currentIndex, () => {
 	updateChart()
@@ -301,5 +370,41 @@ onBeforeUnmount(() => {
 <style scoped>
 .bar-chart-race {
 	width: 100%;
+}
+
+/* Custom slider styling */
+.slider {
+	appearance: none;
+	-webkit-appearance: none;
+	background: linear-gradient(to right, #3b82f6 0%, #6b7280 100%);
+	outline: none;
+	opacity: 0.7;
+	transition: opacity 0.2s;
+}
+
+.slider:hover {
+	opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: #3b82f6;
+	cursor: pointer;
+	border: 2px solid #ffffff;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.slider::-moz-range-thumb {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: #3b82f6;
+	cursor: pointer;
+	border: 2px solid #ffffff;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
