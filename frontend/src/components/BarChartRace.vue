@@ -19,9 +19,9 @@
 			</div>
 
 			<!-- Settings -->
-			<div class="flex flex-col items-center space-y-3">
+			<div class="flex flex-wrap items-center justify-center gap-4 lg:gap-8">
 				<!-- Participants Only Toggle -->
-				<div class="flex items-center space-x-3">
+				<div class="flex items-center space-x-2">
 					<label class="flex cursor-pointer items-center space-x-2">
 						<input
 							type="checkbox"
@@ -47,10 +47,8 @@
 					<span class="text-muted text-xs">Slow</span>
 					<span class="text-muted-light w-12 text-xs">{{ speedControl }}ms</span>
 				</div>
-			</div>
 
-			<!-- Highlight User Section -->
-			<div class="flex flex-col items-center space-y-3">
+				<!-- Highlight User Section -->
 				<div class="flex items-center space-x-3">
 					<span class="text-text text-sm font-medium">Highlight User:</span>
 					<select
@@ -242,6 +240,37 @@ const processedData = computed(() => {
 	})
 })
 
+// Compute the ideal starting index for a better visualization
+const idealStartIndex = computed(() => {
+	if (processedData.value.length === 0) return 0
+
+	// First, try to find a date from 2025-07-01 onwards with at least 10 users
+	const targetDate = '2025-07-01'
+	const from2025July = processedData.value.findIndex((data) => {
+		const dateStr = data.date.substring(0, 10) // Extract YYYY-MM-DD part
+		return dateStr >= targetDate && data.users.length >= 10
+	})
+
+	if (from2025July !== -1) {
+		return from2025July
+	}
+
+	// If no date from July 1st has 10+ users, find the first date with at least 10 users
+	const firstWith10Users = processedData.value.findIndex((data) => data.users.length >= 10)
+	if (firstWith10Users !== -1) {
+		return firstWith10Users
+	}
+
+	// If we have fewer than 10 total participants, find the first date with at least 5 users
+	const firstWith5Users = processedData.value.findIndex((data) => data.users.length >= 5)
+	if (firstWith5Users !== -1) {
+		return firstWith5Users
+	}
+
+	// Fallback: find the 10th data point or use the available length
+	return Math.min(9, processedData.value.length - 1)
+})
+
 const uniqueDates = computed(() => processedData.value.map((d) => d.date))
 const currentDate = computed(() => uniqueDates.value[currentIndex.value] || '')
 
@@ -249,6 +278,8 @@ const initChart = () => {
 	if (!chartContainer.value) return
 
 	chart = echarts.init(chartContainer.value)
+	// Set initial index to ideal start position for better visualization
+	currentIndex.value = idealStartIndex.value
 	updateChart()
 }
 
@@ -356,12 +387,12 @@ const updateChart = () => {
 					silent: true,
 					data: [
 						{
-							xAxis: 10,
+							xAxis: 70,
 							lineStyle: {
 								color: '#22c55e', // green-500
 								width: 2,
 								type: 'dashed',
-								translate: "10px 10px"
+								translate: '10px 10px',
 							},
 							label: {
 								position: 'end',
@@ -377,7 +408,7 @@ const updateChart = () => {
 								color: '#f59e0b', // amber-500
 								width: 2,
 								type: 'dashed',
-								translate: "10px 10px"
+								translate: '10px 10px',
 							},
 							label: {
 								position: 'end',
@@ -393,7 +424,7 @@ const updateChart = () => {
 								color: '#FFD700',
 								width: 2,
 								type: 'dashed',
-								translate: "10px 10px"
+								translate: '10px 10px',
 							},
 							label: {
 								position: 'end',
@@ -452,7 +483,7 @@ const togglePlay = () => {
 
 const startAnimation = () => {
 	if (currentIndex.value >= processedData.value.length - 1) {
-		currentIndex.value = 0
+		currentIndex.value = idealStartIndex.value
 	}
 
 	isPlaying.value = true
@@ -484,7 +515,7 @@ const pauseAnimation = () => {
 
 const resetAnimation = () => {
 	pauseAnimation()
-	currentIndex.value = 0
+	currentIndex.value = idealStartIndex.value
 }
 
 // Watch for data changes
@@ -492,8 +523,8 @@ watch(
 	() => props.data,
 	() => {
 		if (chart) {
-			// Reset to beginning when data changes
-			currentIndex.value = 0
+			// Reset to ideal beginning when data changes
+			currentIndex.value = idealStartIndex.value
 			updateChart()
 		}
 	},
@@ -505,7 +536,7 @@ watch(participantsOnly, () => {
 	if (chart) {
 		// Reset animation when filter changes
 		pauseAnimation()
-		currentIndex.value = 0
+		currentIndex.value = idealStartIndex.value
 		updateChart()
 	}
 })
