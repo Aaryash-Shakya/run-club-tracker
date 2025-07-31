@@ -57,7 +57,7 @@
 					>
 						<option value="">None</option>
 						<option v-for="user in availableUsers" :key="user.id" :value="user.id">
-							{{ user.name }} ({{ user.id.slice(-4) }})
+							{{ user.name }}
 						</option>
 					</select>
 				</div>
@@ -88,7 +88,7 @@ const isPlaying = ref(false)
 const currentIndex = ref(0)
 const participantsOnly = ref(true)
 const speedControl = ref(2000) // Default speed in milliseconds
-const highlightedUserId = ref('') // ID of the user to highlight
+const highlightedUserId = ref('6862b7405f7a41fafa3bcbd1') // ID of the user to highlight
 
 const updateFrequency = computed(() => speedControl.value) // Use reactive speed
 const barWidthAnimationDuration = 2500 // slower width changes

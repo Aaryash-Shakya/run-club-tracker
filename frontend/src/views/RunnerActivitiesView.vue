@@ -62,6 +62,12 @@
 				<RunnerHeaderStats :stats="activityData.stats" />
 			</div>
 
+			<!-- Distance Chart Section -->
+			<div v-if="activityData.activities.length > 0" class="border-soft border-b px-2 py-4">
+				<h3 class="mb-4 text-lg font-semibold text-white">Distance Chart</h3>
+				<DistanceChart :activities="activityData.activities" />
+			</div>
+
 			<!-- Activities Cards -->
 			<div v-if="activityData.activities.length > 0" class="space-y-4 px-2 py-4">
 				<div
@@ -162,6 +168,7 @@ import { useRoute } from 'vue-router'
 import UiAvatar from '@/components/UiAvatar.vue'
 import RunnerActivityStats from '@/components/RunnerActivityStats.vue'
 import RunnerHeaderStats from '@/components/RunnerHeaderStats.vue'
+import DistanceChart from '@/components/DistanceChart.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
 // Reactive state
