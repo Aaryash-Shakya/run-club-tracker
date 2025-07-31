@@ -1,7 +1,5 @@
 <template>
 	<div class="container mx-auto px-4 py-6">
-		<h1 class="mb-8 text-center text-3xl font-bold">Activity Visualization</h1>
-
 		<div v-if="loading" class="flex h-64 items-center justify-center">
 			<div class="text-lg">Loading activities...</div>
 		</div>
@@ -18,10 +16,14 @@
 			</div>
 
 			<!-- Activities Summary -->
-			<div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+			<div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 				<div class="bg-surface rounded-lg p-4 text-center">
 					<div class="text-2xl font-bold text-green-400">{{ activities.length }}</div>
 					<div class="text-muted-light text-sm">Total Activities</div>
+				</div>
+				<div class="bg-surface rounded-lg p-4 text-center">
+					<div class="text-2xl font-bold text-yellow-400">{{ validActivities }}</div>
+					<div class="text-muted-light text-sm">Valid Activities</div>
 				</div>
 				<div class="bg-surface rounded-lg p-4 text-center">
 					<div class="text-2xl font-bold text-blue-400">
@@ -30,8 +32,10 @@
 					<div class="text-muted-light text-sm">Total Distance</div>
 				</div>
 				<div class="bg-surface rounded-lg p-4 text-center">
-					<div class="text-2xl font-bold text-yellow-400">{{ validActivities }}</div>
-					<div class="text-muted-light text-sm">Valid Activities</div>
+					<div class="text-2xl font-bold text-fuchsia-400">
+						{{ formatSecondsToHMS(totalDuration) }}
+					</div>
+					<div class="text-muted-light text-sm">Total Duration</div>
 				</div>
 			</div>
 		</div>
@@ -42,6 +46,7 @@
 import { ref, onMounted, computed } from 'vue'
 import type { TActivityWithUser } from '@/types/activity'
 import BarChartRace from '@/components/BarChartRace.vue'
+import { formatSecondsToHMS } from '@/utils/time.utils'
 
 const activities = ref<TActivityWithUser[]>([])
 const loading = ref(true)
@@ -75,6 +80,15 @@ const totalDistance = computed(() => {
 	return activities.value.reduce((sum, activity) => {
 		if (activity.isValid) {
 			return sum + activity.distance / 1000
+		}
+		return sum
+	}, 0)
+})
+
+const totalDuration = computed(() => {
+	return activities.value.reduce((sum, activity) => {
+		if (activity.isValid) {
+			return sum + activity.movingTime
 		}
 		return sum
 	}, 0)
@@ -124,7 +138,7 @@ const activitiesArray = computed(() => {
 			let userName = ''
 			if (activity.user.firstName.split(' ').length > 1) {
 				const formattedFirstName = activity.user.firstName.split(' ')[0]
-				userName = `${formattedFirstName} ${activity.user.lastName}.`
+				userName = `${formattedFirstName} ${activity.user.lastName}`
 			} else {
 				userName = `${activity.user.firstName} ${activity.user.lastName}`
 			}

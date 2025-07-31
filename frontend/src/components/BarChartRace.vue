@@ -6,13 +6,13 @@
 			<div class="flex justify-center space-x-4">
 				<button
 					@click="togglePlay"
-					class="text-muted rounded bg-blue-500 px-4 py-2 font-bold hover:bg-blue-700"
+					class="bg-accent-run hover:bg-accent-run-hover cursor-pointer rounded px-4 py-2 font-bold text-white transition-colors"
 				>
 					{{ isPlaying ? 'Pause' : 'Play' }}
 				</button>
 				<button
 					@click="resetAnimation"
-					class="text-muted rounded bg-gray-500 px-4 py-2 font-bold hover:bg-gray-700"
+					class="bg-soft hover:bg-soft-hover cursor-pointer rounded px-4 py-2 font-bold text-white transition-colors"
 				>
 					Reset
 				</button>
@@ -26,36 +26,36 @@
 						<input
 							type="checkbox"
 							v-model="participantsOnly"
-							class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+							class="text-accent-run focus:ring-accent-run border-soft bg-surface rounded"
 						/>
-						<span class="text-sm font-medium text-gray-700">Participants Only</span>
+						<span class="text-text text-sm font-medium">Participants Only</span>
 					</label>
 				</div>
 
 				<!-- Speed Control -->
 				<div class="flex items-center space-x-3">
-					<span class="text-sm font-medium text-gray-700">Speed:</span>
-					<span class="text-xs text-gray-500">Fast</span>
+					<span class="text-text text-sm font-medium">Speed:</span>
+					<span class="text-muted text-xs">Fast</span>
 					<input
 						type="range"
 						v-model="speedControl"
-						min="500"
+						min="300"
 						max="3000"
 						step="100"
-						class="slider h-2 w-32 cursor-pointer appearance-none rounded-lg bg-gray-200"
+						class="themed-slider h-2 w-32 cursor-pointer appearance-none rounded-lg"
 					/>
-					<span class="text-xs text-gray-500">Slow</span>
-					<span class="w-12 text-xs text-gray-600">{{ speedControl }}ms</span>
+					<span class="text-muted text-xs">Slow</span>
+					<span class="text-muted-light w-12 text-xs">{{ speedControl }}ms</span>
 				</div>
 			</div>
 
 			<!-- Highlight User Section -->
 			<div class="flex flex-col items-center space-y-3">
 				<div class="flex items-center space-x-3">
-					<span class="text-sm font-medium text-gray-700">Highlight User:</span>
+					<span class="text-text text-sm font-medium">Highlight User:</span>
 					<select
 						v-model="highlightedUserId"
-						class="rounded border border-gray-300 bg-white px-3 py-1 text-sm text-black focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+						class="focus:border-accent-run focus:ring-accent-run text-text border-soft bg-surface rounded border px-3 py-1 text-sm focus:ring-1 focus:outline-none"
 					>
 						<option value="">None</option>
 						<option v-for="user in availableUsers" :key="user.id" :value="user.id">
@@ -65,7 +65,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="mt-2 text-center text-sm text-gray-600">
+		<div class="text-muted mt-2 text-center text-sm">
 			{{ currentDate }} ({{ currentIndex + 1 }} / {{ uniqueDates.length }})
 		</div>
 	</div>
@@ -262,10 +262,10 @@ const updateChart = () => {
 
 	const option = {
 		grid: {
-			top: 40,
-			bottom: 40,
+			top: 20,
+			bottom: 20,
 			left: 80,
-			right: 80,
+			right: 20,
 		},
 		xAxis: {
 			type: 'value',
@@ -352,19 +352,37 @@ const updateChart = () => {
 				},
 				// Add goal lines
 				markLine: {
+					symbol: 'none',
 					silent: true,
 					data: [
 						{
-							xAxis: 70,
+							xAxis: 10,
 							lineStyle: {
 								color: '#22c55e', // green-500
 								width: 2,
 								type: 'dashed',
+								translate: "10px 10px"
 							},
 							label: {
 								position: 'end',
-								formatter: '70km Goal',
+								formatter: '🏁70K Finisher',
 								color: '#22c55e',
+								fontSize: 12,
+								fontWeight: 'bold',
+							},
+						},
+						{
+							xAxis: 100,
+							lineStyle: {
+								color: '#f59e0b', // amber-500
+								width: 2,
+								type: 'dashed',
+								translate: "10px 10px"
+							},
+							label: {
+								position: 'end',
+								formatter: '🔥100K Legend',
+								color: '#f59e0b',
 								fontSize: 12,
 								fontWeight: 'bold',
 							},
@@ -372,14 +390,15 @@ const updateChart = () => {
 						{
 							xAxis: 140,
 							lineStyle: {
-								color: '#f59e0b', // amber-500
+								color: '#FFD700',
 								width: 2,
 								type: 'dashed',
+								translate: "10px 10px"
 							},
 							label: {
 								position: 'end',
-								formatter: '140km Legend',
-								color: '#f59e0b',
+								formatter: '🚀140K Overachiever',
+								color: '#FFD700',
 								fontSize: 12,
 								fontWeight: 'bold',
 							},
@@ -392,19 +411,19 @@ const updateChart = () => {
 			elements: [
 				{
 					type: 'text',
-					right: 80,
-					bottom: 80,
+					right: 20,
+					bottom: 35,
 					style: {
 						text: currentData.date.slice(0, 10),
-						font: 'bold 28px monospace',
+						font: 'bold 24px monospace',
 						fill: 'rgba(255, 255, 255, 0.6)',
 					},
 					z: 100,
 				},
 				{
 					type: 'text',
-					right: 80,
-					bottom: 60,
+					right: 20,
+					bottom: 15,
 					style: {
 						text: currentData.date.slice(11),
 						font: 'bold 18px monospace',
@@ -513,39 +532,49 @@ onBeforeUnmount(() => {
 	width: 100%;
 }
 
-/* Custom slider styling */
-.slider {
+/* Custom themed slider styling */
+.themed-slider {
 	appearance: none;
 	-webkit-appearance: none;
-	background: linear-gradient(to right, #3b82f6 0%, #6b7280 100%);
+	background: linear-gradient(to right, var(--color-accent-run) 0%, var(--color-soft) 100%);
 	outline: none;
-	opacity: 0.7;
+	opacity: 0.8;
 	transition: opacity 0.2s;
 }
 
-.slider:hover {
+.themed-slider:hover {
 	opacity: 1;
 }
 
-.slider::-webkit-slider-thumb {
+.themed-slider::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
 	width: 18px;
 	height: 18px;
 	border-radius: 50%;
-	background: #3b82f6;
+	background: var(--color-accent-run);
 	cursor: pointer;
-	border: 2px solid #ffffff;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	border: 2px solid var(--color-text);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	transition: background-color 0.2s;
 }
 
-.slider::-moz-range-thumb {
+.themed-slider::-webkit-slider-thumb:hover {
+	background: var(--color-accent-run-hover);
+}
+
+.themed-slider::-moz-range-thumb {
 	width: 18px;
 	height: 18px;
 	border-radius: 50%;
-	background: #3b82f6;
+	background: var(--color-accent-run);
 	cursor: pointer;
-	border: 2px solid #ffffff;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	border: 2px solid var(--color-text);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	transition: background-color 0.2s;
+}
+
+.themed-slider::-moz-range-thumb:hover {
+	background: var(--color-accent-run-hover);
 }
 </style>
