@@ -53,7 +53,7 @@
 				</router-link>
 				<router-link
 					to="/visualization"
-					class="navbar-item"
+					class="navbar-item hidden md:block"
 					:class="[$route.name === 'visualization' ? 'navbar-item-selected' : '']"
 				>
 					Visualization

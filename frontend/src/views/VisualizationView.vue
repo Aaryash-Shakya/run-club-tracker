@@ -12,26 +12,26 @@
 
 		<div v-else class="space-y-8">
 			<!-- Test Visualization Section -->
-			<div class="rounded-lg bg-white p-2 shadow-md">
+			<div class="bg-surface rounded-lg p-2 shadow-md">
 				<!-- Simple Bar Chart Representation -->
 				<BarChartRace :data="activitiesArray" class="h-fit w-full" />
 			</div>
 
 			<!-- Activities Summary -->
 			<div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-				<div class="rounded-lg bg-gray-50 p-4 text-center">
-					<div class="text-2xl font-bold text-blue-600">{{ activities.length }}</div>
-					<div class="text-sm text-gray-600">Total Activities</div>
+				<div class="bg-surface rounded-lg p-4 text-center">
+					<div class="text-2xl font-bold text-green-400">{{ activities.length }}</div>
+					<div class="text-muted-light text-sm">Total Activities</div>
 				</div>
-				<div class="rounded-lg bg-gray-50 p-4 text-center">
-					<div class="text-2xl font-bold text-green-600">
+				<div class="bg-surface rounded-lg p-4 text-center">
+					<div class="text-2xl font-bold text-blue-400">
 						{{ totalDistance.toFixed(1) }} km
 					</div>
-					<div class="text-sm text-gray-600">Total Distance</div>
+					<div class="text-muted-light text-sm">Total Distance</div>
 				</div>
-				<div class="rounded-lg bg-gray-50 p-4 text-center">
-					<div class="text-2xl font-bold text-purple-600">{{ validActivities }}</div>
-					<div class="text-sm text-gray-600">Valid Activities</div>
+				<div class="bg-surface rounded-lg p-4 text-center">
+					<div class="text-2xl font-bold text-yellow-400">{{ validActivities }}</div>
+					<div class="text-muted-light text-sm">Valid Activities</div>
 				</div>
 			</div>
 		</div>
@@ -124,8 +124,7 @@ const activitiesArray = computed(() => {
 			let userName = ''
 			if (activity.user.firstName.split(' ').length > 1) {
 				const formattedFirstName = activity.user.firstName.split(' ')[0]
-				const formattedLastName = activity.user.firstName.split(' ')[1].slice(0, 1)
-				userName = `${formattedFirstName} ${formattedLastName}.`
+				userName = `${formattedFirstName} ${activity.user.lastName}.`
 			} else {
 				userName = `${activity.user.firstName} ${activity.user.lastName}`
 			}

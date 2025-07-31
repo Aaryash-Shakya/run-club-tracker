@@ -6,13 +6,13 @@
 			<div class="flex justify-center space-x-4">
 				<button
 					@click="togglePlay"
-					class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+					class="text-muted rounded bg-blue-500 px-4 py-2 font-bold hover:bg-blue-700"
 				>
 					{{ isPlaying ? 'Pause' : 'Play' }}
 				</button>
 				<button
 					@click="resetAnimation"
-					class="rounded bg-gray-500 px-4 py-2 font-bold text-white hover:bg-gray-700"
+					class="text-muted rounded bg-gray-500 px-4 py-2 font-bold hover:bg-gray-700"
 				>
 					Reset
 				</button>
@@ -48,6 +48,22 @@
 					<span class="w-12 text-xs text-gray-600">{{ speedControl }}ms</span>
 				</div>
 			</div>
+
+			<!-- Highlight User Section -->
+			<div class="flex flex-col items-center space-y-3">
+				<div class="flex items-center space-x-3">
+					<span class="text-sm font-medium text-gray-700">Highlight User:</span>
+					<select
+						v-model="highlightedUserId"
+						class="rounded border border-gray-300 bg-white px-3 py-1 text-sm text-black focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+					>
+						<option value="">None</option>
+						<option v-for="user in availableUsers" :key="user.id" :value="user.id">
+							{{ user.name }} ({{ user.id.slice(-4) }})
+						</option>
+					</select>
+				</div>
+			</div>
 		</div>
 		<div class="mt-2 text-center text-sm text-gray-600">
 			{{ currentDate }} ({{ currentIndex + 1 }} / {{ uniqueDates.length }})
@@ -74,6 +90,7 @@ const isPlaying = ref(false)
 const currentIndex = ref(0)
 const participantsOnly = ref(true)
 const speedControl = ref(2000) // Default speed in milliseconds
+const highlightedUserId = ref('') // ID of the user to highlight
 
 const updateFrequency = computed(() => speedControl.value) // Use reactive speed
 const barWidthAnimationDuration = 2500 // slower width changes
@@ -82,7 +99,6 @@ const sortAnimationDuration = 500 // faster horizontal/sorting changes
 // Generate consistent colors for users
 const userColors: Record<string, string> = {}
 const baseColors = [
-	'#6a88c8', // softened blue
 	'#a4d88a', // muted green
 	'#f7d372', // light gold
 	'#f18888', // light red
@@ -103,16 +119,85 @@ const baseColors = [
 	'#ffcc80', // light orange
 	'#b0e0ff', // baby blue
 ]
+// const baseColors = [
+// 	'#3c6464', // deeper slate green
+// 	'#4a4f6a', // muted indigo
+// 	'#556243', // earthy olive
+// 	'#62587a', // warm violet gray
+// 	'#666666', // balanced gray
+// 	'#617d67', // medium jungle green
+// 	'#7a5f86', // mauve-gray
+// 	'#74808d', // soft steel blue
+// 	'#8395a4', // cloudy sky
+// 	'#866c6c', // dusty rose
+// 	'#999999', // light neutral gray
+// 	'#90a5b8', // overcast blue
+// 	'#a3a3a3', // silver
+// 	'#aaaaaa', // light ash
+// 	'#b0b0b0', // platinum
+// 	'#b3bed2', // pale denim
+// 	'#bcbcbc', // light fog
+// 	'#c5c5c5', // soft frost
+// 	'#d0d0d0', // pale silver
+// ]
 
-// const highlightedColor = '#FFD700' // Gold (strong highlight)
+const highlightedColor = '#FFD700' // Gold (strong highlight)
 
-const getUserColor = (name: string): string => {
+const getUserColor = (name: string, userId?: string): string | echarts.LinearGradientObject => {
+	const highlightGradient: echarts.LinearGradientObject = {
+		type: 'linear',
+		x: 0,
+		y: 0,
+		x2: 1,
+		y2: 0,
+		colorStops: [
+			{
+				offset: 0,
+				color: '#FFD700', // gold
+			},
+			{
+				offset: 1,
+				color: '#8B5CF6', // purple
+			},
+		],
+	}
+
+	// Check if this user should be highlighted
+	if (highlightedUserId.value && userId && userId === highlightedUserId.value) {
+		return highlightGradient
+	}
+
 	if (!userColors[name]) {
 		const colorIndex = Object.keys(userColors).length % baseColors.length
 		userColors[name] = baseColors[colorIndex]
 	}
 	return userColors[name]
 }
+
+// Get list of available users for the dropdown
+const availableUsers = computed(() => {
+	const userMap = new Map<string, string>() // id -> name mapping
+
+	props.data.forEach(([, id, name]) => {
+		userMap.set(id, name)
+	})
+
+	return Array.from(userMap.entries())
+		.map(([id, name]) => ({
+			id,
+			name,
+		}))
+		.sort((a, b) => a.name.localeCompare(b.name))
+})
+
+// Create a mapping from user names to IDs for the current data
+const userNameToId = computed(() => {
+	const mapping = new Map<string, string>()
+	props.data.forEach(([, id, name]) => {
+		mapping.set(name, id)
+	})
+	return mapping
+})
 
 // Process data to get unique dates and cumulative distances
 const processedData = computed(() => {
@@ -177,10 +262,10 @@ const updateChart = () => {
 
 	const option = {
 		grid: {
-			top: 50,
-			bottom: 60,
-			left: 180,
-			right: 100,
+			top: 40,
+			bottom: 40,
+			left: 80,
+			right: 80,
 		},
 		xAxis: {
 			type: 'value',
@@ -193,7 +278,7 @@ const updateChart = () => {
 			splitLine: {
 				show: true,
 				lineStyle: {
-					color: '#f0f0f0',
+					color: 'rgba(255,255,255,0.2)',
 				},
 			},
 		},
@@ -204,8 +289,21 @@ const updateChart = () => {
 			axisLabel: {
 				show: true,
 				fontSize: 14,
-				color: '#333',
+				color: '#e1e1e1',
 				fontWeight: 'normal',
+				formatter: (value: string) => {
+					// Highlight the name if this user is selected
+					const userId = userNameToId.value.get(value)
+					return highlightedUserId.value && userId === highlightedUserId.value
+						? `{highlight|${value}}`
+						: value
+				},
+				rich: {
+					highlight: {
+						color: highlightedColor,
+						fontWeight: 'bold',
+					},
+				},
 			},
 			axisLine: {
 				show: true,
@@ -220,20 +318,27 @@ const updateChart = () => {
 			{
 				type: 'bar',
 				realtimeSort: true,
-				data: currentData.users.map(([name, distance]) => ({
-					value: distance,
-					itemStyle: {
-						color: getUserColor(name),
-						borderRadius: [0, 8, 8, 0],
-					},
-				})),
+				data: currentData.users.map(([name, distance]) => {
+					const userId = userNameToId.value.get(name)
+					const isHighlighted =
+						highlightedUserId.value && userId === highlightedUserId.value
+					return {
+						value: distance,
+						itemStyle: {
+							color: getUserColor(name, userId),
+							borderRadius: [0, 8, 8, 0],
+							borderWidth: isHighlighted ? 2 : 0,
+							borderColor: isHighlighted ? '#e1e1e1' : undefined,
+						},
+					}
+				}),
 				label: {
 					show: true,
 					position: 'right',
 					formatter: (params: { value: number }) => params.value.toFixed(2) + ' km',
 					fontSize: 12,
 					fontWeight: 'normal',
-					color: '#333',
+					color: '#e1e1e1',
 				},
 				animationDuration: 0,
 				animationDurationUpdate: barWidthAnimationDuration, // slower width changes
@@ -244,6 +349,42 @@ const updateChart = () => {
 					enabled: true,
 					delay: () => 0,
 					duration: sortAnimationDuration, // faster position changes
+				},
+				// Add goal lines
+				markLine: {
+					silent: true,
+					data: [
+						{
+							xAxis: 70,
+							lineStyle: {
+								color: '#22c55e', // green-500
+								width: 2,
+								type: 'dashed',
+							},
+							label: {
+								position: 'end',
+								formatter: '70km Goal',
+								color: '#22c55e',
+								fontSize: 12,
+								fontWeight: 'bold',
+							},
+						},
+						{
+							xAxis: 140,
+							lineStyle: {
+								color: '#f59e0b', // amber-500
+								width: 2,
+								type: 'dashed',
+							},
+							label: {
+								position: 'end',
+								formatter: '140km Legend',
+								color: '#f59e0b',
+								fontSize: 12,
+								fontWeight: 'bold',
+							},
+						},
+					],
 				},
 			},
 		],
@@ -256,7 +397,7 @@ const updateChart = () => {
 					style: {
 						text: currentData.date.slice(0, 10),
 						font: 'bold 28px monospace',
-						fill: 'rgba(0, 0, 0, 0.6)',
+						fill: 'rgba(255, 255, 255, 0.6)',
 					},
 					z: 100,
 				},
@@ -267,7 +408,7 @@ const updateChart = () => {
 					style: {
 						text: currentData.date.slice(11),
 						font: 'bold 18px monospace',
-						fill: 'rgba(0, 0, 0, 0.6)',
+						fill: 'rgba(255, 255, 255, 0.6)',
 					},
 					z: 100,
 				},
