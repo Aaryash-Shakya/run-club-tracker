@@ -43,6 +43,7 @@ type EChartsOption = echarts.EChartsOption
 
 interface Props {
 	activities: TActivity[]
+	monthDateString: string // Expected format: "2025-08-01" or any date within the month
 }
 
 const props = defineProps<Props>()
@@ -50,19 +51,38 @@ const props = defineProps<Props>()
 const chartContainer = ref<HTMLElement>()
 let chart: echarts.ECharts | null = null
 
+// Compute start and end of month based on the provided date
+const monthInfo = computed(() => {
+	const date = new Date(props.monthDateString)
+	const year = date.getFullYear()
+	const month = date.getMonth()
+
+	const startOfMonth = new Date(year, month, 1)
+	const endOfMonth = new Date(year, month + 1, 0) // Last day of the month
+
+	const startDateString = startOfMonth.toISOString().split('T')[0]
+	const endDateString = endOfMonth.toISOString().split('T')[0]
+
+	return {
+		startDateString,
+		endDateString,
+		year,
+		month,
+		daysInMonth: endOfMonth.getDate(),
+	}
+})
+
 // Process activities data for the chart
 const chartData = computed(() => {
 	if (!props.activities || props.activities.length === 0) {
 		return { dates: [], distances: [] }
 	}
 
-	// Filter and sort activities by date (ascending)
+	const { month, year, daysInMonth } = monthInfo.value
+
+	// Filter and sort activities by date (ascending) for the specific month
 	const filteredActivities = props.activities
-		.filter((activity) => {
-			const activityDate = new Date(activity.activityDate)
-			const dateStr = activityDate.toISOString().split('T')[0]
-			return dateStr >= '2025-08-01' && activity.isValid
-		})
+		.filter((activity) => activity.isValid)
 		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
 
 	// Create a map of activity distances by date
@@ -73,12 +93,12 @@ const chartData = computed(() => {
 		activityMap.set(dateStr, (activityMap.get(dateStr) || 0) + distance)
 	})
 
-	// Generate full month range from July 1st to July 31st, 2025
+	// Generate full month range based on the provided month
 	const dates: string[] = []
 	const distances: number[] = []
 
-	for (let day = 1; day <= 31; day++) {
-		const date = new Date(2025, 7, day) // Month is 0-indexed, so 7 = August
+	for (let day = 1; day <= daysInMonth; day++) {
+		const date = new Date(year, month, day)
 		const dateStr = date.toISOString().split('T')[0]
 
 		// Format date for display
@@ -116,11 +136,13 @@ const filteredActivities = computed(() => {
 		return []
 	}
 
+	const { startDateString, endDateString } = monthInfo.value
+
 	return props.activities
 		.filter((activity) => {
 			const activityDate = new Date(activity.activityDate)
 			const dateStr = activityDate.toISOString().split('T')[0]
-			return dateStr >= '2025-08-01' && activity.isValid
+			return dateStr >= startDateString && dateStr <= endDateString && activity.isValid
 		})
 		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
 })
@@ -362,7 +384,7 @@ const updateChart = () => {
 
 // Watch for data changes
 watch(
-	() => props.activities,
+	[() => props.activities, () => props.monthDateString],
 	() => {
 		if (chart) {
 			updateChart()
