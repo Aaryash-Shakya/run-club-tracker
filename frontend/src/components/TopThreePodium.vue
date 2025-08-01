@@ -1,6 +1,49 @@
 <template>
-	<div v-if="topThree.length > 0" class="my-10 px-4">
-		<div class="flex items-end justify-center gap-3 md:gap-6">
+	<div class="my-10 px-4">
+		<!-- Loading State -->
+		<div v-if="isLoading" class="flex items-end justify-center gap-3 md:gap-6">
+			<!-- 2nd Place Loading -->
+			<div class="flex flex-col items-center">
+				<div class="silver-rank-banner animate-pulse bg-gray-600/50">
+					<div class="mb-2 h-6 w-20 rounded bg-gray-500/50"></div>
+					<div class="h-4 w-16 rounded bg-gray-500/50"></div>
+					<div class="silver-rank-banner-overlay"></div>
+				</div>
+				<div class="mt-2 text-center">
+					<div class="mb-1 h-4 w-12 animate-pulse rounded bg-gray-500/30"></div>
+					<div class="h-3 w-16 animate-pulse rounded bg-gray-500/30"></div>
+				</div>
+			</div>
+
+			<!-- 1st Place Loading -->
+			<div class="flex flex-col items-center">
+				<div class="gold-rank-banner animate-pulse bg-gray-600/50">
+					<div class="mb-2 h-6 w-24 rounded bg-gray-500/50"></div>
+					<div class="h-4 w-20 rounded bg-gray-500/50"></div>
+					<div class="gold-rank-banner-overlay"></div>
+				</div>
+				<div class="mt-2 text-center">
+					<div class="mb-1 h-4 w-12 animate-pulse rounded bg-gray-500/30"></div>
+					<div class="h-3 w-16 animate-pulse rounded bg-gray-500/30"></div>
+				</div>
+			</div>
+
+			<!-- 3rd Place Loading -->
+			<div class="flex flex-col items-center">
+				<div class="bronze-rank-banner animate-pulse bg-gray-600/50">
+					<div class="mb-2 h-6 w-16 rounded bg-gray-500/50"></div>
+					<div class="h-4 w-14 rounded bg-gray-500/50"></div>
+					<div class="bronze-rank-banner-overlay"></div>
+				</div>
+				<div class="mt-2 text-center">
+					<div class="mb-1 h-4 w-12 animate-pulse rounded bg-gray-500/30"></div>
+					<div class="h-3 w-16 animate-pulse rounded bg-gray-500/30"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Actual Podium Data -->
+		<div v-else-if="topThree.length > 0" class="flex items-end justify-center gap-3 md:gap-6">
 			<!-- 2nd Place -->
 			<div v-if="topThree[1]" class="flex flex-col items-center">
 				<div class="silver-rank-banner">
@@ -57,14 +100,17 @@
 
 <script lang="ts" setup>
 import type { TUserWithStats } from '@/types/activity'
-import { computed } from 'vue'
+import { computed, withDefaults } from 'vue'
 import LaurealFeatherWithPosition from './LaurealFeatherWithPosition.vue'
 
 interface Props {
 	records: TUserWithStats[]
+	isLoading?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+	isLoading: false,
+})
 
 // Get top 3 records
 const topThree = computed(() => {

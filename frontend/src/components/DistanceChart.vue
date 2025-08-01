@@ -61,7 +61,7 @@ const chartData = computed(() => {
 		.filter((activity) => {
 			const activityDate = new Date(activity.activityDate)
 			const dateStr = activityDate.toISOString().split('T')[0]
-			return dateStr >= '2025-07-01' && activity.isValid
+			return dateStr >= '2025-08-01' && activity.isValid
 		})
 		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
 
@@ -78,7 +78,7 @@ const chartData = computed(() => {
 	const distances: number[] = []
 
 	for (let day = 1; day <= 31; day++) {
-		const date = new Date(2025, 6, day) // Month is 0-indexed, so 6 = July
+		const date = new Date(2025, 7, day) // Month is 0-indexed, so 7 = August
 		const dateStr = date.toISOString().split('T')[0]
 
 		// Format date for display
@@ -120,7 +120,7 @@ const filteredActivities = computed(() => {
 		.filter((activity) => {
 			const activityDate = new Date(activity.activityDate)
 			const dateStr = activityDate.toISOString().split('T')[0]
-			return dateStr >= '2025-07-01' && activity.isValid
+			return dateStr >= '2025-08-01' && activity.isValid
 		})
 		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
 })
@@ -220,13 +220,16 @@ const updateChart = () => {
 	const { dates, distances } = chartData.value
 
 	// Check if there are any actual activities (non-zero distances)
-	const hasActivities = distances.some((distance) => distance > 0)
+	const hasActivities = distances.some((distance) => {
+		console.log('Checking distance:', distance)
+		return distance > 0
+	})
 
 	if (!hasActivities) {
 		// Show empty state
 		const option: EChartsOption = {
 			title: {
-				text: 'No activities in July 2025',
+				text: 'No activities yet.',
 				left: 'center',
 				top: 'middle',
 				textStyle: {

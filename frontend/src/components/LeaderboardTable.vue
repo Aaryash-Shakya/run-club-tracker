@@ -1,8 +1,9 @@
 <template>
 	<!-- Top 3 Podium for Monthly View -->
 	<TopThreePodium
-		v-if="activityPeriod === 'monthly' && !loading && filteredLeaderboard.length > 0"
+		v-if="activityPeriod === 'monthly'"
 		:records="filteredLeaderboard"
+		:is-loading="loading"
 	/>
 	<div class="bg-surface mt-5 overflow-hidden rounded-xl px-2 shadow-lg">
 		<div class="flex items-center justify-end p-4">
