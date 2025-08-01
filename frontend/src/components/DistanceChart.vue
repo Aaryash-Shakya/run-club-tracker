@@ -221,7 +221,6 @@ const updateChart = () => {
 
 	// Check if there are any actual activities (non-zero distances)
 	const hasActivities = distances.some((distance) => {
-		console.log('Checking distance:', distance)
 		return distance > 0
 	})
 
