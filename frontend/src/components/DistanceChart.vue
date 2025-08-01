@@ -220,10 +220,7 @@ const updateChart = () => {
 	const { dates, distances } = chartData.value
 
 	// Check if there are any actual activities (non-zero distances)
-	const hasActivities = distances.some((distance) => {
-		console.log('Checking distance:', distance)
-		return distance > 0
-	})
+	const hasActivities = distances.some((distance) => distance > 0)
 
 	if (!hasActivities) {
 		// Show empty state
