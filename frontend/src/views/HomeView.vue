@@ -63,7 +63,7 @@ type ActivityPeriod = 'daily' | 'weekly' | 'monthly'
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')
 const leaderboardTableRef = ref<InstanceType<typeof LeaderboardTable>>()
-const queryDate = ref<string>(new Date().toISOString().split('T')[0]) // Default to current date (2025-08-01 format)
+const queryDate = ref<string>('2025-07-01') // Default to July 2025
 
 // Function to change the activity period
 const setActivityPeriod = (period: ActivityPeriod) => {
