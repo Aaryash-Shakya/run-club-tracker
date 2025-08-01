@@ -304,6 +304,7 @@ type LeaderboardWithPosition = TUserWithStats & {
 
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')
+const queryDate = ref<string>(new Date().toISOString().split('T')[0]) // Default to current date
 const leaderboard = ref<LeaderboardWithPosition[]>([])
 const loading = ref(false)
 const showParticipantsOnly = ref(false)
@@ -423,10 +424,9 @@ const fetchLeaderboardData = async () => {
 		if (activityPeriod.value === 'monthly') {
 			// For monthly period, fetch recent activities and calculate position changes
 			const [currentRes, recentData] = await Promise.all([
-				fetch(
-					`${apiBaseUrl}/activities?period=monthly&date=${new Date().toISOString().split('T')[0]}`,
-					{ cache: 'default' },
-				),
+				fetch(`${apiBaseUrl}/activities?period=monthly&date=${queryDate.value}`, {
+					cache: 'default',
+				}),
 				fetchRecentActivities(),
 			])
 
@@ -460,10 +460,9 @@ const fetchLeaderboardData = async () => {
 			})
 		} else {
 			// For daily and weekly periods, use existing logic
-			const today = new Date().toISOString().split('T')[0]
 			const url = new URL(`${apiBaseUrl}/activities`)
 			url.searchParams.set('period', activityPeriod.value)
-			url.searchParams.set('date', today)
+			url.searchParams.set('date', queryDate.value)
 			const res = await fetch(url.toString(), { cache: 'default' })
 			response = await res.json()
 
@@ -491,16 +490,24 @@ watch(activityPeriod, () => {
 	fetchLeaderboardData()
 })
 
+// Watch for queryDate changes and refetch data
+watch(queryDate, () => {
+	fetchLeaderboardData()
+})
+
 // Initial data fetch
 onMounted(() => {
 	fetchLeaderboardData()
 })
 
-// Expose activityPeriod for parent components to control
+// Expose activityPeriod and queryDate for parent components to control
 defineExpose({
 	activityPeriod,
 	setActivityPeriod: (period: ActivityPeriod) => {
 		activityPeriod.value = period
+	},
+	setQueryDate: (date: string) => {
+		queryDate.value = date
 	},
 })
 </script>
