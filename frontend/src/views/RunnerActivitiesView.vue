@@ -88,7 +88,7 @@
 				<h3 class="mb-4 text-lg font-semibold text-white">Distance Chart</h3>
 				<DistanceChart
 					:activities="activityData.activities"
-					:month-date-string="queryDate"
+					:date-string="queryDate"
 				/>
 			</div>
 
