@@ -76,17 +76,20 @@ const validActivities = computed(() => {
 		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
 })
 
-// Process activities data for the chart
-const chartData = computed(() => {
-	const { month, year, daysInMonth } = monthInfo.value
-
-	// Create a map of activity distances by date
+// Create a map of activity distances by date
+const dailyDistanceMap = computed(() => {
 	const activityMap = new Map<string, number>()
 	validActivities.value.forEach((activity) => {
 		const nepalDateString = toNepaliDateString(activity.activityDate)
 		const distance = parseFloat((activity.distance / 1000).toFixed(2))
 		activityMap.set(nepalDateString, (activityMap.get(nepalDateString) || 0) + distance)
 	})
+	return activityMap
+})
+
+// Process activities data for the chart
+const chartData = computed(() => {
+	const { month, year, daysInMonth } = monthInfo.value
 
 	// Generate full month range based on the provided month
 	const dates: string[] = []
@@ -102,13 +105,12 @@ const chartData = computed(() => {
 		})
 
 		dates.push(displayDate)
-		distances.push(Number(activityMap.get(dateStr)?.toFixed(2) ?? 0))
+		distances.push(Number(dailyDistanceMap.value.get(dateStr)?.toFixed(2) ?? 0))
 	}
 
 	return { dates, distances }
 })
 
-// Computed statistics
 const totalDistance = computed(() => chartData.value.distances.reduce((sum, dist) => sum + dist, 0))
 
 const averageActivityDistance = computed(() => {
@@ -179,15 +181,7 @@ const longestStreak = computed(() => {
 const best7DayDistance = computed(() => {
 	if (validActivities.value.length === 0) return 0
 
-	// Group activities by date and sum distances per day
-	const dailyDistances = new Map<string, number>()
-	validActivities.value.forEach((activity) => {
-		const dateStr = toNepaliDateString(activity.activityDate)
-		const distance = activity.distance / 1000
-		dailyDistances.set(dateStr, (dailyDistances.get(dateStr) || 0) + distance)
-	})
-
-	const sortedDates = Array.from(dailyDistances.keys()).sort()
+	const sortedDates = Array.from(dailyDistanceMap.value.keys()).sort()
 
 	let maxDistance = 0
 
@@ -200,7 +194,7 @@ const best7DayDistance = computed(() => {
 		let windowDistance = 0
 
 		// Sum all distances within this 7-day window
-		for (const [dateStr, distance] of dailyDistances) {
+		for (const [dateStr, distance] of dailyDistanceMap.value) {
 			const date = new Date(dateStr)
 			if (date >= startDate && date <= endDate) {
 				windowDistance += distance
@@ -222,13 +216,9 @@ const initChart = () => {
 
 const updateChart = () => {
 	if (!chart) return
-
 	const { dates, distances } = chartData.value
 
-	// Check if there are any actual activities (non-zero distances)
-	const hasActivities = distances.some((distance) => distance > 0)
-
-	if (!hasActivities) {
+	if (totalDistance.value === 0) {
 		// Show empty state
 		const option: EChartsOption = {
 			title: {
