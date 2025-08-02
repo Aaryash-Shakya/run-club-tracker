@@ -86,10 +86,7 @@
 			<!-- Distance Chart Section -->
 			<div v-if="activityData.activities.length > 0" class="border-soft border-b px-2 py-4">
 				<h3 class="mb-4 text-lg font-semibold text-white">Distance Chart</h3>
-				<DistanceChart
-					:activities="activityData.activities"
-					:date-string="queryDate"
-				/>
+				<DistanceChart :activities="activityData.activities" :date-string="queryDate" />
 			</div>
 
 			<!-- Activities Cards -->
@@ -169,18 +166,11 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="text-muted py-8 text-center">No activities found for this user</div>
 		</div>
 
 		<!-- Empty State -->
 		<div v-else class="py-12 text-center">
-			<p class="text-lg text-white/70">No activity data available</p>
-			<button
-				@click="fetchUserActivityData"
-				class="bg-accent-run hover:bg-accent-run-hover mt-4 rounded-lg px-6 py-2 text-white transition-colors"
-			>
-				Refresh Data
-			</button>
+			<p class="text-muted-light text-lg">User has no activity in this month.</p>
 		</div>
 	</div>
 </template>
