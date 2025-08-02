@@ -3,27 +3,15 @@
 		<!-- Chart Summary Stats -->
 		<div
 			v-if="chartData.distances.some((dist) => dist > 0)"
-			class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5"
+			class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
 		>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Avg Activity Distance</p>
-				<p class="text-sm font-semibold text-white">{{ averageActivityDistance }} km</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Longest Activity</p>
-				<p class="text-sm font-semibold text-white">{{ longestActivity }} km</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Longest Day</p>
-				<p class="text-sm font-semibold text-white">{{ longestDayDistance.distance }} km</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Longest Streak</p>
-				<p class="text-sm font-semibold text-white">{{ longestStreak }} days</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Best 7 Days</p>
-				<p class="text-sm font-semibold text-white">{{ best7DayDistance.toFixed(1) }} km</p>
+			<div
+				v-for="(item, index) in statItems"
+				:key="index"
+				class="bg-surface-light rounded-lg p-3 text-center"
+			>
+				<p class="text-muted mb-1 text-sm">{{ item.label }}</p>
+				<p class="text-lg font-semibold text-white">{{ item.value }}</p>
 			</div>
 		</div>
 
@@ -49,6 +37,15 @@ const props = defineProps<Props>()
 
 const chartContainer = ref<HTMLElement>()
 let chart: echarts.ECharts | null = null
+
+const statItems = computed(() => [
+	{ label: 'Total Distance', value: `${totalDistance.value} km` },
+	{ label: 'Avg Activity Distance', value: `${averageActivityDistance.value} km` },
+	{ label: 'Longest Activity', value: `${longestActivity.value} km` },
+	{ label: 'Longest Day', value: `${longestDayDistance.value.distance} km` },
+	{ label: 'Longest Streak', value: `${longestStreak.value} days` },
+	{ label: 'Best 7 Days', value: `${best7DayDistance.value.toFixed(1)} km` },
+])
 
 // Compute start and end of month based on the provided date
 const monthInfo = computed(() => {
