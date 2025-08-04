@@ -4,7 +4,7 @@ import cors from "cors";
 import { config } from "./config";
 import { startStravaJob } from "./src/jobs/strava.job";
 import router from "./src/routes/index.route";
-import { errorHandler, notFoundHandler } from "./src/middleware/errorHandler";
+import { errorHandler, notFoundHandler } from "./src/middlewares/errorHandler";
 import { startNotificationJobs } from "./src/jobs/notification.job";
 
 const app: Application = express();

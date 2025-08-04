@@ -39,7 +39,7 @@ const chartContainer = ref<HTMLElement>()
 let chart: echarts.ECharts | null = null
 
 const statItems = computed(() => [
-	{ label: 'Total Distance', value: `${totalDistance.value} km` },
+	{ label: 'Total Distance', value: `${totalDistance.value.toFixed(2)} km` },
 	{ label: 'Avg Activity Distance', value: `${averageActivityDistance.value} km` },
 	{ label: 'Longest Activity', value: `${longestActivity.value} km` },
 	{ label: 'Longest Day', value: `${longestDayDistance.value.distance} km` },
