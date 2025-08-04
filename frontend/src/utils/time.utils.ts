@@ -15,3 +15,18 @@ export function formatSecondsToHMS(totalSeconds: number): string {
 	parts.push(`${seconds.toString().padStart(2, '0')}s`)
 	return parts.join(' ')
 }
+
+export function toNepaliDateString(zuluDateStr: string | Date): string {
+	const date = new Date(zuluDateStr)
+
+	// Add 5 hours and 45 minutes to convert to Nepal time
+	const nepalOffsetMs = (5 * 60 + 45) * 60 * 1000
+	const localNepaliDate = new Date(date.getTime() + nepalOffsetMs)
+
+	// Format to YYYY-MM-DD
+	const year = localNepaliDate.getUTCFullYear()
+	const month = String(localNepaliDate.getUTCMonth() + 1).padStart(2, '0')
+	const day = String(localNepaliDate.getUTCDate()).padStart(2, '0')
+
+	return `${year}-${month}-${day}`
+}

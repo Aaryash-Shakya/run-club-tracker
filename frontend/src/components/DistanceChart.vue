@@ -1,31 +1,17 @@
 <template>
-	<div class="distance-chart">
+	<div class="w-full">
 		<!-- Chart Summary Stats -->
 		<div
 			v-if="chartData.distances.some((dist) => dist > 0)"
-			class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5"
+			class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6"
 		>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Avg Distance</p>
-				<p class="text-sm font-semibold text-white">{{ averageDistance.toFixed(1) }} km</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Best Run</p>
-				<p class="text-sm font-semibold text-white">{{ maxDistance.toFixed(1) }} km</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Longest Day</p>
-				<p class="text-sm font-semibold text-white">
-					{{ longestDayDistance.toFixed(1) }} km
-				</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Longest Streak</p>
-				<p class="text-sm font-semibold text-white">{{ longestStreak }} days</p>
-			</div>
-			<div class="bg-surface-light rounded-lg p-2 text-center">
-				<p class="text-muted mb-1 text-xs">Best 7 Days</p>
-				<p class="text-sm font-semibold text-white">{{ best7DayDistance.toFixed(1) }} km</p>
+			<div
+				v-for="(item, index) in statItems"
+				:key="index"
+				class="bg-surface-light rounded-lg p-3 text-center"
+			>
+				<p class="text-muted mb-1 text-sm">{{ item.label }}</p>
+				<p class="text-lg font-semibold text-white">{{ item.value }}</p>
 			</div>
 		</div>
 
@@ -38,11 +24,13 @@
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import * as echarts from 'echarts'
 import type { TActivity } from '@/types/activity'
+import { toNepaliDateString } from '@/utils/time.utils'
 
 type EChartsOption = echarts.EChartsOption
 
 interface Props {
 	activities: TActivity[]
+	dateString: string // Expected format: "2025-08-01" or any date within the month
 }
 
 const props = defineProps<Props>()
@@ -50,100 +38,117 @@ const props = defineProps<Props>()
 const chartContainer = ref<HTMLElement>()
 let chart: echarts.ECharts | null = null
 
-// Process activities data for the chart
-const chartData = computed(() => {
+const statItems = computed(() => [
+	{ label: 'Total Distance', value: `${totalDistance.value.toFixed(2)} km` },
+	{ label: 'Avg Activity Distance', value: `${averageActivityDistance.value} km` },
+	{ label: 'Longest Activity', value: `${longestActivity.value} km` },
+	{ label: 'Longest Day', value: `${longestDayDistance.value.distance} km` },
+	{ label: 'Longest Streak', value: `${longestStreak.value} days` },
+	{ label: 'Best 7 Days', value: `${best7DayDistance.value.toFixed(1)} km` },
+])
+
+// Compute start and end of month based on the provided date
+const monthInfo = computed(() => {
+	const date = new Date(props.dateString)
+	const year = date.getFullYear()
+	const month = date.getMonth()
+
+	const endOfMonth = new Date(year, month + 1, 0)
+
+	return {
+		year,
+		month,
+		daysInMonth: endOfMonth.getDate(),
+	}
+})
+
+// Filter and sort valid activities by date (ascending) for the specific month
+const validActivities = computed(() => {
 	if (!props.activities || props.activities.length === 0) {
-		return { dates: [], distances: [] }
+		return []
 	}
 
-	// Filter and sort activities by date (ascending)
-	const filteredActivities = props.activities
-		.filter((activity) => {
-			const activityDate = new Date(activity.activityDate)
-			const dateStr = activityDate.toISOString().split('T')[0]
-			return dateStr >= '2025-08-01' && activity.isValid
-		})
+	return props.activities
+		.filter((activity) => activity.isValid)
 		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
+})
 
-	// Create a map of activity distances by date
+// Create a map of activity distances by date
+const dailyDistanceMap = computed(() => {
 	const activityMap = new Map<string, number>()
-	filteredActivities.forEach((activity) => {
-		const dateStr = new Date(activity.activityDate).toISOString().split('T')[0]
+	validActivities.value.forEach((activity) => {
+		const nepalDateString = toNepaliDateString(activity.activityDate)
 		const distance = parseFloat((activity.distance / 1000).toFixed(2))
-		activityMap.set(dateStr, (activityMap.get(dateStr) || 0) + distance)
+		activityMap.set(nepalDateString, (activityMap.get(nepalDateString) || 0) + distance)
 	})
+	return activityMap
+})
 
-	// Generate full month range from July 1st to July 31st, 2025
+// Process activities data for the chart
+const chartData = computed(() => {
+	const { month, year, daysInMonth } = monthInfo.value
+
+	// Generate full month range based on the provided month
 	const dates: string[] = []
 	const distances: number[] = []
 
-	for (let day = 1; day <= 31; day++) {
-		const date = new Date(2025, 7, day) // Month is 0-indexed, so 7 = August
-		const dateStr = date.toISOString().split('T')[0]
+	for (let day = 1; day <= daysInMonth; day++) {
+		const date = new Date(year, month, day)
+		const dateStr = toNepaliDateString(date) // Match keys in activityMap
 
-		// Format date for display
 		const displayDate = date.toLocaleDateString('en-US', {
 			month: 'short',
 			day: 'numeric',
 		})
 
 		dates.push(displayDate)
-		// Use the actual distance if there's an activity on this date, otherwise 0
-		distances.push(activityMap.get(dateStr) || 0)
+		distances.push(Number(dailyDistanceMap.value.get(dateStr)?.toFixed(2) ?? 0))
 	}
 
 	return { dates, distances }
 })
 
-// Computed statistics
-const totalDistance = computed(() =>
-	chartData.value.distances.filter((dist) => dist > 0).reduce((sum, dist) => sum + dist, 0),
-)
+const totalDistance = computed(() => chartData.value.distances.reduce((sum, dist) => sum + dist, 0))
 
-const averageDistance = computed(() => {
-	const nonZeroDistances = chartData.value.distances.filter((dist) => dist > 0)
-	return nonZeroDistances.length > 0 ? totalDistance.value / nonZeroDistances.length : 0
+const averageActivityDistance = computed(() => {
+	const totalActivities = validActivities.value.length
+	return totalActivities > 0 ? (totalDistance.value / totalActivities).toFixed(1) : 0
 })
 
-const maxDistance = computed(() => {
-	const nonZeroDistances = chartData.value.distances.filter((dist) => dist > 0)
-	return nonZeroDistances.length > 0 ? Math.max(...nonZeroDistances) : 0
+const longestActivity = computed(() => {
+	const distances = validActivities.value.map((activity) => activity.distance / 1000)
+	return distances.length > 0 ? Math.max(...distances).toFixed(1) : 0
 })
 
-// Get filtered activities for additional calculations
-const filteredActivities = computed(() => {
-	if (!props.activities || props.activities.length === 0) {
-		return []
+const longestDayDistance = computed(() => {
+	const distances = chartData.value.distances
+	const dates = chartData.value.dates
+
+	if (!distances.length || !dates.length)
+		return {
+			date: '',
+			distance: 0,
+		}
+
+	let maxIndex = 0
+	for (let i = 1; i < distances.length; i++) {
+		if (distances[i] > distances[maxIndex]) {
+			maxIndex = i
+		}
 	}
 
-	return props.activities
-		.filter((activity) => {
-			const activityDate = new Date(activity.activityDate)
-			const dateStr = activityDate.toISOString().split('T')[0]
-			return dateStr >= '2025-08-01' && activity.isValid
-		})
-		.sort((a, b) => new Date(a.activityDate).getTime() - new Date(b.activityDate).getTime())
+	return {
+		date: dates[maxIndex],
+		distance: distances[maxIndex].toFixed(1),
+	}
 })
 
-// Longest distance in a single day (sum of all runs on the same day)
-const longestDayDistance = computed(() => {
-	const dailyDistances = new Map<string, number>()
-
-	filteredActivities.value.forEach((activity) => {
-		const dateStr = new Date(activity.activityDate).toISOString().split('T')[0]
-		const distance = activity.distance / 1000
-		dailyDistances.set(dateStr, (dailyDistances.get(dateStr) || 0) + distance)
-	})
-
-	return dailyDistances.size > 0 ? Math.max(...dailyDistances.values()) : 0
-})
-
-// Longest streak of consecutive days with runs
+// Longest streak of consecutive days with activities
 const longestStreak = computed(() => {
-	if (filteredActivities.value.length === 0) return 0
+	if (validActivities.value.length === 0) return 0
 
 	const uniqueDates = new Set(
-		filteredActivities.value.map(
+		validActivities.value.map(
 			(activity) => new Date(activity.activityDate).toISOString().split('T')[0],
 		),
 	)
@@ -171,17 +176,9 @@ const longestStreak = computed(() => {
 
 // Best 7-day period (rolling window)
 const best7DayDistance = computed(() => {
-	if (filteredActivities.value.length === 0) return 0
+	if (validActivities.value.length === 0) return 0
 
-	// Group activities by date and sum distances per day
-	const dailyDistances = new Map<string, number>()
-	filteredActivities.value.forEach((activity) => {
-		const dateStr = new Date(activity.activityDate).toISOString().split('T')[0]
-		const distance = activity.distance / 1000
-		dailyDistances.set(dateStr, (dailyDistances.get(dateStr) || 0) + distance)
-	})
-
-	const sortedDates = Array.from(dailyDistances.keys()).sort()
+	const sortedDates = Array.from(dailyDistanceMap.value.keys()).sort()
 
 	let maxDistance = 0
 
@@ -194,7 +191,7 @@ const best7DayDistance = computed(() => {
 		let windowDistance = 0
 
 		// Sum all distances within this 7-day window
-		for (const [dateStr, distance] of dailyDistances) {
+		for (const [dateStr, distance] of dailyDistanceMap.value) {
 			const date = new Date(dateStr)
 			if (date >= startDate && date <= endDate) {
 				windowDistance += distance
@@ -216,15 +213,9 @@ const initChart = () => {
 
 const updateChart = () => {
 	if (!chart) return
-
 	const { dates, distances } = chartData.value
 
-	// Check if there are any actual activities (non-zero distances)
-	const hasActivities = distances.some((distance) => {
-		return distance > 0
-	})
-
-	if (!hasActivities) {
+	if (totalDistance.value === 0) {
 		// Show empty state
 		const option: EChartsOption = {
 			title: {
@@ -364,7 +355,7 @@ const updateChart = () => {
 
 // Watch for data changes
 watch(
-	() => props.activities,
+	[() => props.activities, () => props.dateString],
 	() => {
 		if (chart) {
 			updateChart()
@@ -392,9 +383,3 @@ onBeforeUnmount(() => {
 	window.removeEventListener('resize', handleResize)
 })
 </script>
-
-<style scoped>
-.distance-chart {
-	width: 100%;
-}
-</style>

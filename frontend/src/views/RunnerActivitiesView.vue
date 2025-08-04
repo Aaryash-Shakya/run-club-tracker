@@ -18,6 +18,27 @@
 			</button>
 		</div>
 
+		<!-- Month Selector for Monthly View -->
+		<div v-if="activityPeriod === 'monthly'" class="my-4 flex items-center justify-center">
+			<div class="bg-surface flex items-center gap-2 rounded-lg p-3">
+				<button
+					@click="previousMonth"
+					class="hover:text-accent-run hover:bg-soft flex cursor-pointer items-center rounded p-1 px-1 text-2xl text-white transition-colors"
+				>
+					<VIcon name="md-keyboardarrowleft-round" />
+				</button>
+				<span class="min-w-[120px] text-center font-medium text-white">
+					{{ getCurrentMonthName() }}
+				</span>
+				<button
+					@click="nextMonth"
+					class="hover:text-accent-run hover:bg-soft flex cursor-pointer items-center rounded p-1 px-1 text-2xl text-white transition-colors"
+				>
+					<VIcon name="md-keyboardarrowright-round" />
+				</button>
+			</div>
+		</div>
+
 		<!-- Loading State -->
 		<div v-if="loading" class="flex items-center justify-center py-12">
 			<div class="h-12 w-12 animate-spin rounded-full border-b-2 border-white"></div>
@@ -65,7 +86,7 @@
 			<!-- Distance Chart Section -->
 			<div v-if="activityData.activities.length > 0" class="border-soft border-b px-2 py-4">
 				<h3 class="mb-4 text-lg font-semibold text-white">Distance Chart</h3>
-				<DistanceChart :activities="activityData.activities" />
+				<DistanceChart :activities="activityData.activities" :date-string="queryDate" />
 			</div>
 
 			<!-- Activities Cards -->
@@ -145,24 +166,17 @@
 					</div>
 				</div>
 			</div>
-			<div v-else class="text-muted py-8 text-center">No activities found for this user</div>
 		</div>
 
 		<!-- Empty State -->
 		<div v-else class="py-12 text-center">
-			<p class="text-lg text-white/70">No activity data available</p>
-			<button
-				@click="fetchUserActivityData"
-				class="bg-accent-run hover:bg-accent-run-hover mt-4 rounded-lg px-6 py-2 text-white transition-colors"
-			>
-				Refresh Data
-			</button>
+			<p class="text-muted-light text-lg">User has no activity in this month.</p>
 		</div>
 	</div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import type { TUserActivitiesWithStats } from '@/types/activity'
 import { useRoute } from 'vue-router'
 import UiAvatar from '@/components/UiAvatar.vue'
@@ -171,9 +185,14 @@ import RunnerHeaderStats from '@/components/RunnerHeaderStats.vue'
 import DistanceChart from '@/components/DistanceChart.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 
+// Get route at the top level
+const route = useRoute()
+
 // Reactive state
 const loading = ref<boolean>(false)
 const activityData = ref<TUserActivitiesWithStats | null>(null)
+const activityPeriod = ref<string>('monthly') // Default to monthly
+const queryDate = ref<string>(new Date().toISOString().split('T')[0]) // Default to current date
 
 type ActivitiesResponse = {
 	status: string
@@ -185,12 +204,10 @@ const fetchUserActivityData = async () => {
 	try {
 		loading.value = true
 		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-		const today = new Date().toISOString().split('T')[0]
-		const route = useRoute()
 		const runnerId = route.params.runnerId as string
 		const url = new URL(`${apiBaseUrl}/activities/users/${runnerId}`)
-		url.searchParams.set('period', 'monthly')
-		url.searchParams.set('date', today)
+		url.searchParams.set('period', activityPeriod.value)
+		url.searchParams.set('date', queryDate.value)
 		const res = await fetch(url.toString(), { cache: 'default' })
 		const response: ActivitiesResponse = await res.json()
 
@@ -201,6 +218,42 @@ const fetchUserActivityData = async () => {
 	} finally {
 		loading.value = false
 	}
+}
+
+// Function to get current month name
+const getCurrentMonthName = (): string => {
+	const date = new Date(queryDate.value)
+	const monthNames = [
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December',
+	]
+	return `${monthNames[date.getMonth()]} ${date.getFullYear()}`
+}
+
+// Function to go to previous month
+const previousMonth = () => {
+	const date = new Date(queryDate.value)
+	date.setMonth(date.getMonth() - 1)
+	queryDate.value = date.toISOString().split('T')[0]
+	// fetchUserActivityData() will be called automatically by the watcher
+}
+
+// Function to go to next month
+const nextMonth = () => {
+	const date = new Date(queryDate.value)
+	date.setMonth(date.getMonth() + 1)
+	queryDate.value = date.toISOString().split('T')[0]
+	// fetchUserActivityData() will be called automatically by the watcher
 }
 
 const formatDate = (dateString: string): string => {
@@ -216,6 +269,11 @@ const formatDate = (dateString: string): string => {
 
 // Fetch data on component mount
 onMounted(() => {
+	fetchUserActivityData()
+})
+
+// Watch for queryDate changes and refetch data
+watch(queryDate, () => {
 	fetchUserActivityData()
 })
 </script>

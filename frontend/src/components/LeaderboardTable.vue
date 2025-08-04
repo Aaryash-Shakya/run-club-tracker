@@ -305,7 +305,7 @@ type LeaderboardWithPosition = TUserWithStats & {
 
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')
-const queryDate = ref<string>(new Date().toISOString().split('T')[0]) // Default to current date
+const queryDate = ref<string>('2025-07-01') // Default to July 2025
 const leaderboard = ref<LeaderboardWithPosition[]>([])
 const loading = ref(false)
 const showParticipantsOnly = ref(false)
@@ -422,7 +422,11 @@ const fetchLeaderboardData = async () => {
 
 		let response: ActivitiesResponse
 
-		if (activityPeriod.value === 'monthly') {
+		const currentMonthDateString = new Date().toISOString().split('T')[0]
+
+		const isThisMonth = queryDate.value.slice(0, 7) === currentMonthDateString.slice(0, 7)
+
+		if (activityPeriod.value === 'monthly' && isThisMonth) {
 			// For monthly period, fetch recent activities and calculate position changes
 			const [currentRes, recentData] = await Promise.all([
 				fetch(`${apiBaseUrl}/activities?period=monthly&date=${queryDate.value}`, {

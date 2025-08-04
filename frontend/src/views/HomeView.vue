@@ -31,21 +31,21 @@
 
 		<!-- Month Selector for Monthly View -->
 		<div v-if="activityPeriod === 'monthly'" class="mt-4 flex items-center justify-center">
-			<div class="bg-surface flex items-center gap-1 rounded-lg p-3">
+			<div class="bg-surface flex items-center gap-2 rounded-lg p-3">
 				<button
 					@click="previousMonth"
-					class="hover:text-accent-run hover:bg-soft cursor-pointer rounded px-2 py-1 text-white transition-colors"
+					class="hover:text-accent-run hover:bg-soft flex cursor-pointer items-center rounded p-1 px-1 text-2xl text-white transition-colors"
 				>
-					&lt;
+					<VIcon name="md-keyboardarrowleft-round" />
 				</button>
 				<span class="min-w-[120px] text-center font-medium text-white">
 					{{ getCurrentMonthName() }}
 				</span>
 				<button
 					@click="nextMonth"
-					class="hover:text-accent-run hover:bg-soft cursor-pointer rounded p-1 px-1 text-white transition-colors"
+					class="hover:text-accent-run hover:bg-soft flex cursor-pointer items-center rounded p-1 px-1 text-2xl text-white transition-colors"
 				>
-					&gt;
+					<VIcon name="md-keyboardarrowright-round" />
 				</button>
 			</div>
 		</div>
@@ -63,7 +63,7 @@ type ActivityPeriod = 'daily' | 'weekly' | 'monthly'
 // State
 const activityPeriod = ref<ActivityPeriod>('monthly')
 const leaderboardTableRef = ref<InstanceType<typeof LeaderboardTable>>()
-const queryDate = ref<string>(new Date().toISOString().split('T')[0]) // Default to current date (2025-08-01 format)
+const queryDate = ref<string>('2025-07-01') // Default to July 2025
 
 // Function to change the activity period
 const setActivityPeriod = (period: ActivityPeriod) => {

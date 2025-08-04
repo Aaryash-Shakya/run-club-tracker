@@ -1,23 +1,16 @@
 <template>
-	<div class="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-		<div class="bg-surface-light rounded-lg p-3 text-center">
-			<p class="text-muted text-sm">Total Distance</p>
-			<p class="text-lg font-semibold text-white">
-				{{ (stats.totalDistance / 1000).toFixed(2) }} km
+	<div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+		<div
+			v-for="(card, index) in statCards"
+			:key="index"
+			class="bg-surface-light rounded-lg p-3 text-center"
+		>
+			<p class="text-muted text-sm">{{ card.label }}</p>
+			<p class="text-lg font-semibold" :class="card.textClass">
+				{{ card.value }}
 			</p>
 		</div>
-		<div class="bg-surface-light rounded-lg p-3 text-center">
-			<p class="text-muted text-sm">Total Activities</p>
-			<p class="text-lg font-semibold text-white">
-				{{ stats.totalActivities }}
-			</p>
-		</div>
-		<div class="bg-surface-light rounded-lg p-3 text-center">
-			<p class="text-muted text-sm">Average Pace</p>
-			<p class="text-lg font-semibold text-white">
-				{{ paceUtils.formatPaceToString(stats.averagePace) }}
-			</p>
-		</div>
+		<!-- Run:Walk Ratio Card -->
 		<div class="bg-surface-light rounded-lg p-3 text-center">
 			<p class="text-muted text-sm">Run : Walk Ratio</p>
 			<div class="flex flex-col items-center">
@@ -74,18 +67,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="bg-surface-light rounded-lg p-3 text-center">
-			<p class="text-muted text-sm">Total Moving Time</p>
-			<p class="text-lg font-semibold text-white">
-				{{ formatSecondsToHMS(stats.totalMovingTime) }}
-			</p>
-		</div>
-		<div class="bg-surface-light rounded-lg p-3 text-center">
-			<p class="text-muted text-sm">Invalid Activities</p>
-			<p class="text-lg font-semibold text-red-400">
-				{{ stats.invalidActivities }}
-			</p>
-		</div>
 	</div>
 </template>
 
@@ -93,10 +74,39 @@
 import type { TStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
+import { computed } from 'vue'
 
 interface Props {
 	stats: TStats
 }
 
-defineProps<Props>()
+const { stats } = defineProps<Props>()
+
+const statCards = computed(() => [
+	{
+		label: 'Total Distance',
+		value: `${(stats.totalDistance / 1000).toFixed(2)} km`,
+		textClass: 'text-white',
+	},
+	{
+		label: 'Total Activities',
+		value: stats.totalActivities,
+		textClass: 'text-white',
+	},
+	{
+		label: 'Invalid Activities',
+		value: stats.invalidActivities,
+		textClass: 'text-red-400',
+	},
+	{
+		label: 'Average Pace',
+		value: paceUtils.formatPaceToString(stats.averagePace),
+		textClass: 'text-white',
+	},
+	{
+		label: 'Total Moving Time',
+		value: formatSecondsToHMS(stats.totalMovingTime),
+		textClass: 'text-white',
+	},
+])
 </script>

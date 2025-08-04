@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import activityRepository from "../repositories/activity.repository";
 import activityHelper from "../helpers/activity.helper";
 import dateUtils from "../utils/date.utils";
-import { ActivityQueryParams } from "../middleware/validation.middleware";
+import { ActivityQueryParams } from "../middlewares/validation.middleware";
 
 async function fetchActivities(req: Request, res: Response, next: NextFunction) {
 	try {
