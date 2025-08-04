@@ -118,7 +118,7 @@ body::after {
 }
 
 .navbar-item {
-	@apply inline-flex items-center rounded-lg px-6 py-3 text-base leading-snug font-normal text-white;
+	@apply rounded-lg px-6 py-3 text-base leading-snug font-normal text-white;
 }
 
 .navbar-item:hover {
