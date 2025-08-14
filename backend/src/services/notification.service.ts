@@ -20,10 +20,14 @@ async function sendDailyUpdate(): Promise<void> {
 			return;
 		}
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
+		let userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
 			userGroupedActivities,
 			false
 		) as TUserWithStats[];
+
+		userActivitiesWithStats = userActivitiesWithStats.filter((user) => {
+			return user.stats.totalDistance > 0;
+		});
 
 		// Format message using slack helper
 		const message = await slackHelper.formatDailyUpdateMessage(userActivitiesWithStats);
@@ -56,10 +60,14 @@ async function sendWeeklyUpdate(): Promise<void> {
 		}
 
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
-		const userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
+		let userActivitiesWithStats = activityHelper.calculateUserStatsAndSort(
 			userGroupedActivities,
 			false
 		) as TUserWithStats[];
+		userActivitiesWithStats = userActivitiesWithStats.filter((user) => {
+			// Filter out users with no valid activities
+			return user.stats.totalDistance > 0;
+		});
 
 		// Format message using slack helper
 		const message = await slackHelper.formatWeeklyUpdateMessage(userActivitiesWithStats);
