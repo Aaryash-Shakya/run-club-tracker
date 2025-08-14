@@ -121,15 +121,15 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			const paceString = paceUtils.formatPaceToString(pace);
 			if (associatedUser) {
 				// Pace above 10 min/km is considered walking
-				if (pace > 10 && stravaActivity.distance < 3000) {
+				if (pace > 10 && stravaActivity.distance < 500) {
 					isValid = false;
-					note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum 3 km required for a valid walk.`;
+					note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid walk.`;
 				}
 
 				// Pace 10 min/km or below is considered running
 				if (pace <= 10 && stravaActivity.distance < 500) {
 					isValid = false;
-					note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 1 km required for a valid run.`;
+					note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid run.`;
 				}
 
 				// Format activity according to database schema
