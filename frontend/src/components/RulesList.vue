@@ -108,7 +108,7 @@ const runClubRules = [
 		description: 'Minimum required distances for activities.',
 		details: [
 			{ activity: 'Run', requirement: 'at least 500 meters' },
-			{ activity: 'Walk', requirement: 'at least 3 km' },
+			{ activity: 'Walk', requirement: 'at least 500 meters' },
 		],
 	},
 ]
