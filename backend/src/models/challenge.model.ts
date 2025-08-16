@@ -5,9 +5,9 @@ export interface IChallenge extends Document {
 	description?: string;
 	startDate: Date;
 	endDate: Date;
-	targetKm?: number;
+	targetKm: number;
 
-	minRunPace: number; // minute per km: the maximum pace (slowest) that still counts as "running"
+	maxRunPace: number; // minute per km: the maximum pace (slowest) that still counts as "running"
 	minWalkingDistance: number; // meters: minimum distance for a walk activity to be counted
 	minRunningDistance: number; // meters: minimum distance for a running activity to be counted
 
@@ -21,11 +21,11 @@ const ChallengeSchema = new Schema<IChallenge>(
 		description: { type: String },
 		startDate: { type: Date, required: true },
 		endDate: { type: Date, required: true },
-		targetKm: { type: Number },
+		targetKm: { type: Number, required: true },
 
 		// Pace and distance thresholds:
-		// Interpretation: an activity with an average pace <= minRunPace qualifies as a "run".
-		minRunPace: {
+		// Interpretation: an activity with an average pace <= maxRunPace qualifies as a "run".
+		maxRunPace: {
 			type: Number,
 			required: true,
 			default: 10,
