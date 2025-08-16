@@ -1,7 +1,8 @@
 import { Activity } from "../models/activity.model";
-import { User } from "../models/user.model";
+import { IUser, User } from "../models/user.model";
 import stravaService from "./strava.service";
 import paceUtils from "../utils/pace.utils";
+import challengeRepository from "../repositories/challenge.repository";
 
 // Strava API response type for club activities
 export type StravaClubActivity = {
@@ -84,7 +85,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 		console.log(`👥 Found ${users.length} users in database`);
 
 		// 2. Convert users array into object with firstName_lastName as key
-		const userMap: { [key: string]: any } = {};
+		const userMap: { [key: string]: IUser } = {};
 		users.forEach((user) => {
 			const key = `${user.firstName}_${user.lastName}`;
 			userMap[key] = user;
@@ -110,49 +111,10 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 		for (const stravaActivity of newActivities) {
 			// Create the key to find the user
 			const userKey = `${stravaActivity.athlete.firstname}_${stravaActivity.athlete.lastname}`;
-			const associatedUser = userMap[userKey];
+			let associatedUser = userMap[userKey];
 
-			let isValid: boolean = true;
-			let note: string | null = null;
-			const pace = paceUtils.getPaceFromTimeAndDistance(
-				stravaActivity.moving_time,
-				stravaActivity.distance
-			);
-			const paceString = paceUtils.formatPaceToString(pace);
-			if (associatedUser) {
-				// Pace above 10 min/km is considered walking
-				if (pace > 10 && stravaActivity.distance < 500) {
-					isValid = false;
-					note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid walk.`;
-				}
-
-				// Pace 10 min/km or below is considered running
-				if (pace <= 10 && stravaActivity.distance < 500) {
-					isValid = false;
-					note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid run.`;
-				}
-
-				// Format activity according to database schema
-				const formattedActivity = {
-					name: stravaActivity.name,
-					distance: stravaActivity.distance,
-					movingTime: stravaActivity.moving_time,
-					elapsedTime: stravaActivity.elapsed_time,
-					totalElevationGain: stravaActivity.total_elevation_gain,
-					movingPace: pace, // Calculate moving pace in min per km
-					type: stravaActivity.type,
-					sportType: stravaActivity.sport_type,
-					workoutType: stravaActivity.workout_type,
-					activityDate: new Date(),
-					isValid: isValid,
-					note: note,
-					user: String(associatedUser._id), // Reference to user's _id as string
-				};
-
-				activitiesToSave.push(formattedActivity);
-				console.log(`✅ Mapped activity "${stravaActivity.name}" to user ${userKey}`);
-			} else {
-				// Create new user if not found
+			// Create new user if not found
+			if (!associatedUser) {
 				console.log(`👤 Creating new user: ${userKey}`);
 
 				const newUser = new User({
@@ -160,32 +122,59 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 					lastName: stravaActivity.athlete.lastname,
 				});
 
-				const savedUser = await newUser.save();
-				console.log(`✅ Created new user: ${savedUser.firstName} ${savedUser.lastName}`);
+				associatedUser = await newUser.save();
+				console.log(
+					`✅ Created new user: ${associatedUser.firstName} ${associatedUser.lastName}`
+				);
 
 				// Add the new user to userMap for future activities in this batch
-				userMap[userKey] = savedUser;
-
-				// Format activity with new user's ID
-				const formattedActivity = {
-					name: stravaActivity.name,
-					distance: stravaActivity.distance,
-					movingTime: stravaActivity.moving_time,
-					elapsedTime: stravaActivity.elapsed_time,
-					totalElevationGain: stravaActivity.total_elevation_gain,
-					movingPace: pace,
-					type: stravaActivity.type,
-					sportType: stravaActivity.sport_type,
-					workoutType: stravaActivity.workout_type,
-					activityDate: new Date(),
-					isValid: isValid,
-					note: note,
-					user: String(savedUser._id), // Reference to new user's _id as string
-				};
-
-				activitiesToSave.push(formattedActivity);
-				console.log(`✅ Mapped activity "${stravaActivity.name}" to new user ${userKey}`);
+				userMap[userKey] = associatedUser;
 			}
+
+			// Validate activity and create formatted object
+			let isValid: boolean = true;
+			let note: string | null = null;
+			const pace = paceUtils.getPaceFromTimeAndDistance(
+				stravaActivity.moving_time,
+				stravaActivity.distance
+			);
+			const paceString = paceUtils.formatPaceToString(pace);
+
+			// fetch challenge threshold
+			const challenge = await challengeRepository.findChallenge(new Date());
+			const MAX_RUN_PACE = challenge?.maxRunPace ?? 10;
+			const MIN_WALKING_DISTANCE = challenge?.minWalkingDistance ?? 500;
+			const MIN_RUNNING_DISTANCE = challenge?.minRunningDistance ?? 500;
+
+			if (pace > MAX_RUN_PACE && stravaActivity.distance < MIN_WALKING_DISTANCE) {
+				isValid = false;
+				note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid walk.`;
+			}
+
+			if (pace <= MAX_RUN_PACE && stravaActivity.distance < MIN_RUNNING_DISTANCE) {
+				isValid = false;
+				note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid run.`;
+			}
+
+			// Format activity according to database schema
+			const formattedActivity = {
+				name: stravaActivity.name,
+				distance: stravaActivity.distance,
+				movingTime: stravaActivity.moving_time,
+				elapsedTime: stravaActivity.elapsed_time,
+				totalElevationGain: stravaActivity.total_elevation_gain,
+				movingPace: pace,
+				type: stravaActivity.type,
+				sportType: stravaActivity.sport_type,
+				workoutType: stravaActivity.workout_type,
+				activityDate: new Date(),
+				isValid: isValid,
+				note: note,
+				user: String(associatedUser._id),
+			};
+
+			activitiesToSave.push(formattedActivity);
+			console.log(`✅ Mapped activity "${stravaActivity.name}" to user ${userKey}`);
 		}
 
 		// 4. Bulk insert all activities to database

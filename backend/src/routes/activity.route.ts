@@ -1,7 +1,6 @@
 import { Router } from "express";
 import activityController from "../controller/activity.controller";
 import { validateActivityQuery } from "../middlewares/validation.middleware";
-import { validateUserIdParams } from "../validations/user.validation";
 
 const router = Router();
 
@@ -11,12 +10,5 @@ router.get("", validateActivityQuery, activityController.fetchActivities);
 router.get("/july", activityController.fetchAllActivitiesOfJuly);
 
 router.get("/recent", activityController.fetchRecentActivities);
-
-router.get(
-	"/users/:userId",
-	validateUserIdParams,
-	validateActivityQuery,
-	activityController.fetchUserActivities
-);
 
 export default router;

@@ -31,13 +31,6 @@
 								<h3 class="text-xl font-semibold text-white">
 									{{ runner.firstName }} {{ runner.lastName }}
 								</h3>
-								<!-- Participation Status Tag -->
-								<span
-									v-if="!PARTICIPANT_IDS.includes(runner._id)"
-									class="rounded bg-orange-500/20 px-2 py-1 text-xs font-medium text-orange-400"
-								>
-									Not Participating
-								</span>
 							</div>
 							<p v-if="runner.bio" class="mt-1 text-base text-white/70">
 								{{ runner.bio }}
@@ -82,7 +75,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import UiAvatar from '@/components/UiAvatar.vue'
-import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 import type { TUser } from '@/types/activity'
 
 // Reactive state

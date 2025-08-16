@@ -205,7 +205,7 @@ const fetchUserActivityData = async () => {
 		loading.value = true
 		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 		const runnerId = route.params.runnerId as string
-		const url = new URL(`${apiBaseUrl}/activities/users/${runnerId}`)
+		const url = new URL(`${apiBaseUrl}/users/${runnerId}/activities`)
 		url.searchParams.set('period', activityPeriod.value)
 		url.searchParams.set('date', queryDate.value)
 		const res = await fetch(url.toString(), { cache: 'default' })
