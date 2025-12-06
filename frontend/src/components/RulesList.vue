@@ -99,16 +99,16 @@ const runClubRules = [
 		description:
 			'Activities are auto-labeled based on moving pace, not what Strava tags them as.',
 		details: [
-			{ activity: 'Run', requirement: 'pace ≤ 10:00 min/km' },
-			{ activity: 'Walk', requirement: 'pace > 10:00 min/km' },
+			{ activity: 'Run', requirement: 'pace ≤ 9:30 min/km' },
+			{ activity: 'Walk', requirement: 'pace > 9:30 min/km' },
 		],
 	},
 	{
 		title: 'Minimum Distances',
 		description: 'Minimum required distances for activities.',
 		details: [
-			{ activity: 'Run', requirement: 'at least 500 meters' },
-			{ activity: 'Walk', requirement: 'at least 500 meters' },
+			{ activity: 'Run', requirement: 'at least 400 meters' },
+			{ activity: 'Walk', requirement: 'at least 2 kilometers' },
 		],
 	},
 ]
