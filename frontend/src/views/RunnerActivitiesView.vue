@@ -134,9 +134,14 @@
 								class="text-muted-light hidden text-sm md:inline"
 							>
 								{{
-									activity.movingPace <= 9.5 && activity.type === 'Run'
-										? 'Pace suggests this run was more of a walk.'
-										: 'Pace suggests this walk was more of a run.'
+									activity.movingPace <= 9.5 &&
+									activity.type === 'Walk' &&
+									'Pace suggests this walk was more of a run.'
+								}}
+								{{
+									activity.movingPace > 9.5 &&
+									activity.type === 'Run' &&
+									'Pace suggests this run was more of a walk.'
 								}}
 							</span>
 						</div>
