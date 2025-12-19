@@ -100,7 +100,7 @@
 
 <script lang="ts" setup>
 import type { TUserWithStats } from '@/types/activity'
-import { computed, withDefaults } from 'vue'
+import { computed } from 'vue'
 import LaurealFeatherWithPosition from './LaurealFeatherWithPosition.vue'
 
 interface Props {

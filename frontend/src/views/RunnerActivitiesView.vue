@@ -128,8 +128,8 @@
 							</p>
 							<span
 								v-if="
-									(activity.movingPace <= 9.5 && activity.type === 'Run') ||
-									(activity.movingPace > 9.5 && activity.type === 'Walk')
+									(activity.movingPace > 9.5 && activity.type === 'Run') ||
+									(activity.movingPace <= 9.5 && activity.type === 'Walk')
 								"
 								class="text-muted-light hidden text-sm md:inline"
 							>

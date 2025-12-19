@@ -65,13 +65,13 @@
 						v-for="({ user, stats, changes }, index) in filteredLeaderboard"
 						:key="user._id"
 					>
-						<!-- Separator for first record under 70km -->
+						<!-- Separator for first record under 100km -->
 						<tr v-if="index === separatorIndex" class="bg-transparent">
 							<td colspan="7" class="px-2 py-2">
 								<div class="flex items-center gap-3">
 									<div class="h-px flex-1 bg-white/20"></div>
 									<span class="text-xs font-medium text-white/50"
-										>Finish Line (70km)</span
+										>Finish Line (100km)</span
 									>
 									<div class="h-px flex-1 bg-white/20"></div>
 								</div>
@@ -276,7 +276,7 @@ import { PARTICIPANT_IDS } from '@/constants/participant.constants'
 import UpArrow from './icons/UpArrow.vue'
 import DownArrow from './icons/DownArrow.vue'
 
-const TARGET_DISTANCE = 70000
+const TARGET_DISTANCE = 100000
 
 type ActivitiesResponse = {
 	status: string
@@ -318,14 +318,14 @@ const filteredLeaderboard = computed(() => {
 	return leaderboard.value
 })
 
-// Computed property to find the index where separator should be placed (first record under 70km)
+// Computed property to find the index where separator should be placed (first record under 100km)
 const separatorIndex = computed(() => {
 	if (activityPeriod.value !== 'monthly') return -1
 
 	const index = filteredLeaderboard.value.findIndex(
 		(record) => record.stats.totalDistance < TARGET_DISTANCE,
 	)
-	// If the first record is under 70km, don't show separator
+	// If the first record is under 100km, don't show separator
 	return index === 0 ? -1 : index
 })
 
