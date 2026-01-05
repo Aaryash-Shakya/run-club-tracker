@@ -143,8 +143,8 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			// fetch challenge threshold
 			const challenge = await challengeRepository.findChallenge(new Date());
 			const MAX_RUN_PACE = challenge?.maxRunPace ?? 9.5;
-			const MIN_WALKING_DISTANCE = challenge?.minWalkingDistance ?? 2000;
-			const MIN_RUNNING_DISTANCE = challenge?.minRunningDistance ?? 400;
+			const MIN_WALKING_DISTANCE = challenge?.minWalkingDistance ?? 100;
+			const MIN_RUNNING_DISTANCE = challenge?.minRunningDistance ?? 100;
 
 			if (pace > MAX_RUN_PACE && stravaActivity.distance < MIN_WALKING_DISTANCE) {
 				isValid = false;
