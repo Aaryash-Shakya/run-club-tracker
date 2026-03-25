@@ -8,7 +8,10 @@ async function addParticipant(userId: string, challengeId: string): Promise<IPar
 	return participant.save();
 }
 
-async function removeParticipant(userId: string, challengeId: string): Promise<IParticipant | null> {
+async function removeParticipant(
+	userId: string,
+	challengeId: string
+): Promise<IParticipant | null> {
 	return Participant.findOneAndDelete({ user: userId, challenge: challengeId });
 }
 
