@@ -44,6 +44,99 @@
 				</button>
 			</div>
 
+			<!-- Users Tab -->
+			<div v-if="activeTab === 'Users'">
+				<div class="bg-surface mb-6 rounded-xl p-6 shadow-lg">
+					<div class="mb-4 flex items-center justify-between">
+						<h2 class="text-lg font-semibold text-white">All Users</h2>
+						<div class="flex gap-3">
+							<input
+								v-model="userSearch"
+								type="text"
+								placeholder="Search by name..."
+								class="bg-soft border-white/20 focus:border-accent-run rounded-lg border px-3 py-2 text-sm text-white outline-none placeholder:text-white/30"
+								@keyup.enter="fetchAdminUsers"
+							/>
+							<button
+								class="bg-accent-run hover:bg-accent-run-hover rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
+								@click="fetchAdminUsers"
+							>
+								Search
+							</button>
+						</div>
+					</div>
+					<p
+						v-if="userMessage"
+						class="mb-4 text-sm"
+						:class="userMessageIsError ? 'text-red-400' : 'text-green-400'"
+					>
+						{{ userMessage }}
+					</p>
+					<div v-if="usersLoading" class="text-muted py-4 text-center text-sm">
+						Loading...
+					</div>
+					<div
+						v-else-if="adminUsers.length === 0"
+						class="text-muted py-4 text-center text-sm"
+					>
+						No users found
+					</div>
+					<div v-else class="space-y-2">
+						<div
+							v-for="user in adminUsers"
+							:key="user._id"
+							class="bg-soft rounded-lg px-4 py-3"
+						>
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-3">
+									<div
+										class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-xs font-medium text-white"
+									>
+										{{ user.firstName?.[0] }}{{ user.lastName?.[0] }}
+									</div>
+									<div>
+										<p class="text-sm font-medium text-white">
+											{{ user.firstName }} {{ user.lastName }}
+										</p>
+										<p class="text-muted text-xs">
+											{{ user.bio || 'No bio' }}
+										</p>
+									</div>
+								</div>
+								<button
+									v-if="editingBioUserId !== user._id"
+									class="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-white transition-colors hover:bg-white/20"
+									@click="startEditBio(user)"
+								>
+									Edit Bio
+								</button>
+							</div>
+							<div v-if="editingBioUserId === user._id" class="mt-3 flex gap-2">
+								<input
+									v-model="editingBioValue"
+									type="text"
+									placeholder="Enter bio..."
+									class="bg-background border-white/20 focus:border-accent-run flex-1 rounded-lg border px-3 py-2 text-sm text-white outline-none placeholder:text-white/30"
+									@keyup.enter="saveBio(user._id)"
+								/>
+								<button
+									class="bg-accent-run hover:bg-accent-run-hover rounded-lg px-4 py-2 text-xs font-medium text-white transition-colors"
+									@click="saveBio(user._id)"
+								>
+									Save
+								</button>
+								<button
+									class="rounded-lg bg-white/10 px-3 py-2 text-xs text-white transition-colors hover:bg-white/20"
+									@click="cancelEditBio"
+								>
+									Cancel
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- Challenges Tab -->
 			<div v-if="activeTab === 'Challenges'">
 				<!-- Create Challenge Form -->
@@ -249,8 +342,17 @@ const authenticated = ref(false)
 const authError = ref('')
 
 // Tabs
-const tabs = ['Challenges', 'Participants'] as const
+const tabs = ['Users', 'Challenges', 'Participants'] as const
 const activeTab = ref<(typeof tabs)[number]>('Challenges')
+
+// Users
+const adminUsers = ref<TUser[]>([])
+const usersLoading = ref(false)
+const userSearch = ref('')
+const editingBioUserId = ref<string | null>(null)
+const editingBioValue = ref('')
+const userMessage = ref('')
+const userMessageIsError = ref(false)
 
 // Challenges
 const challenges = ref<TChallenge[]>([])
@@ -286,6 +388,57 @@ function authHeaders() {
 	}
 }
 
+async function fetchAdminUsers() {
+	usersLoading.value = true
+	try {
+		const url = new URL(`${apiBaseUrl}/admin/users`)
+		if (userSearch.value) url.searchParams.set('search', userSearch.value)
+		url.searchParams.set('limit', '100')
+		const res = await fetch(url.toString(), { headers: authHeaders() })
+		const data = await res.json()
+		adminUsers.value = data.data.users
+	} catch {
+		adminUsers.value = []
+	} finally {
+		usersLoading.value = false
+	}
+}
+
+function startEditBio(user: TUser) {
+	editingBioUserId.value = user._id
+	editingBioValue.value = user.bio || ''
+}
+
+function cancelEditBio() {
+	editingBioUserId.value = null
+	editingBioValue.value = ''
+}
+
+async function saveBio(userId: string) {
+	userMessage.value = ''
+	try {
+		const res = await fetch(`${apiBaseUrl}/admin/users/${userId}`, {
+			method: 'PATCH',
+			headers: authHeaders(),
+			body: JSON.stringify({ bio: editingBioValue.value }),
+		})
+		const data = await res.json()
+		if (!res.ok) {
+			userMessage.value = data.message || 'Failed to update bio'
+			userMessageIsError.value = true
+			return
+		}
+		userMessage.value = 'Bio updated successfully'
+		userMessageIsError.value = false
+		editingBioUserId.value = null
+		editingBioValue.value = ''
+		fetchAdminUsers()
+	} catch {
+		userMessage.value = 'Failed to update bio'
+		userMessageIsError.value = true
+	}
+}
+
 async function authenticate() {
 	authError.value = ''
 	try {
@@ -300,6 +453,7 @@ async function authenticate() {
 		const data = await res.json()
 		challenges.value = data.data.challenges
 		fetchUsers()
+		fetchAdminUsers()
 	} catch {
 		authError.value = 'Failed to connect'
 	}
