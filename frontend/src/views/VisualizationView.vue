@@ -24,15 +24,17 @@
 		<!-- Countdown -->
 		<ChallengeCountDown :year="selectedYear" :month="selectedMonth" />
 
-		<div v-if="loading" class="flex h-64 items-center justify-center">
-			<div class="text-lg">Loading activities...</div>
-		</div>
+		<!-- Only show visualization if the month has started -->
+		<template v-if="hasMonthStarted">
+			<div v-if="loading" class="flex h-64 items-center justify-center">
+				<div class="text-lg">Loading activities...</div>
+			</div>
 
-		<div v-else-if="error" class="text-center text-red-500">
-			<p>Error loading data: {{ error }}</p>
-		</div>
+			<div v-else-if="error" class="text-center text-red-500">
+				<p>Error loading data: {{ error }}</p>
+			</div>
 
-		<div v-else class="space-y-8">
+			<div v-else class="space-y-8">
 			<!-- Bar Chart Race Section -->
 			<div class="bg-surface rounded-lg p-2 shadow-md">
 				<BarChartRace :data="activitiesArray" class="h-fit w-full" />
@@ -62,6 +64,7 @@
 				</div>
 			</div>
 		</div>
+		</template>
 	</div>
 </template>
 
@@ -93,6 +96,13 @@ const monthNames = [
 	'January', 'February', 'March', 'April', 'May', 'June',
 	'July', 'August', 'September', 'October', 'November', 'December',
 ]
+
+// Check if the selected month has started (in NPT)
+const hasMonthStarted = computed(() => {
+	const monthStr = String(selectedMonth.value).padStart(2, '0')
+	const start = new Date(`${selectedYear.value}-${monthStr}-01T00:00:00+05:45`)
+	return new Date() >= start
+})
 
 const monthLabel = computed(() => {
 	return `${monthNames[selectedMonth.value - 1]} ${selectedYear.value}`
@@ -127,6 +137,11 @@ const updateRoute = () => {
 }
 
 const fetchActivities = async () => {
+	if (!hasMonthStarted.value) {
+		loading.value = false
+		activities.value = []
+		return
+	}
 	try {
 		loading.value = true
 		error.value = null
