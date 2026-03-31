@@ -32,6 +32,18 @@
 					</label>
 				</div>
 
+				<!-- Auto Loop Toggle -->
+				<div class="flex items-center space-x-2">
+					<label class="flex cursor-pointer items-center space-x-2">
+						<input
+							type="checkbox"
+							v-model="autoLoop"
+							class="text-accent-run focus:ring-accent-run border-soft bg-surface rounded"
+						/>
+						<span class="text-text text-sm font-medium">Auto Loop</span>
+					</label>
+				</div>
+
 				<!-- Speed Control -->
 				<div class="flex items-center space-x-3">
 					<span class="text-text text-sm font-medium">Speed:</span>
@@ -88,7 +100,8 @@ const isPlaying = ref(false)
 const currentIndex = ref(0)
 const participantsOnly = ref(true)
 const speedControl = ref(2000) // Default speed in milliseconds
-const highlightedUserId = ref('6862b7405f7a41fafa3bcbd1') // ID of the user to highlight
+const highlightedUserId = ref('') // No user highlighted by default
+const autoLoop = ref(true) // Auto-loop animation by default
 
 const updateFrequency = computed(() => speedControl.value) // Use reactive speed
 const barWidthAnimationDuration = 2500 // slower width changes
@@ -483,9 +496,13 @@ const startAnimation = () => {
 
 		currentIndex.value++
 		if (currentIndex.value >= processedData.value.length) {
-			pauseAnimation()
-			currentIndex.value = processedData.value.length - 1
-			return
+			if (autoLoop.value) {
+				currentIndex.value = idealStartIndex.value
+			} else {
+				pauseAnimation()
+				currentIndex.value = processedData.value.length - 1
+				return
+			}
 		}
 
 		animationTimer = window.setTimeout(animate, updateFrequency.value)
