@@ -37,17 +37,29 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
-async function fetchAllActivitiesOfJuly(req: Request, res: Response, next: NextFunction) {
-	console.log(1);
+async function fetchActivitiesByMonth(req: Request, res: Response, next: NextFunction) {
 	try {
-		const { startDate, endDate } = dateUtils.getDateRange("monthly", new Date("2025-07-15"));
+		const { year, month } = req.params;
+		const yearNum = parseInt(year, 10);
+		const monthNum = parseInt(month, 10);
+
+		if (isNaN(yearNum) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+			res.status(400).json({
+				status: "ERROR",
+				message: "Invalid year or month. Use /activities/visualization/YYYY/MM",
+			});
+			return;
+		}
+
+		// Create a date in the middle of the requested month
+		const targetDate = new Date(`${year}-${month.padStart(2, "0")}-15`);
+		const { startDate, endDate } = dateUtils.getDateRange("monthly", targetDate);
 
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 
-		// res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
 		res.json({
 			status: "OK",
-			message: "Monthly activities for July fetched successfully",
+			message: `Activities for ${year}-${month.padStart(2, "0")} fetched successfully`,
 			activities,
 		});
 	} catch (error) {
@@ -116,7 +128,7 @@ async function fetchUserActivities(req: Request, res: Response, next: NextFuncti
 
 export default {
 	fetchActivities,
-	fetchAllActivitiesOfJuly,
+	fetchActivitiesByMonth,
 	fetchRecentActivities,
 	fetchUserActivities,
 };
