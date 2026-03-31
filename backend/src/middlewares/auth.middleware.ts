@@ -20,6 +20,27 @@ export function authenticateApiKey(req: any, res: any, next: any) {
 	return next();
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function authenticateAdminKey(req: any, res: any, next: any) {
+	const tokenPrefix = "bearer ";
+	const { authorization } = req.headers;
+
+	if (!authorization || !authorization.toLowerCase().startsWith(tokenPrefix)) {
+		return res.status(401).json({
+			message: "Unauthorized: Missing or invalid authorization header",
+		});
+	}
+
+	const token = authorization.slice(tokenPrefix.length).trim();
+
+	if (token !== config.ADMIN_API_KEY) {
+		return res.status(401).json({ message: "Unauthorized: Invalid admin API key" });
+	}
+
+	return next();
+}
+
 export default {
 	authenticateApiKey,
+	authenticateAdminKey,
 };
