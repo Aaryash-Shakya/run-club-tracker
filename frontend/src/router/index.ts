@@ -29,7 +29,7 @@ const router = createRouter({
 			component: RulesView,
 		},
 		{
-			path: '/visualization',
+			path: '/visualization/:year?/:month?',
 			name: 'visualization',
 			component: VisualizationView,
 		},

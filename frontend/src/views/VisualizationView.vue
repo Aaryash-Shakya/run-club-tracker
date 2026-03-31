@@ -1,5 +1,29 @@
 <template>
 	<div class="container mx-auto px-4 py-6">
+		<!-- Month Selector -->
+		<div class="flex items-center justify-center">
+			<div class="bg-surface flex items-center gap-2 rounded-lg p-3">
+				<button
+					@click="previousMonth"
+					class="hover:text-accent-run hover:bg-soft flex cursor-pointer items-center rounded p-1 px-1 text-2xl text-white transition-colors"
+				>
+					&lt;
+				</button>
+				<span class="min-w-[160px] text-center font-medium text-white">
+					{{ monthLabel }}
+				</span>
+				<button
+					@click="nextMonth"
+					class="hover:text-accent-run hover:bg-soft flex cursor-pointer items-center rounded p-1 px-1 text-2xl text-white transition-colors"
+				>
+					&gt;
+				</button>
+			</div>
+		</div>
+
+		<!-- Countdown -->
+		<ChallengeCountDown :year="selectedYear" :month="selectedMonth" />
+
 		<div v-if="loading" class="flex h-64 items-center justify-center">
 			<div class="text-lg">Loading activities...</div>
 		</div>
@@ -9,9 +33,8 @@
 		</div>
 
 		<div v-else class="space-y-8">
-			<!-- Test Visualization Section -->
+			<!-- Bar Chart Race Section -->
 			<div class="bg-surface rounded-lg p-2 shadow-md">
-				<!-- Simple Bar Chart Representation -->
 				<BarChartRace :data="activitiesArray" class="h-fit w-full" />
 			</div>
 
@@ -43,14 +66,65 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import type { TActivityWithUser } from '@/types/activity'
 import BarChartRace from '@/components/BarChartRace.vue'
+import ChallengeCountDown from '@/components/ChallengeCountDown.vue'
 import { formatSecondsToHMS } from '@/utils/time.utils'
+
+const route = useRoute()
+const router = useRouter()
 
 const activities = ref<TActivityWithUser[]>([])
 const loading = ref(true)
 const error = ref<string | null>(null)
+
+// Parse year/month from route params, default to current date
+const now = new Date()
+const selectedYear = ref(
+	route.params.year ? parseInt(route.params.year as string, 10) : now.getFullYear(),
+)
+const selectedMonth = ref(
+	route.params.month ? parseInt(route.params.month as string, 10) : now.getMonth() + 1,
+)
+
+const monthNames = [
+	'January', 'February', 'March', 'April', 'May', 'June',
+	'July', 'August', 'September', 'October', 'November', 'December',
+]
+
+const monthLabel = computed(() => {
+	return `${monthNames[selectedMonth.value - 1]} ${selectedYear.value}`
+})
+
+const previousMonth = () => {
+	if (selectedMonth.value === 1) {
+		selectedMonth.value = 12
+		selectedYear.value--
+	} else {
+		selectedMonth.value--
+	}
+	updateRoute()
+}
+
+const nextMonth = () => {
+	if (selectedMonth.value === 12) {
+		selectedMonth.value = 1
+		selectedYear.value++
+	} else {
+		selectedMonth.value++
+	}
+	updateRoute()
+}
+
+const updateRoute = () => {
+	const monthStr = String(selectedMonth.value).padStart(2, '0')
+	router.replace({
+		name: 'visualization',
+		params: { year: String(selectedYear.value), month: monthStr },
+	})
+}
 
 const fetchActivities = async () => {
 	try {
@@ -58,7 +132,10 @@ const fetchActivities = async () => {
 		error.value = null
 
 		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
-		const response = await fetch(`${apiBaseUrl}/activities/july`)
+		const monthStr = String(selectedMonth.value).padStart(2, '0')
+		const response = await fetch(
+			`${apiBaseUrl}/activities/visualization/${selectedYear.value}/${monthStr}`,
+		)
 
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`)
@@ -132,7 +209,6 @@ const activitiesArray = computed(() => {
 	const result: Array<[number, string, string, string]> = []
 
 	sortedActivities.value.forEach((activity) => {
-		// Only include valid activities
 		if (activity.isValid) {
 			const userId = activity.user._id
 			let userName = ''
@@ -142,7 +218,7 @@ const activitiesArray = computed(() => {
 			} else {
 				userName = `${activity.user.firstName} ${activity.user.lastName}`
 			}
-			const distanceKm = activity.distance / 1000 // Convert to km
+			const distanceKm = activity.distance / 1000
 			const dateIndex = generateDateIndex(activity.activityDate.toString())
 
 			result.push([distanceKm, userId, userName, dateIndex])
@@ -151,6 +227,26 @@ const activitiesArray = computed(() => {
 
 	return result
 })
+
+// Re-fetch when year/month changes
+watch([selectedYear, selectedMonth], () => {
+	fetchActivities()
+})
+
+// Sync from route params when navigating directly
+watch(
+	() => route.params,
+	(params) => {
+		if (params.year && params.month) {
+			const y = parseInt(params.year as string, 10)
+			const m = parseInt(params.month as string, 10)
+			if (y !== selectedYear.value || m !== selectedMonth.value) {
+				selectedYear.value = y
+				selectedMonth.value = m
+			}
+		}
+	},
+)
 
 onMounted(() => {
 	fetchActivities()
