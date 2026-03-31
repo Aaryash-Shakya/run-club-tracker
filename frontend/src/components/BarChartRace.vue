@@ -84,7 +84,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import * as echarts from 'echarts'
-import { PARTICIPANT_IDS } from '@/constants/participant.constants'
+import { PARTICIPANT_IDS, PARTICIPANT_NAMES } from '@/constants/participant.constants'
 
 interface Props {
 	data: Array<[number, string, string, string]> // [distance, id, name, date]
@@ -99,7 +99,7 @@ let animationTimer: number | null = null
 const isPlaying = ref(false)
 const currentIndex = ref(0)
 const participantsOnly = ref(true)
-const speedControl = ref(2000) // Default speed in milliseconds
+const speedControl = ref(1000) // Default speed in milliseconds
 const highlightedUserId = ref('') // No user highlighted by default
 const autoLoop = ref(true) // Auto-loop animation by default
 
@@ -234,6 +234,23 @@ const processedData = computed(() => {
 	// Create cumulative data for each date
 	const sortedDates = Array.from(dateMap.keys()).sort()
 	const cumulativeData = new Map<string, number>()
+
+	// Seed all participants with 0 so they appear even without activities
+	if (participantsOnly.value) {
+		for (const [id, name] of Object.entries(PARTICIPANT_NAMES)) {
+			if (PARTICIPANT_IDS.includes(id)) {
+				cumulativeData.set(name, 0)
+			}
+		}
+	}
+
+	// If no activities yet, show a single frame with all participants at 0
+	if (sortedDates.length === 0 && cumulativeData.size > 0) {
+		return [{
+			date: 'No activities yet',
+			users: Array.from(cumulativeData.entries()).sort((a, b) => a[0].localeCompare(b[0])),
+		}]
+	}
 
 	return sortedDates.map((date) => {
 		const dayData = dateMap.get(date)!

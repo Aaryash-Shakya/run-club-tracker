@@ -24,17 +24,15 @@
 		<!-- Countdown -->
 		<ChallengeCountDown :year="selectedYear" :month="selectedMonth" />
 
-		<!-- Only show visualization if the month has started -->
-		<template v-if="hasMonthStarted">
-			<div v-if="loading" class="flex h-64 items-center justify-center">
-				<div class="text-lg">Loading activities...</div>
-			</div>
+		<div v-if="loading" class="flex h-64 items-center justify-center">
+			<div class="text-lg">Loading activities...</div>
+		</div>
 
-			<div v-else-if="error" class="text-center text-red-500">
-				<p>Error loading data: {{ error }}</p>
-			</div>
+		<div v-else-if="error" class="text-center text-red-500">
+			<p>Error loading data: {{ error }}</p>
+		</div>
 
-			<div v-else class="space-y-8">
+		<div v-else class="space-y-8">
 			<!-- Bar Chart Race Section -->
 			<div class="bg-surface rounded-lg p-2 shadow-md">
 				<BarChartRace :data="activitiesArray" class="h-fit w-full" />
@@ -64,7 +62,6 @@
 				</div>
 			</div>
 		</div>
-		</template>
 	</div>
 </template>
 
@@ -190,26 +187,20 @@ const validActivities = computed(() => {
 	return activities.value.filter((activity) => activity.isValid).length
 })
 
-const generateDateIndex = (dateString: string) => {
+const generateDateIndex = (dateString: string, index: number) => {
 	const dt = new Date(dateString)
 	// Convert to Asia/Kathmandu timezone offset (+5:45)
 	const kathmanduOffset = 5.75 * 60 // in minutes
 	const utc = dt.getTime() + dt.getTimezoneOffset() * 60000
 	const kathmanduTime = new Date(utc + kathmanduOffset * 60000)
 
-	const hour = kathmanduTime.getHours()
-	let suffix = ''
-	if (hour >= 4 && hour < 12) {
-		suffix = 'morning'
-	} else if (hour >= 12 && hour < 20) {
-		suffix = 'day'
-	} else {
-		suffix = 'night'
-	}
 	const year = kathmanduTime.getFullYear()
 	const month = String(kathmanduTime.getMonth() + 1).padStart(2, '0')
 	const day = String(kathmanduTime.getDate()).padStart(2, '0')
-	return `${year}-${month}-${day}-${suffix}`
+	const hour = String(kathmanduTime.getHours()).padStart(2, '0')
+	const min = String(kathmanduTime.getMinutes()).padStart(2, '0')
+	// Append index to guarantee uniqueness per activity
+	return `${year}-${month}-${day} ${hour}:${min} #${String(index).padStart(4, '0')}`
 }
 
 // Sorted activities by date (ascending)
@@ -223,7 +214,7 @@ const sortedActivities = computed(() => {
 const activitiesArray = computed(() => {
 	const result: Array<[number, string, string, string]> = []
 
-	sortedActivities.value.forEach((activity) => {
+	sortedActivities.value.forEach((activity, index) => {
 		if (activity.isValid) {
 			const userId = activity.user._id
 			let userName = ''
@@ -234,7 +225,7 @@ const activitiesArray = computed(() => {
 				userName = `${activity.user.firstName} ${activity.user.lastName}`
 			}
 			const distanceKm = activity.distance / 1000
-			const dateIndex = generateDateIndex(activity.activityDate.toString())
+			const dateIndex = generateDateIndex(activity.activityDate.toString(), index)
 
 			result.push([distanceKm, userId, userName, dateIndex])
 		}
