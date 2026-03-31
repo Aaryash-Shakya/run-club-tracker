@@ -244,18 +244,7 @@ const processedData = computed(() => {
 const idealStartIndex = computed(() => {
 	if (processedData.value.length === 0) return 0
 
-	// First, try to find a date from 2025-07-01 onwards with at least 10 users
-	const targetDate = '2025-07-01'
-	const from2025July = processedData.value.findIndex((data) => {
-		const dateStr = data.date.substring(0, 10) // Extract YYYY-MM-DD part
-		return dateStr >= targetDate && data.users.length >= 10
-	})
-
-	if (from2025July !== -1) {
-		return from2025July
-	}
-
-	// If no date from July 1st has 10+ users, find the first date with at least 10 users
+	// Find the first date with at least 10 users
 	const firstWith10Users = processedData.value.findIndex((data) => data.users.length >= 10)
 	if (firstWith10Users !== -1) {
 		return firstWith10Users
