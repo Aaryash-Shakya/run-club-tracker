@@ -406,7 +406,7 @@ const updateChart = () => {
 					silent: true,
 					data: [
 						{
-							xAxis: 70,
+							xAxis: 100,
 							lineStyle: {
 								color: '#22c55e', // green-500
 								width: 2,
@@ -415,24 +415,8 @@ const updateChart = () => {
 							},
 							label: {
 								position: 'end',
-								formatter: '🏁70K Finisher',
+								formatter: '🏁100K Finisher',
 								color: '#22c55e',
-								fontSize: 12,
-								fontWeight: 'bold',
-							},
-						},
-						{
-							xAxis: 100,
-							lineStyle: {
-								color: '#f59e0b', // amber-500
-								width: 2,
-								type: 'dashed',
-								translate: '10px 10px',
-							},
-							label: {
-								position: 'end',
-								formatter: '🔥100K Legend',
-								color: '#f59e0b',
 								fontSize: 12,
 								fontWeight: 'bold',
 							},
