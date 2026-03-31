@@ -26,13 +26,13 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 	try {
 		console.log("🔍 Looking for new activities...");
 
-		// Fetch recent activities from Strava (last 30) - newest first
-		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava(1, 30);
+		// Fetch recent activities from Strava (last 50) - newest first
+		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava(1, 50);
 
-		// Fetch recent activities from DB (last 30 for better coverage) - newest first
+		// Fetch recent activities from DB (last 50 for better coverage) - newest first
 		const recentDbActivities = await Activity.find()
 			.sort({ createdAt: -1, _id: -1 })
-			.limit(30)
+			.limit(50)
 			.exec();
 
 		const newActivities: StravaClubActivity[] = [];
