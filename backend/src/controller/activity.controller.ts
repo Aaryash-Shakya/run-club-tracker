@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { DateTime } from "luxon";
 import activityRepository from "../repositories/activity.repository";
 import activityHelper from "../helpers/activity.helper";
 import dateUtils from "../utils/date.utils";
@@ -72,8 +73,13 @@ async function fetchRecentActivities(req: Request, res: Response, next: NextFunc
 		const now = new Date();
 		const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
+		// Clamp to start of current month (NPT) so last month's activities don't leak in
+		const nptNow = DateTime.fromJSDate(now).setZone(dateUtils.TIME_ZONE);
+		const monthStart = nptNow.startOf("month").toJSDate();
+		const rangeStart = twentyFourHoursAgo < monthStart ? monthStart : twentyFourHoursAgo;
+
 		const activities = await activityRepository.listAllActivitiesInRange(
-			twentyFourHoursAgo,
+			rangeStart,
 			now
 		);
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
