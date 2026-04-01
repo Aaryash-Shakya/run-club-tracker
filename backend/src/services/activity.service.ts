@@ -33,6 +33,7 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 		const recentDbActivities = await Activity.find()
 			.sort({ createdAt: -1, _id: -1 })
 			.limit(50)
+			.populate("user", "firstName lastName")
 			.exec();
 
 		const newActivities: StravaClubActivity[] = [];
@@ -40,13 +41,17 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 
 		// Process Strava activities in order (newest first)
 		for (const stravaActivity of stravaActivities) {
-			const matchFound = recentDbActivities.some(
-				(dbActivity) =>
+			const matchFound = recentDbActivities.some((dbActivity) => {
+				const dbUser = dbActivity.user as unknown as IUser;
+				return (
+					stravaActivity.athlete.firstname === dbUser.firstName &&
+					stravaActivity.athlete.lastname === dbUser.lastName &&
 					stravaActivity.distance === dbActivity.distance &&
 					stravaActivity.moving_time === dbActivity.movingTime &&
 					stravaActivity.elapsed_time === dbActivity.elapsedTime &&
 					stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
-			);
+				);
+			});
 
 			if (matchFound) {
 				// Record exists in DB - ignore it and increment match count
