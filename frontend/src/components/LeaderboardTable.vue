@@ -269,7 +269,7 @@
 import type { TUserWithStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import UiAvatar from './UiAvatar.vue'
 import TopThreePodium from './TopThreePodium.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
@@ -500,9 +500,16 @@ watch(queryDate, () => {
 	fetchLeaderboardData()
 })
 
-// Initial data fetch
+// Initial data fetch + auto-refresh every 10 minutes
+let refreshInterval: ReturnType<typeof setInterval>
+
 onMounted(() => {
 	fetchLeaderboardData()
+	refreshInterval = setInterval(fetchLeaderboardData, 10 * 60 * 1000)
+})
+
+onUnmounted(() => {
+	clearInterval(refreshInterval)
 })
 
 // Expose activityPeriod and queryDate for parent components to control

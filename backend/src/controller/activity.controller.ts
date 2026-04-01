@@ -26,7 +26,7 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 			monthly: "Monthly activities fetched successfully",
 		};
 
-		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.set("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: periodMessages[period],
@@ -82,7 +82,7 @@ async function fetchRecentActivities(req: Request, res: Response, next: NextFunc
 			false
 		);
 
-		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.set("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: "Recent activities fetched successfully",
@@ -115,7 +115,7 @@ async function fetchUserActivities(req: Request, res: Response, next: NextFuncti
 			monthly: "User monthly activities fetched successfully",
 		};
 
-		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.set("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: periodMessages[period],
