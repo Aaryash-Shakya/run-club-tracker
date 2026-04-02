@@ -43,7 +43,6 @@ async function findNewActivities(pagesToFetch: number = 1): Promise<StravaClubAc
 			.exec();
 
 		const newActivities: StravaClubActivity[] = [];
-		let matchCount = 0;
 
 		for (const stravaActivity of stravaActivities) {
 			const hash = generateActivityHash(stravaActivity);
@@ -67,25 +66,10 @@ async function findNewActivities(pagesToFetch: number = 1): Promise<StravaClubAc
 				return false;
 			});
 
-			if (matchFound) {
-				// Record exists in DB - ignore it and increment match count
-				matchCount++;
-				console.log(
-					`✅ Activity already exists in DB (Hash: ${hash.substring(0, 8)}, match ${matchCount})`
-				);
-
-				// If we have 10 consecutive matches, we've likely hit the "already synced" portion of history
-				if (matchCount >= 10) {
-					console.log(`🛑 Found ${matchCount} consecutive matches, stopping search`);
-					break;
-				}
-			} else {
+			if (!matchFound) {
 				// Record doesn't exist in DB - add to new activities
 				newActivities.push(stravaActivity);
 				console.log(`🆕 New activity found: "${stravaActivity.name}"`);
-
-				// Reset match count when we find a new activity
-				matchCount = 0;
 			}
 		}
 
