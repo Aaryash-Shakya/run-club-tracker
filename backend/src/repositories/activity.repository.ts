@@ -44,14 +44,14 @@ async function listUserActivitiesInRange(
 		{
 			$match: {
 				user: new Types.ObjectId(userId),
-				createdAt: {
+				activityDate: {
 					$gte: startDate,
 					$lt: endDate,
 				},
 			},
 		},
 		{
-			$sort: { createdAt: -1, _id: -1 },
+			$sort: { activityDate: -1, _id: -1 },
 		},
 		{
 			$lookup: {
