@@ -59,6 +59,8 @@ export const PARTICIPANT_IDS = [
 	'69c415bfed05867c847d26c6', // Rishab ..
 	'69c415bfed05867c847d26c7', // Shamal B.
 	'69cc73ed1103bb2af39f4f5e', // Riwaj P.
+	'69cdc1e9c205a58527879d2f', // Rishabh ..
+	'69cdfeda690f53dd7169d364', // Shyam S.
 ]
 
 // Map of participant IDs to display names
@@ -84,4 +86,6 @@ export const PARTICIPANT_NAMES: Record<string, string> = {
 	'69c415bfed05867c847d26c6': 'Rishab ..',
 	'69c415bfed05867c847d26c7': 'Shamal B.',
 	'69cc73ed1103bb2af39f4f5e': 'Riwaj P.',
+	'69cdc1e9c205a58527879d2f': 'Rishabh ..',
+	'69cdfeda690f53dd7169d364': 'Shyam S.',
 }
