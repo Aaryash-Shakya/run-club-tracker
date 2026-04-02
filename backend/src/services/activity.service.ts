@@ -216,9 +216,8 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 
 function generateActivityHash(activity: StravaClubActivity): string {
 	const components = [
-		activity.athlete.firstname,
-		activity.athlete.lastname,
-		activity.name,
+		activity.athlete.firstname.toLowerCase(),
+		activity.athlete.lastname.toLowerCase(),
 		activity.distance,
 		activity.moving_time,
 		activity.elapsed_time,
