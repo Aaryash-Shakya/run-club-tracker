@@ -37,9 +37,9 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 			.exec();
 
 		const newActivities: StravaClubActivity[] = [];
-		let matchCount = 0;
 
-		// Process Strava activities in order (newest first)
+		// Process all Strava activities (newest first) — no early exit since
+		// late-synced watch activities can appear scattered among existing ones
 		for (const stravaActivity of stravaActivities) {
 			const matchFound = recentDbActivities.some((dbActivity) => {
 				const dbUser = dbActivity.user as unknown as IUser;
@@ -54,22 +54,10 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 			});
 
 			if (matchFound) {
-				// Record exists in DB - ignore it and increment match count
-				matchCount++;
-				console.log(`✅ Activity already exists in DB (match ${matchCount})`);
-
-				// If we have enough consecutive matches, we can be confident older activities exist
-				if (matchCount >= 10) {
-					console.log(`🛑 Found ${matchCount} consecutive matches, stopping search`);
-					break;
-				}
+				console.log(`✅ Activity already exists in DB`);
 			} else {
-				// Record doesn't exist in DB - add to new activities
 				newActivities.push(stravaActivity);
 				console.log(`🆕 New activity found: "${stravaActivity.name}"`);
-
-				// Reset match count when we find a new activity
-				matchCount = 0;
 			}
 		}
 
