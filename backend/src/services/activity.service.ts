@@ -35,10 +35,11 @@ async function findNewActivities(pagesToFetch: number = 1): Promise<StravaClubAc
 			if (activities.length === 0) break;
 		}
 
-		// Fetch recent activities from DB (last 30 for better coverage) - newest first
+		// Fetch recent activities from DB (last 50 for better coverage) - newest first
 		const recentDbActivities = await Activity.find()
 			.sort({ createdAt: -1, _id: -1 })
-			.limit(30)
+			.limit(50)
+			.populate("user", "firstName lastName")
 			.exec();
 
 		const newActivities: StravaClubActivity[] = [];

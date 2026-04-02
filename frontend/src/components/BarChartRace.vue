@@ -32,6 +32,18 @@
 					</label>
 				</div>
 
+				<!-- Auto Loop Toggle -->
+				<div class="flex items-center space-x-2">
+					<label class="flex cursor-pointer items-center space-x-2">
+						<input
+							type="checkbox"
+							v-model="autoLoop"
+							class="text-accent-run focus:ring-accent-run border-soft bg-surface rounded"
+						/>
+						<span class="text-text text-sm font-medium">Auto Loop</span>
+					</label>
+				</div>
+
 				<!-- Speed Control -->
 				<div class="flex items-center space-x-3">
 					<span class="text-text text-sm font-medium">Speed:</span>
@@ -72,7 +84,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import * as echarts from 'echarts'
-import { PARTICIPANT_IDS } from '@/constants/participant.constants'
+import { PARTICIPANT_IDS, PARTICIPANT_NAMES } from '@/constants/participant.constants'
 
 interface Props {
 	data: Array<[number, string, string, string]> // [distance, id, name, date]
@@ -87,8 +99,9 @@ let animationTimer: number | null = null
 const isPlaying = ref(false)
 const currentIndex = ref(0)
 const participantsOnly = ref(true)
-const speedControl = ref(2000) // Default speed in milliseconds
-const highlightedUserId = ref('6862b7405f7a41fafa3bcbd1') // ID of the user to highlight
+const speedControl = ref(1000) // Default speed in milliseconds
+const highlightedUserId = ref('') // No user highlighted by default
+const autoLoop = ref(true) // Auto-loop animation by default
 
 const updateFrequency = computed(() => speedControl.value) // Use reactive speed
 const barWidthAnimationDuration = 2500 // slower width changes
@@ -222,6 +235,23 @@ const processedData = computed(() => {
 	const sortedDates = Array.from(dateMap.keys()).sort()
 	const cumulativeData = new Map<string, number>()
 
+	// Seed all participants with 0 so they appear even without activities
+	if (participantsOnly.value) {
+		for (const [id, name] of Object.entries(PARTICIPANT_NAMES)) {
+			if (PARTICIPANT_IDS.includes(id)) {
+				cumulativeData.set(name, 0)
+			}
+		}
+	}
+
+	// If no activities yet, show a single frame with all participants at 0
+	if (sortedDates.length === 0 && cumulativeData.size > 0) {
+		return [{
+			date: 'No activities yet',
+			users: Array.from(cumulativeData.entries()).sort((a, b) => a[0].localeCompare(b[0])),
+		}]
+	}
+
 	return sortedDates.map((date) => {
 		const dayData = dateMap.get(date)!
 
@@ -244,18 +274,7 @@ const processedData = computed(() => {
 const idealStartIndex = computed(() => {
 	if (processedData.value.length === 0) return 0
 
-	// First, try to find a date from 2025-07-01 onwards with at least 10 users
-	const targetDate = '2025-07-01'
-	const from2025July = processedData.value.findIndex((data) => {
-		const dateStr = data.date.substring(0, 10) // Extract YYYY-MM-DD part
-		return dateStr >= targetDate && data.users.length >= 10
-	})
-
-	if (from2025July !== -1) {
-		return from2025July
-	}
-
-	// If no date from July 1st has 10+ users, find the first date with at least 10 users
+	// Find the first date with at least 10 users
 	const firstWith10Users = processedData.value.findIndex((data) => data.users.length >= 10)
 	if (firstWith10Users !== -1) {
 		return firstWith10Users
@@ -387,7 +406,7 @@ const updateChart = () => {
 					silent: true,
 					data: [
 						{
-							xAxis: 70,
+							xAxis: 100,
 							lineStyle: {
 								color: '#22c55e', // green-500
 								width: 2,
@@ -396,24 +415,8 @@ const updateChart = () => {
 							},
 							label: {
 								position: 'end',
-								formatter: '🏁70K Finisher',
+								formatter: '🏁100K Finisher',
 								color: '#22c55e',
-								fontSize: 12,
-								fontWeight: 'bold',
-							},
-						},
-						{
-							xAxis: 100,
-							lineStyle: {
-								color: '#f59e0b', // amber-500
-								width: 2,
-								type: 'dashed',
-								translate: '10px 10px',
-							},
-							label: {
-								position: 'end',
-								formatter: '🔥100K Legend',
-								color: '#f59e0b',
 								fontSize: 12,
 								fontWeight: 'bold',
 							},
@@ -494,9 +497,13 @@ const startAnimation = () => {
 
 		currentIndex.value++
 		if (currentIndex.value >= processedData.value.length) {
-			pauseAnimation()
-			currentIndex.value = processedData.value.length - 1
-			return
+			if (autoLoop.value) {
+				currentIndex.value = idealStartIndex.value
+			} else {
+				pauseAnimation()
+				currentIndex.value = processedData.value.length - 1
+				return
+			}
 		}
 
 		animationTimer = window.setTimeout(animate, updateFrequency.value)

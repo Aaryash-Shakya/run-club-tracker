@@ -5,7 +5,7 @@ async function listAllUsers(req: Request, res: Response, next: NextFunction) {
 	try {
 		const users = await userRepository.listAllUsers();
 
-		res.setHeader("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.setHeader("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: "Users fetched successfully",

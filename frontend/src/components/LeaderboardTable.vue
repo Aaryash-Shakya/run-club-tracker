@@ -269,7 +269,7 @@
 import type { TUserWithStats } from '@/types/activity'
 import paceUtils from '@/utils/pace.utils'
 import { formatSecondsToHMS } from '@/utils/time.utils'
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import UiAvatar from './UiAvatar.vue'
 import TopThreePodium from './TopThreePodium.vue'
 import { PARTICIPANT_IDS } from '@/constants/participant.constants'
@@ -414,10 +414,15 @@ const checkPositionChanges = (
 }
 
 // API call function
-const fetchLeaderboardData = async () => {
+const getLeaderboardFingerprint = (data: LeaderboardWithPosition[]) =>
+	data.map((r) => `${r.user._id}:${r.stats.totalDistance}`).join(',')
+
+const fetchLeaderboardData = async (silent = false) => {
 	try {
-		loading.value = true
-		leaderboard.value = [] // Clear existing data when starting new fetch
+		if (!silent) {
+			loading.value = true
+			leaderboard.value = [] // Clear existing data when starting new fetch
+		}
 		const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
 		let response: ActivitiesResponse
@@ -447,7 +452,7 @@ const fetchLeaderboardData = async () => {
 			})
 
 			// Add position change information to leaderboard data
-			leaderboard.value = response.userActivitiesWithStats.map((record) => {
+			const newData = response.userActivitiesWithStats.map((record) => {
 				const recent = recentMap.get(record.user._id)
 				const distanceAdded = recent ? recent.stats.totalDistance : 0
 				const activitiesAdded = recent ? recent.stats.totalActivities : 0
@@ -463,6 +468,13 @@ const fetchLeaderboardData = async () => {
 					changes,
 				}
 			})
+			if (
+				!silent ||
+				getLeaderboardFingerprint(newData) !==
+					getLeaderboardFingerprint(leaderboard.value)
+			) {
+				leaderboard.value = newData
+			}
 		} else {
 			// For daily and weekly periods, use existing logic
 			const url = new URL(`${apiBaseUrl}/activities`)
@@ -477,16 +489,23 @@ const fetchLeaderboardData = async () => {
 				distanceAdded: 0,
 				activitiesAdded: 0,
 			}
-			leaderboard.value = response.userActivitiesWithStats.map((record) => ({
+			const newData = response.userActivitiesWithStats.map((record) => ({
 				...record,
 				changes: noChange,
 			}))
+			if (
+				!silent ||
+				getLeaderboardFingerprint(newData) !==
+					getLeaderboardFingerprint(leaderboard.value)
+			) {
+				leaderboard.value = newData
+			}
 		}
 	} catch (error) {
 		console.error('Error fetching leaderboard data:', error)
-		leaderboard.value = []
+		if (!silent) leaderboard.value = []
 	} finally {
-		loading.value = false
+		if (!silent) loading.value = false
 	}
 }
 
@@ -500,9 +519,16 @@ watch(queryDate, () => {
 	fetchLeaderboardData()
 })
 
-// Initial data fetch
+// Initial data fetch + auto-refresh every 10 minutes
+let refreshInterval: ReturnType<typeof setInterval>
+
 onMounted(() => {
 	fetchLeaderboardData()
+	refreshInterval = setInterval(() => fetchLeaderboardData(true), 10 * 60 * 1000)
+})
+
+onUnmounted(() => {
+	clearInterval(refreshInterval)
 })
 
 // Expose activityPeriod and queryDate for parent components to control

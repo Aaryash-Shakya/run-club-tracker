@@ -73,3 +73,29 @@ export type TActivityWithUser = {
 	createdAt: Date
 	updatedAt: Date
 }
+
+export type TChallenge = {
+	_id: string
+	name: string
+	description?: string
+	startDate: string
+	endDate: string
+	targetKm: number
+	maxRunPace: number
+	minWalkingDistance: number
+	minRunningDistance: number
+	createdAt: string
+	updatedAt: string
+	__v: number
+}
+
+export type TParticipant = {
+	_id: string
+	user: TUser
+	challenge: string
+	joinedAt: string
+	role?: string
+	createdAt: string
+	updatedAt: string
+	__v: number
+}

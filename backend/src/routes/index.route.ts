@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import activityRoutes from "./activity.route";
 import userRoutes from "./user.route";
 import slackRoutes from "./slack.route";
+import adminRoutes from "./admin.route";
 import authMiddleware from "../middlewares/auth.middleware";
 
 const router = Router();
@@ -28,5 +29,7 @@ router.use("/activities", activityRoutes);
 router.use("/users", userRoutes);
 
 router.use("/slack", authMiddleware.authenticateApiKey, slackRoutes);
+
+router.use("/admin", authMiddleware.authenticateAdminKey, adminRoutes);
 
 export default router;

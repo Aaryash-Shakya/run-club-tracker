@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { DateTime } from "luxon";
 import activityRepository from "../repositories/activity.repository";
 import activityHelper from "../helpers/activity.helper";
 import dateUtils from "../utils/date.utils";
@@ -26,7 +27,7 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 			monthly: "Monthly activities fetched successfully",
 		};
 
-		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.set("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: periodMessages[period],
@@ -37,17 +38,29 @@ async function fetchActivities(req: Request, res: Response, next: NextFunction) 
 	}
 }
 
-async function fetchAllActivitiesOfJuly(req: Request, res: Response, next: NextFunction) {
-	console.log(1);
+async function fetchActivitiesByMonth(req: Request, res: Response, next: NextFunction) {
 	try {
-		const { startDate, endDate } = dateUtils.getDateRange("monthly", new Date("2025-07-15"));
+		const { year, month } = req.params;
+		const yearNum = parseInt(year, 10);
+		const monthNum = parseInt(month, 10);
+
+		if (isNaN(yearNum) || isNaN(monthNum) || monthNum < 1 || monthNum > 12) {
+			res.status(400).json({
+				status: "ERROR",
+				message: "Invalid year or month. Use /activities/visualization/YYYY/MM",
+			});
+			return;
+		}
+
+		// Create a date in the middle of the requested month
+		const targetDate = new Date(`${year}-${month.padStart(2, "0")}-15`);
+		const { startDate, endDate } = dateUtils.getDateRange("monthly", targetDate);
 
 		const activities = await activityRepository.listAllActivitiesInRange(startDate, endDate);
 
-		// res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
 		res.json({
 			status: "OK",
-			message: "Monthly activities for July fetched successfully",
+			message: `Activities for ${year}-${month.padStart(2, "0")} fetched successfully`,
 			activities,
 		});
 	} catch (error) {
@@ -60,8 +73,13 @@ async function fetchRecentActivities(req: Request, res: Response, next: NextFunc
 		const now = new Date();
 		const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
+		// Clamp to start of current month (NPT) so last month's activities don't leak in
+		const nptNow = DateTime.fromJSDate(now).setZone(dateUtils.TIME_ZONE);
+		const monthStart = nptNow.startOf("month").toJSDate();
+		const rangeStart = twentyFourHoursAgo < monthStart ? monthStart : twentyFourHoursAgo;
+
 		const activities = await activityRepository.listAllActivitiesInRange(
-			twentyFourHoursAgo,
+			rangeStart,
 			now
 		);
 		const userGroupedActivities = activityHelper.groupActivitiesByUser(activities);
@@ -70,7 +88,7 @@ async function fetchRecentActivities(req: Request, res: Response, next: NextFunc
 			false
 		);
 
-		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.set("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: "Recent activities fetched successfully",
@@ -103,7 +121,7 @@ async function fetchUserActivities(req: Request, res: Response, next: NextFuncti
 			monthly: "User monthly activities fetched successfully",
 		};
 
-		res.set("Cache-Control", "public, max-age=300"); // Cache for 5 minutes
+		res.set("Cache-Control", "public, max-age=120"); // Cache for 2 minutes
 		res.json({
 			status: "OK",
 			message: periodMessages[period],
@@ -116,7 +134,7 @@ async function fetchUserActivities(req: Request, res: Response, next: NextFuncti
 
 export default {
 	fetchActivities,
-	fetchAllActivitiesOfJuly,
+	fetchActivitiesByMonth,
 	fetchRecentActivities,
 	fetchUserActivities,
 };

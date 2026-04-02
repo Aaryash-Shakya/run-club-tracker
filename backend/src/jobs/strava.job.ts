@@ -3,7 +3,7 @@ import stravaController from "../controller/strava.controller";
 
 export function startStravaJob() {
 	new CronJob(
-		"*/30 * * * *",
+		"*/5 * * * *",
 		async () => {
 			console.log("⏰ Running scheduled fetchAndStoreActivities...");
 			await stravaController.fetchAndStoreActivities();
