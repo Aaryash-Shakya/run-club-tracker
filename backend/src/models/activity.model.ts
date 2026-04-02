@@ -1,6 +1,7 @@
 import { Schema, model, Document, Types } from "mongoose";
 
 export interface IActivity extends Document {
+	activityHash?: string;
 	name: string;
 	distance: number;
 	movingTime: number;
@@ -20,6 +21,7 @@ export interface IActivity extends Document {
 
 const ActivitySchema = new Schema<IActivity>(
 	{
+		activityHash: { type: String, unique: true, sparse: true },
 		name: { type: String, required: true },
 		distance: { type: Number, required: true },
 		movingTime: { type: Number, required: true },

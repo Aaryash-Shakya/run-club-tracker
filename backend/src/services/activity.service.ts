@@ -6,6 +6,7 @@ import challengeRepository from "../repositories/challenge.repository";
 
 // Strava API response type for club activities
 export type StravaClubActivity = {
+	id: number;
 	resource_state: number;
 	athlete: {
 		resource_state: number;
@@ -20,14 +21,19 @@ export type StravaClubActivity = {
 	type: string;
 	sport_type: string;
 	workout_type: number;
+	start_date: string;
 };
 
-async function findNewActivities(): Promise<StravaClubActivity[]> {
+async function findNewActivities(pagesToFetch: number = 1): Promise<StravaClubActivity[]> {
 	try {
-		console.log("🔍 Looking for new activities...");
+		console.log(`🔍 Looking for new activities (fetching ${pagesToFetch} pages)...`);
 
-		// Fetch recent activities from Strava (last 30) - newest first
-		const stravaActivities = await stravaService.fetchClubActivitiesFromStrava(1, 30);
+		let stravaActivities: StravaClubActivity[] = [];
+		for (let i = 1; i <= pagesToFetch; i++) {
+			const activities = await stravaService.fetchClubActivitiesFromStrava(i, 50);
+			stravaActivities = [...stravaActivities, ...activities];
+			if (activities.length === 0) break;
+		}
 
 		// Fetch recent activities from DB (last 30 for better coverage) - newest first
 		const recentDbActivities = await Activity.find()
@@ -38,22 +44,36 @@ async function findNewActivities(): Promise<StravaClubActivity[]> {
 		const newActivities: StravaClubActivity[] = [];
 		let matchCount = 0;
 
-		// Process Strava activities in order (newest first)
 		for (const stravaActivity of stravaActivities) {
-			const matchFound = recentDbActivities.some(
-				(dbActivity) =>
-					stravaActivity.distance === dbActivity.distance &&
-					stravaActivity.moving_time === dbActivity.movingTime &&
-					stravaActivity.elapsed_time === dbActivity.elapsedTime &&
-					stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
-			);
+			const hash = generateActivityHash(stravaActivity);
+
+			const matchFound = recentDbActivities.some((dbActivity) => {
+				// 1. Try matching by activityHash (most accurate)
+				if (dbActivity.activityHash === hash) {
+					return true;
+				}
+
+				// 2. Fallback to fuzzy match for legacy activities without hash
+				if (!dbActivity.activityHash) {
+					return (
+						stravaActivity.distance === dbActivity.distance &&
+						stravaActivity.moving_time === dbActivity.movingTime &&
+						stravaActivity.elapsed_time === dbActivity.elapsedTime &&
+						stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
+					);
+				}
+
+				return false;
+			});
 
 			if (matchFound) {
 				// Record exists in DB - ignore it and increment match count
 				matchCount++;
-				console.log(`✅ Activity already exists in DB (match ${matchCount})`);
+				console.log(
+					`✅ Activity already exists in DB (Hash: ${hash.substring(0, 8)}, match ${matchCount})`
+				);
 
-				// If we have enough consecutive matches, we can be confident older activities exist
+				// If we have 10 consecutive matches, we've likely hit the "already synced" portion of history
 				if (matchCount >= 10) {
 					console.log(`🛑 Found ${matchCount} consecutive matches, stopping search`);
 					break;
@@ -101,11 +121,10 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 			movingPace: number;
 			type: string;
 			sportType: string;
-			workoutType: number;
-			activityDate: Date;
 			isValid: boolean;
 			note: string | null;
 			user: string;
+			activityHash: string;
 		}[] = [];
 
 		for (const stravaActivity of newActivities) {
@@ -158,6 +177,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 
 			// Format activity according to database schema
 			const formattedActivity = {
+				activityHash: generateActivityHash(stravaActivity),
 				name: stravaActivity.name,
 				distance: stravaActivity.distance,
 				movingTime: stravaActivity.moving_time,
@@ -167,7 +187,7 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 				type: stravaActivity.type,
 				sportType: stravaActivity.sport_type,
 				workoutType: stravaActivity.workout_type,
-				activityDate: new Date(),
+				activityDate: new Date(), // Club API has no date, but hash prevents duplicates
 				isValid: isValid,
 				note: note,
 				user: String(associatedUser._id),
@@ -194,7 +214,22 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 	}
 }
 
+function generateActivityHash(activity: StravaClubActivity): string {
+	const components = [
+		activity.athlete.firstname,
+		activity.athlete.lastname,
+		activity.name,
+		activity.distance,
+		activity.moving_time,
+		activity.elapsed_time,
+		activity.total_elevation_gain,
+		activity.type,
+	];
+	return components.join("_").replace(/\s+/g, "");
+}
+
 export default {
 	findNewActivities,
 	addNewActivitiesToDatabase,
+	generateActivityHash,
 };
