@@ -78,6 +78,27 @@
 							</td>
 						</tr>
 
+						<!-- Danger Line Separator for being behind schedule -->
+						<tr
+							v-if="index === dangerIndex && index !== separatorIndex"
+							class="bg-transparent"
+						>
+							<td colspan="7" class="px-2 py-2">
+								<div class="flex items-center gap-3">
+									<div class="h-px flex-1 bg-red-500/30"></div>
+									<div class="flex items-center gap-1.5">
+										<span class="text-[10px] font-bold tracking-tighter text-red-500 uppercase">
+											⚠️ Behind Schedule
+										</span>
+										<span class="text-[10px] font-medium text-red-500/70">
+											(Need {{ (monthlyProgressDetails.requiredDistance / 1000).toFixed(1) }}km total)
+										</span>
+									</div>
+									<div class="h-px flex-1 bg-red-500/30"></div>
+								</div>
+							</td>
+						</tr>
+
 						<tr
 							:class="[
 								'bg-surface-light cursor-pointer rounded-lg hover:bg-[#282F4570]',
@@ -156,6 +177,19 @@
 													: ''
 											}}
 										</span>
+									</div>
+									<!-- Required Daily Avg indicator -->
+									<div
+										v-if="
+											activityPeriod === 'monthly' &&
+											stats.totalDistance <
+												monthlyProgressDetails.requiredDistance &&
+											monthlyProgressDetails.remainingDays > 0
+										"
+										class="text-[10px] whitespace-nowrap text-red-400"
+										:title="`Need ${calculateRequiredDailyAvg(stats.totalDistance).toFixed(1)}km/day to finish`"
+									>
+										{{ calculateRequiredDailyAvg(stats.totalDistance).toFixed(1) }}k/d
 									</div>
 								</div>
 							</td>
@@ -317,6 +351,69 @@ const filteredLeaderboard = computed(() => {
 	}
 	return leaderboard.value
 })
+
+// Calculate required progress for the monthly 100km challenge
+const monthlyProgressDetails = computed(() => {
+	const date = new Date(queryDate.value)
+	const year = date.getFullYear()
+	const month = date.getMonth() + 1 // 1-indexed
+
+	const now = new Date()
+	const currentYear = now.getFullYear()
+	const currentMonth = now.getMonth() + 1
+	const currentDay = now.getDate()
+
+	// Days in the selected month
+	const daysInMonth = new Date(year, month, 0).getDate()
+
+	let progressDays = 0
+	if (year < currentYear || (year === currentYear && month < currentMonth)) {
+		// Past month: entire month was for the challenge
+		progressDays = daysInMonth
+	} else if (year === currentYear && month === currentMonth) {
+		// Current month: progress is up to today
+		progressDays = currentDay
+	} else {
+		// Future month: 0 progress days
+		progressDays = 0
+	}
+
+	const requiredDistance = (TARGET_DISTANCE / daysInMonth) * progressDays
+	const remainingDays = Math.max(0, daysInMonth - progressDays)
+
+	return {
+		requiredDistance,
+		remainingDays,
+		daysInMonth,
+		isChallengeActive: year === currentYear && month === currentMonth,
+		isChallengeFinished:
+			year < currentYear || (year === currentYear && month < currentMonth),
+	}
+})
+
+// Computed property to find the index where the "Danger Line" should be placed
+const dangerIndex = computed(() => {
+	if (activityPeriod.value !== 'monthly') return -1
+
+	const required = monthlyProgressDetails.value.requiredDistance
+	// If required is 0 (future month), no danger line
+	if (required <= 0) return -1
+
+	const index = filteredLeaderboard.value.findIndex((record) => record.stats.totalDistance < required)
+
+	// If all are above, or if the separator would be at the very top (index 0),
+	// we still show it to indicate the high bar, unless everyone is way ahead.
+	// But let's follow the separator pattern: only show if there's someone below.
+	return index
+})
+
+// Function to calculate required daily average to finish 100km
+const calculateRequiredDailyAvg = (currentDistance: number) => {
+	const remaining = TARGET_DISTANCE - currentDistance
+	const daysLeft = monthlyProgressDetails.value.remainingDays
+	if (daysLeft <= 0) return remaining > 0 ? Infinity : 0
+	return (remaining / daysLeft) / 1000 // In km
+}
 
 // Computed property to find the index where separator should be placed (first record under 100km)
 const separatorIndex = computed(() => {
