@@ -23,6 +23,12 @@
 						<th class="rounded-l-lg px-2 py-3 text-center font-medium">Rank</th>
 						<th class="px-2 py-3 text-left font-medium">Runner</th>
 						<th class="px-2 py-3 text-left font-medium">Distance</th>
+						<th
+							v-if="activityPeriod === 'monthly'"
+							class="px-2 py-3 text-left font-medium"
+						>
+							Projected
+						</th>
 						<th class="px-2 py-3 text-left font-medium">Run : Walk</th>
 						<th class="px-2 py-3 text-left font-medium">Avg. Pace</th>
 						<th class="hidden px-2 py-3 text-left font-medium md:table-cell">
@@ -38,7 +44,7 @@
 				<tbody>
 					<!-- Loading State -->
 					<tr v-if="loading" class="bg-surface-light rounded-lg">
-						<td colspan="7" class="px-4 py-8 text-center">
+						<td :colspan="activityPeriod === 'monthly' ? 8 : 7" class="px-4 py-8 text-center">
 							<div class="flex items-center justify-center">
 								<div
 									class="h-8 w-8 animate-spin rounded-full border-b-2 border-white"
@@ -52,7 +58,7 @@
 						v-else-if="filteredLeaderboard.length === 0"
 						class="bg-surface-light rounded-lg"
 					>
-						<td colspan="7" class="px-4 py-8 text-center">
+						<td :colspan="activityPeriod === 'monthly' ? 8 : 7" class="px-4 py-8 text-center">
 							<div class="text-muted text-lg">No activities yet</div>
 							<div class="mt-2 text-sm text-white/40">
 								Lace up and log your first activity to claim your spot on the
@@ -67,7 +73,7 @@
 					>
 						<!-- Separator for first record under 100km -->
 						<tr v-if="index === separatorIndex" class="bg-transparent">
-							<td colspan="7" class="px-2 py-2">
+							<td :colspan="activityPeriod === 'monthly' ? 8 : 7" class="px-2 py-2">
 								<div class="flex items-center gap-3">
 									<div class="h-px flex-1 bg-white/20"></div>
 									<span class="text-xs font-medium text-white/50"
@@ -83,7 +89,7 @@
 							v-if="index === dangerIndex && index !== separatorIndex"
 							class="bg-transparent"
 						>
-							<td colspan="7" class="px-2 py-2">
+							<td :colspan="activityPeriod === 'monthly' ? 8 : 7" class="px-2 py-2">
 								<div class="flex items-center gap-3">
 									<div class="h-px flex-1 bg-red-500/30"></div>
 									<div class="flex items-center gap-1.5">
@@ -191,6 +197,26 @@
 									>
 										{{ calculateRequiredDailyAvg(stats.totalDistance).toFixed(1) }}k/d
 									</div>
+								</div>
+							</td>
+							<td v-if="activityPeriod === 'monthly'" class="px-2 py-2">
+								<div class="flex flex-col">
+									<span
+										class="text-sm font-semibold"
+										:class="
+											calculateProjectedDistance(stats.totalDistance) >=
+											TARGET_DISTANCE
+												? 'text-green-400'
+												: 'text-accent-run'
+										"
+									>
+										{{
+											(
+												calculateProjectedDistance(stats.totalDistance) / 1000
+											).toFixed(1)
+										}}km
+									</span>
+									<span class="text-[10px] text-white/40">Finish Est.</span>
 								</div>
 							</td>
 							<td class="px-2 py-2">
@@ -384,12 +410,20 @@ const monthlyProgressDetails = computed(() => {
 	return {
 		requiredDistance,
 		remainingDays,
+		progressDays,
 		daysInMonth,
 		isChallengeActive: year === currentYear && month === currentMonth,
 		isChallengeFinished:
 			year < currentYear || (year === currentYear && month < currentMonth),
 	}
 })
+
+// Function to calculate projected distance for the monthly challenge
+const calculateProjectedDistance = (totalDistance: number) => {
+	const { progressDays, daysInMonth } = monthlyProgressDetails.value
+	if (progressDays <= 0) return 0
+	return (totalDistance / progressDays) * daysInMonth
+}
 
 // Computed property to find the index where the "Danger Line" should be placed
 const dangerIndex = computed(() => {
