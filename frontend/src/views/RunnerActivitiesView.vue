@@ -101,11 +101,11 @@
 						<!-- Activity Type Icon -->
 						<span
 							class="mt-1 inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-							:class="activity.movingPace <= 9.5 ? 'bg-accent-run' : 'bg-accent-walk'"
+							:class="activity.movingPace <= 9.0 ? 'bg-accent-run' : 'bg-accent-walk'"
 						>
 							<!-- Run or Walk Icon -->
 							<img
-								v-if="activity.movingPace <= 9.5"
+								v-if="activity.movingPace <= 9.0"
 								src="@/assets/running-shoes.svg"
 								alt="Run Icon"
 								class="h-6 w-6 opacity-70 brightness-0 invert filter"
@@ -126,22 +126,14 @@
 							<p class="text-sm text-white/50">
 								{{ formatDate(activity.activityDate) }}
 							</p>
-							<span
-								v-if="
-									(activity.movingPace > 9.5 && activity.type === 'Run') ||
-									(activity.movingPace <= 9.5 && activity.type === 'Walk')
-								"
-								class="text-muted-light hidden text-sm md:inline"
-							>
+							<span class="text-muted-light hidden text-sm md:inline">
 								{{
-									activity.movingPace <= 9.5 &&
-									activity.type === 'Walk' &&
-									'Pace suggests this walk was more of a run.'
-								}}
-								{{
-									activity.movingPace > 9.5 &&
-									activity.type === 'Run' &&
-									'Pace suggests this run was more of a walk.'
+									(activity.movingPace > 9.0 && activity.type === 'Run' ||
+									activity.movingPace <= 9.0 && activity.type === 'Walk')
+										? (activity.movingPace <= 9.0 && activity.type === 'Walk'
+											? 'Pace suggests this walk was more of a run.'
+											: 'Pace suggests this run was more of a walk.')
+										: ''
 								}}
 							</span>
 						</div>
