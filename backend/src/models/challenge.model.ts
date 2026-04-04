@@ -28,14 +28,14 @@ const ChallengeSchema = new Schema<IChallenge>(
 		maxRunPace: {
 			type: Number,
 			required: true,
-			default: 10,
+			default: 9,
 		},
 
 		// Minimum distance (in meters) for a walk to be considered valid.
 		minWalkingDistance: {
 			type: Number,
 			required: true,
-			default: 500,
+			default: 1000,
 			min: 0,
 		},
 
@@ -43,7 +43,7 @@ const ChallengeSchema = new Schema<IChallenge>(
 		minRunningDistance: {
 			type: Number,
 			required: true,
-			default: 500,
+			default: 400,
 			min: 0,
 		},
 	},

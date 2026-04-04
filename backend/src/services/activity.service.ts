@@ -146,18 +146,18 @@ async function addNewActivitiesToDatabase(newActivities: StravaClubActivity[]) {
 
 			// fetch challenge threshold
 			const challenge = await challengeRepository.findChallenge(new Date());
-			const MAX_RUN_PACE = challenge?.maxRunPace ?? 9.5;
-			const MIN_WALKING_DISTANCE = challenge?.minWalkingDistance ?? 100;
-			const MIN_RUNNING_DISTANCE = challenge?.minRunningDistance ?? 100;
+			const MAX_RUN_PACE = challenge?.maxRunPace ?? 9.0;
+			const MIN_WALKING_DISTANCE = challenge?.minWalkingDistance ?? 1000;
+			const MIN_RUNNING_DISTANCE = challenge?.minRunningDistance ?? 400;
 
 			if (pace > MAX_RUN_PACE && stravaActivity.distance < MIN_WALKING_DISTANCE) {
 				isValid = false;
-				note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid walk.`;
+				note = `Activity pace is ${paceString} min/km, which indicates walking. The distance covered is only ${stravaActivity.distance} meters, below the minimum ${MIN_WALKING_DISTANCE} meters required for a valid walk.`;
 			}
 
 			if (pace <= MAX_RUN_PACE && stravaActivity.distance < MIN_RUNNING_DISTANCE) {
 				isValid = false;
-				note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum 500 meters required for a valid run.`;
+				note = `Activity pace is ${paceString} min/km, which indicates running. The distance covered is only ${stravaActivity.distance} meters, below the minimum ${MIN_RUNNING_DISTANCE} meters required for a valid run.`;
 			}
 
 			// Format activity according to database schema

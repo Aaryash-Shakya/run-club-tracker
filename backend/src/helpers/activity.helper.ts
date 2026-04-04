@@ -68,7 +68,7 @@ function calculateUserStatsAndSort(
 			0
 		);
 		const runningDistance = validActivities.reduce((sum, activity) => {
-			if (activity.movingPace < 10) {
+			if (activity.movingPace < 9.0) {
 				return sum + activity.distance;
 			}
 			return sum;
