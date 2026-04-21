@@ -35,39 +35,17 @@ async function findNewActivities(pagesToFetch: number = 1): Promise<StravaClubAc
 			if (activities.length === 0) break;
 		}
 
-		// Fetch recent activities from DB (last 50 for better coverage) - newest first
-		const recentDbActivities = await Activity.find()
-			.sort({ createdAt: -1, _id: -1 })
-			.limit(50)
-			.populate("user", "firstName lastName")
-			.exec();
+		const candidateHashes = stravaActivities.map((a) => generateActivityHash(a));
+		const existingHashes = new Set(
+			await Activity.find({ activityHash: { $in: candidateHashes } }).distinct("activityHash")
+		);
 
 		const newActivities: StravaClubActivity[] = [];
 
 		for (const stravaActivity of stravaActivities) {
 			const hash = generateActivityHash(stravaActivity);
 
-			const matchFound = recentDbActivities.some((dbActivity) => {
-				// 1. Try matching by activityHash (most accurate)
-				if (dbActivity.activityHash === hash) {
-					return true;
-				}
-
-				// 2. Fallback to fuzzy match for legacy activities without hash
-				if (!dbActivity.activityHash) {
-					return (
-						stravaActivity.distance === dbActivity.distance &&
-						stravaActivity.moving_time === dbActivity.movingTime &&
-						stravaActivity.elapsed_time === dbActivity.elapsedTime &&
-						stravaActivity.total_elevation_gain === dbActivity.totalElevationGain
-					);
-				}
-
-				return false;
-			});
-
-			if (!matchFound) {
-				// Record doesn't exist in DB - add to new activities
+			if (!existingHashes.has(hash)) {
 				newActivities.push(stravaActivity);
 				console.log(`🆕 New activity found: "${stravaActivity.name}"`);
 			}
